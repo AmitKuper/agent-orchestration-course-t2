@@ -9,12 +9,12 @@
 - [x] `src/logger.py` — `setup_logger()` with dual console + file handlers
 - [x] `main.py` — CLI entry point, parses config, stubs orchestrator call
 
-## Phase 2 — Infrastructure Layer
-- [ ] `src/state.py` — `ConversationState`: `append_turn()`, `load_from_file()`, `is_complete()`, `needs_resume()`
-- [ ] `src/output.py` — `OutputManager`: `create_run_folder()`, `result_path()`, path properties
-- [ ] `src/watchdog.py` — `Watchdog`: `start()`, `cancel()`, context manager
-- [ ] `src/validator.py` — `ResponseValidator`: `validate()`, `ValidationResult` dataclass
-- [ ] `src/cost.py` — `CostTracker`: `record_call()`, `get_run_summary()`, `append_to_cost_md()`
+## Phase 2 — Infrastructure Layer ✅ Complete
+- [x] `src/state.py` — `ConversationState`: `append_turn()`, `load_from_file()`, `is_complete()`, `needs_resume()`
+- [x] `src/output.py` — `OutputManager`: `create_run_folder()`, `result_path()`, path properties
+- [x] `src/watchdog.py` — `Watchdog`: `start()`, `cancel()`, context manager
+- [x] `src/validator.py` — `ResponseValidator`: `validate()`, `ValidationResult` dataclass
+- [x] `src/cost.py` — `CostTracker`: `record_call()`, `get_run_summary()`, `append_to_cost_md()`
 
 ## Phase 3 — Agent & Skill Definitions
 - [ ] `.claude/agents/orchestrate/AGENT.md` — tools: Bash, Agent, Read, Write; skills: validate_topic, validate_stance, validate_json
