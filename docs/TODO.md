@@ -1,13 +1,13 @@
 # TODO: AI Debate Platform
 
-## Phase 1 — Project Scaffold
-- [ ] Create full directory tree (empty `__init__.py` files, placeholder stubs)
-- [ ] `pyproject.toml` — deps: `anthropic`, `python-dotenv`, `pyyaml`, `ruff`, `pytest`, `pytest-cov`
-- [ ] `.env.example` — `ANTHROPIC_API_KEY=`
-- [ ] `src/constants.py` — defaults, timeout values, file name constants
-- [ ] `src/config.py` — `DebateConfig` dataclass, `build_cli_parser()`, `load_config()`, `save_config()`
-- [ ] `src/logger.py` — `setup_logger()` with dual console + file handlers
-- [ ] `main.py` — CLI entry point, parses config, stubs orchestrator call
+## Phase 1 — Project Scaffold ✅ Complete
+- [x] Create full directory tree (empty `__init__.py` files, placeholder stubs)
+- [x] `pyproject.toml` — deps: `anthropic`, `python-dotenv`, `pyyaml`, `ruff`, `pytest`, `pytest-cov`
+- [x] `.env.example` — `ANTHROPIC_API_KEY=`
+- [x] `src/constants.py` — defaults, timeout values, file name constants
+- [x] `src/config.py` — `DebateConfig` dataclass, `build_cli_parser()`, `load_config()`, `save_config()`
+- [x] `src/logger.py` — `setup_logger()` with dual console + file handlers
+- [x] `main.py` — CLI entry point, parses config, stubs orchestrator call
 
 ## Phase 2 — Infrastructure Layer
 - [ ] `src/state.py` — `ConversationState`: `append_turn()`, `load_from_file()`, `is_complete()`, `needs_resume()`
