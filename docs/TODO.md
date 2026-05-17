@@ -16,13 +16,13 @@
 - [x] `src/validator.py` — `ResponseValidator`: `validate()`, `ValidationResult` dataclass
 - [x] `src/cost.py` — `CostTracker`: `record_call()`, `get_run_summary()`, `append_to_cost_md()`
 
-## Phase 3 — Agent & Skill Definitions
-- [ ] `.claude/agents/orchestrate/AGENT.md` — tools: Bash, Agent, Read, Write; skills: validate_topic, validate_stance, validate_json
-- [ ] `.claude/agents/debate/AGENT.md` — tools: WebSearch; skills: web_search; outputs JSONL line
-- [ ] `.claude/agents/judge/AGENT.md` — tools: WebSearch; skills: judgment, validate_json, web_search; outputs JSON object
-- [ ] `.claude/skills/validate_json/SKILL.md` — Python json.load check; input/output JSON
-- [ ] `.claude/skills/validate_topic/SKILL.md` — inline LLM call; extracts two opposing positions
-- [ ] `.claude/skills/validate_stance/SKILL.md` — inline LLM call; checks argument supports assigned claim
+## Phase 3 — Agent & Skill Definitions 🚧 In Progress
+- [x] `.claude/agents/debate-orchestrator.md` — tools: Bash, Read, Write; skills: validate_topic, validate_stance, validate_json
+- [ ] `.claude/agents/debate.md` — tools: WebSearch; skills: web_search; outputs JSONL line
+- [ ] `.claude/agents/judge.md` — tools: WebSearch; skills: judgment, validate_json, web_search; outputs JSON object
+- [x] `.claude/skills/validate_json/SKILL.md` — Python json.load check; input/output JSON
+- [x] `.claude/skills/validate_topic/SKILL.md` — inline LLM call; extracts two opposing positions
+- [x] `.claude/skills/validate_stance/SKILL.md` — inline LLM call; checks argument supports assigned claim
 - [ ] `.claude/skills/judgment/SKILL.md` — reads JSONL, invokes judge agent, saves verdict; user-invocable via `/judgment`
 - [ ] `.claude/skills/web_search/SKILL.md` — WebSearch tool wrapper; returns results with references
 
