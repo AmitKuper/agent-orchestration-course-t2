@@ -16,20 +16,20 @@
 - [x] `src/validator.py` — `ResponseValidator`: `validate()`, `ValidationResult` dataclass
 - [x] `src/cost.py` — `CostTracker`: `record_call()`, `get_run_summary()`, `append_to_cost_md()`
 
-## Phase 3 — Agent & Skill Definitions 🚧 In Progress
+## Phase 3 — Agent & Skill Definitions ✅ Complete
 - [x] `.claude/agents/debate-orchestrator.md` — tools: Bash, Read, Write; skills: validate_topic, validate_stance, validate_json
-- [ ] `.claude/agents/debate.md` — tools: WebSearch; skills: web_search; outputs JSONL line
-- [ ] `.claude/agents/judge.md` — tools: WebSearch; skills: judgment, validate_json, web_search; outputs JSON object
+- [x] `.claude/agents/debate-agent.md` — tools: WebSearch; skills: web_search; outputs JSONL line
+- [x] `.claude/agents/debate-judge.md` — tools: WebSearch, Bash, Read; skills: judgment, validate_json, web_search; outputs JSON object
 - [x] `.claude/skills/validate_json/SKILL.md` — Python json.load check; input/output JSON
 - [x] `.claude/skills/validate_topic/SKILL.md` — inline LLM call; extracts two opposing positions
 - [x] `.claude/skills/validate_stance/SKILL.md` — inline LLM call; checks argument supports assigned claim
-- [ ] `.claude/skills/judgment/SKILL.md` — reads JSONL, invokes judge agent, saves verdict; user-invocable via `/judgment`
-- [ ] `.claude/skills/web_search/SKILL.md` — WebSearch tool wrapper; returns results with references
+- [x] `.claude/skills/judgment/SKILL.md` — reads JSONL, invokes judge agent, saves verdict; user-invocable via `/judgment`
+- [x] `.claude/skills/web_search/SKILL.md` — WebSearch tool wrapper; returns results with references
+- [x] `src/agents/base.py` — `BaseAgent` ABC: `invoke_with_retry()`, `_invoke()`, `_build_retry_prompt()`
+- [x] `src/agents/debate.py` — `DebateAgent`: `build_prompt()`, `_format_history()`, `_invoke()`
+- [x] `src/agents/judge.py` — `JudgeAgent`: `build_scoring_prompt()`, `parse_verdict()`, `_invoke()`
 
 ## Phase 4 — Orchestrator & Debate Flow
-- [ ] `src/agents/base.py` — `BaseAgent` ABC: `invoke_with_retry()`, `_invoke()`, `_build_retry_prompt()`
-- [ ] `src/agents/debate.py` — `DebateAgent`: `_build_prompt()`, `_format_history()`, `_invoke()`
-- [ ] `src/agents/judge.py` — `JudgeAgent`: `_build_scoring_prompt()`, `_parse_verdict()`, `_invoke()`
 - [ ] `orchestrator.py` — `DebateOrchestrator`: `validate_topic()`, `initialize_agents()`, `run_turn()`, `run_debate()`, `resume_debate()`
 - [ ] `InvalidTopicError` — raised when topic cannot be split into two opposing sides
 
