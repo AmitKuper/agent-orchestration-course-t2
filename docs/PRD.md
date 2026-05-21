@@ -94,13 +94,18 @@ Every agent response must be validated by the orchestrator before being accepted
 
 ---
 
+## History & State
+
+- Each debater agent has a memory file (`.claude/agent-memory/debate-agent/<name>.md`) that holds the full conversation history
+- The orchestrator clears both memory files at the start of every new debate session
+- After each accepted turn, the orchestrator writes the response to the **opponent's** memory file; each agent writes its own turn to its own memory
+- The JSONL conversation file records all turns for **reporting purposes only** (judge input, cost tracking) — it is not the agents' source of history
+
 ## Resume
 
-- If a debate is interrupted for any reason — crash, error, or user cancellation (e.g. Ctrl+C) — it must be possible to resume it from the point it stopped
-- The user triggers resume via CLI, referencing the previous debate run
-- A turn only counts as complete if the agent fully finished their response. If an agent was mid-response when interrupted, that turn is redone from scratch on resume
-- The conversation JSONL file is the source of truth for resume state — only fully completed turns are written to it
-- On resume, agents must have their context fully reconstructed from the saved conversation so they continue as if uninterrupted
+- If a debate is interrupted, the agents' memory files retain all completed turns
+- On resume the orchestrator does **not** clear memory — agents continue reading from where they left off
+- A turn interrupted mid-response is redone from scratch; the orchestrator does not append incomplete turns to memory
 - A completed debate cannot be resumed
 
 ---

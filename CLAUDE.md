@@ -26,9 +26,11 @@ Agents communicate strictly through the orchestrator — debaters never call eac
 6. After all turns, orchestrator invokes the Judge
 7. Outputs written to a dedicated folder per run
 
-## State & Resume
+## State & History
 
-The JSONL conversation file is the **single source of truth** for resume state. Only fully completed turns are written to it. On resume (triggered via CLI), agents reconstruct context from this file and continue as if uninterrupted. A turn interrupted mid-response is redone from scratch. Completed debates cannot be resumed.
+Agent memory files are the **live history mechanism** — each debater agent has a memory file (`.claude/agent-memory/debate-agent/<name>.md`) that accumulates the full conversation. The orchestrator clears these at the start of every new debate and writes each accepted turn to the opponent's memory file after validation. The agent itself writes its own turns to its own memory.
+
+The JSONL conversation file is used for **reporting only** (judge input, cost tracking, output). It is not the source of history for the agents during a debate.
 
 ## Validation & Retry
 
