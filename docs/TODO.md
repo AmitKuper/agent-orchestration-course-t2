@@ -42,24 +42,24 @@
 - [x] `docs/cost.md` — initialized with header row
 - [x] Log file flush/close on debate end or crash (atexit in `DebateOrchestrator`)
 
-## Phase 6 — Tests
-- [ ] `tests/unit/test_config.py`
-- [ ] `tests/unit/test_state.py`
-- [ ] `tests/unit/test_validator.py`
-- [ ] `tests/unit/test_watchdog.py`
-- [ ] `tests/unit/test_output.py`
-- [ ] `tests/unit/test_cost.py`
-- [ ] `tests/unit/test_base_agent.py`
-- [ ] `tests/unit/test_debate_agent.py`
-- [ ] `tests/unit/test_judge_agent.py`
-- [ ] `tests/unit/test_orchestrator.py`
-- [ ] `tests/integration/test_full_debate.py`
-- [ ] `tests/integration/test_resume.py`
-- [ ] `tests/integration/test_judge_standalone.py`
-- [ ] Coverage ≥ 85%
+## Phase 6 — Tests ✅ Complete (7f66ebf)
+- [x] `tests/unit/test_config.py`
+- [x] `tests/unit/test_state.py`
+- [x] `tests/unit/test_validator.py`
+- [x] `tests/unit/test_watchdog.py`
+- [x] `tests/unit/test_output.py`
+- [x] `tests/unit/test_cost.py`
+- [x] `tests/unit/test_base_agent.py`
+- [x] `tests/unit/test_debate_agent.py`
+- [x] `tests/unit/test_judge_agent.py`
+- [x] `tests/unit/test_orchestrator.py`
+- [x] `tests/integration/test_full_debate.py`
+- [x] `tests/integration/test_resume.py`
+- [x] `tests/integration/test_judge_standalone.py`
+- [x] Coverage ≥ 85% (96% achieved, 94 tests passing)
 
-## Phase 7 — Polish & Documentation
-- [ ] Zero Ruff violations (`ruff check` + `ruff format`)
-- [ ] All docstrings complete (every class, method, function)
-- [ ] `README.md` — setup, `.env` config, usage examples
-- [ ] Final `docs/TODO.md` update — mark all phases complete with commit hashes
+## Phase 7 — Polish & Documentation ✅ Complete
+- [x] Zero Ruff violations (`ruff check` + `ruff format`)
+- [x] All docstrings complete (every class, method, function)
+- [x] `README.md` — setup, `.env` config, usage examples
+- [x] Final `docs/TODO.md` update — all phases complete

@@ -25,11 +25,21 @@ FILE_RESULT_PREFIX = "result"
 
 # Words that trigger the disrespectful language check
 DISRESPECTFUL_PATTERNS = [
-    "fuck", "shit", "asshole", "bitch", "bastard", "cunt", "prick",
+    "fuck",
+    "shit",
+    "asshole",
+    "bitch",
+    "bastard",
+    "cunt",
+    "prick",
 ]
 
 # Strings that indicate an API error response
 API_ERROR_MARKERS = [
-    "error:", "exception:", "traceback", "rate_limit_error",
-    "overloaded_error", "api_error",
+    "error:",
+    "exception:",
+    "traceback",
+    "rate_limit_error",
+    "overloaded_error",
+    "api_error",
 ]

@@ -51,16 +51,28 @@ def build_cli_parser() -> argparse.ArgumentParser:
     p.add_argument("--turns", type=int, help=f"Total turns (default: {DEFAULT_TURNS})")
     p.add_argument("--model-a", dest="model_a", type=str, help="Model for Agent A")
     p.add_argument("--model-b", dest="model_b", type=str, help="Model for Agent B")
-    p.add_argument("--model-judge", dest="model_judge", type=str, help="Model for Judge")
+    p.add_argument(
+        "--model-judge", dest="model_judge", type=str, help="Model for Judge"
+    )
     p.add_argument("--name-a", dest="name_a", type=str, help="Name for Agent A")
     p.add_argument("--name-b", dest="name_b", type=str, help="Name for Agent B")
-    p.add_argument("--max-retries", dest="max_retries", type=int, help="Max retries per turn")
+    p.add_argument(
+        "--max-retries", dest="max_retries", type=int, help="Max retries per turn"
+    )
     p.add_argument("--min-response-len", dest="min_response_len", type=int)
     p.add_argument("--outdir", type=str, help="Output directory")
-    p.add_argument("--factcheck", action="store_true", default=None, help="Enable factcheck")
-    p.add_argument("--log-level", dest="log_level", choices=["DEBUG", "INFO", "WARNING", "ERROR"])
-    p.add_argument("--resume", action="store_true", default=None, help="Resume interrupted debate")
-    p.add_argument("--config", dest="config_file", type=str, help="Path to YAML config file")
+    p.add_argument(
+        "--factcheck", action="store_true", default=None, help="Enable factcheck"
+    )
+    p.add_argument(
+        "--log-level", dest="log_level", choices=["DEBUG", "INFO", "WARNING", "ERROR"]
+    )
+    p.add_argument(
+        "--resume", action="store_true", default=None, help="Resume interrupted debate"
+    )
+    p.add_argument(
+        "--config", dest="config_file", type=str, help="Path to YAML config file"
+    )
     return p
 
 

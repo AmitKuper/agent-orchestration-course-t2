@@ -46,7 +46,9 @@ class CostTracker:
         self._run_id = run_id
         self._records: list[CallRecord] = []
 
-    def record_call(self, agent_name: str, input_tokens: int, output_tokens: int) -> None:
+    def record_call(
+        self, agent_name: str, input_tokens: int, output_tokens: int
+    ) -> None:
         """Record token counts for one completed agent call.
 
         Args:

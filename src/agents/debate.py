@@ -47,7 +47,9 @@ class DebateAgent(BaseAgent):
         self.opponent_name = opponent_name
         self._client = anthropic.Anthropic()
 
-    def build_prompt(self, history: list[dict], turn_number: int, turns_remaining: int) -> str:
+    def build_prompt(
+        self, history: list[dict], turn_number: int, turns_remaining: int
+    ) -> str:
         """Construct the full turn prompt for this debate agent.
 
         Args:

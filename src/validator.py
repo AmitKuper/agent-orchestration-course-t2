@@ -38,7 +38,9 @@ class ResponseValidator:
         if not response or not response.strip():
             return ValidationResult(False, "Response is empty.")
         if len(response.strip()) < min_len:
-            return ValidationResult(False, f"Response is too short (minimum {min_len} characters).")
+            return ValidationResult(
+                False, f"Response is too short (minimum {min_len} characters)."
+            )
         if self._contains_api_error(response):
             return ValidationResult(False, "Response contains an API error message.")
         if self._contains_disrespectful_language(response):
@@ -68,4 +70,6 @@ class ResponseValidator:
     def _contains_disrespectful_language(self, response: str) -> bool:
         """Return True if the response contains any disrespectful terms."""
         lower = response.lower()
-        return any(re.search(rf"\b{re.escape(p)}\b", lower) for p in DISRESPECTFUL_PATTERNS)
+        return any(
+            re.search(rf"\b{re.escape(p)}\b", lower) for p in DISRESPECTFUL_PATTERNS
+        )
