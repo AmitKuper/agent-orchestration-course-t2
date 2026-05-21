@@ -29,16 +29,18 @@
 - [x] `src/agents/debate.py` — `DebateAgent`: `build_prompt()`, `_format_history()`, `_invoke()`
 - [x] `src/agents/judge.py` — `JudgeAgent`: `build_scoring_prompt()`, `parse_verdict()`, `_invoke()`
 
-## Phase 4 — Orchestrator & Debate Flow
-- [ ] `orchestrator.py` — `DebateOrchestrator`: `validate_topic()`, `initialize_agents()`, `run_turn()`, `run_debate()`, `resume_debate()`
-- [ ] `InvalidTopicError` — raised when topic cannot be split into two opposing sides
+## Phase 4 — Orchestrator & Debate Flow ✅ Complete
+- [x] `src/exceptions.py` — `InvalidTopicError`
+- [x] `src/topic_validator.py` — `validate_topic()` helper via Claude API
+- [x] `orchestrator.py` — `DebateOrchestrator`: `validate_topic()`, `initialize_agents()`, `run_turn()`, `run_debate()`, `resume_debate()`
+- [x] `main.py` — wired to `DebateOrchestrator`, handles new vs resume flow
 
-## Phase 5 — Output & Cost Finalization
-- [ ] `OutputManager.write_config()` — saves resolved config as JSON
-- [ ] `OutputManager.write_result()` — writes verdict to uniquely timestamped result file
-- [ ] `CostTracker.append_to_cost_md()` — appends markdown table row to `docs/cost.md`
-- [ ] `docs/cost.md` — initialize with header row
-- [ ] Log file flush/close on debate end or crash (`atexit` or context manager)
+## Phase 5 — Output & Cost Finalization ✅ Complete
+- [x] `OutputManager.write_config()` — saves resolved config as JSON
+- [x] `OutputManager.write_result()` — writes verdict to uniquely timestamped result file
+- [x] `CostTracker.append_to_cost_md()` — appends markdown table row to `docs/cost.md`
+- [x] `docs/cost.md` — initialized with header row
+- [x] Log file flush/close on debate end or crash (atexit in `DebateOrchestrator`)
 
 ## Phase 6 — Tests
 - [ ] `tests/unit/test_config.py`
