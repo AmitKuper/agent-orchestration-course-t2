@@ -17,7 +17,7 @@ A multi-agent debate platform where two AI agents argue opposing sides of a topi
 
 ## Agents
 
-### Debate Agents (Agent A & Agent B)
+### Debater agents (Agent A & Agent B)
 - The two agents hold **opposite points of view** — Agent A and Agent B are always in direct disagreement
 - The orchestrator extracts the two opposing sides from the topic and assigns one to each agent at initialization — e.g., topic "Messi vs. Ronaldo": Agent A argues *Messi is better*, Agent B argues *Ronaldo is better*
 - Each agent must always defend their assigned position — they cannot agree with, concede to, or validate the other agent's point of view under any circumstance

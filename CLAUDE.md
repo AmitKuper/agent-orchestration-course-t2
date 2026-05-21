@@ -11,7 +11,7 @@ This is an **AI Debate Platform** — a multi-agent pipeline where two Claude ag
 Four distinct agent roles, each implemented as a separate Claude Code skill:
 
 - **Orchestrator** — controls the full debate lifecycle: topic injection, turn sequencing, context assembly, validation, retry logic, and output writing. Never debates; only coordinates.
-- **Debate Agent A / B** — assigned opposing positions at initialization; must always defend their side, never concede. Receive full conversation history on every turn.
+- **Debater agent A / B** — assigned opposing positions at initialization; must always defend their side, never concede. Receive full conversation history on every turn.
 - **Judge** — invoked by the orchestrator after all turns complete. Scores Logic, Evidence, Clarity, and Persuasiveness; optionally checks factual accuracy. No ties allowed.
 
 Agents communicate strictly through the orchestrator — debaters never call each other directly.

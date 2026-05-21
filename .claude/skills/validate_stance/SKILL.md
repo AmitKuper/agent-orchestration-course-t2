@@ -1,6 +1,6 @@
 ---
 name: validate_stance
-description: Checks whether a debate agent's argument actually supports their assigned claim/position. Use after every debate turn to detect off-topic or conceding responses.
+description: Checks whether a debater agent's argument actually supports their assigned claim/position. Use after every debate turn to detect off-topic or conceding responses.
 arguments:
   text: The agent's argument text to evaluate
   claim: The position the agent is supposed to be defending

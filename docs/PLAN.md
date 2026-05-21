@@ -13,11 +13,11 @@ The system has three layers:
 user → /agents → orchestrate agent
                     ├─ validate_topic skill   (once, at start)
                     ├─ Bash → src/ scripts    (config, state, output)
-                    ├─ debate agent           (turn 1, Agent A)
+                    ├─ debater agent          (turn 1, Agent A)
                     │    └─ web_search skill
                     ├─ validate_json skill    (after each turn)
                     ├─ validate_stance skill  (after each turn)
-                    ├─ debate agent           (turn 2, Agent B)
+                    ├─ debater agent          (turn 2, Agent B)
                     │    └─ web_search skill
                     ├─ ... repeat for all turns
                     └─ judge agent            (after final turn)
@@ -42,7 +42,7 @@ user → /judgment  (standalone judge run)
     orchestrate/
       AGENT.md            # Orchestrator — full debate lifecycle, spawns debate & judge
     debate/
-      AGENT.md            # Debate agent — argues assigned position, uses web_search
+      AGENT.md            # Debater agent — argues assigned position, uses web_search
     judge/
       AGENT.md            # Judge agent — scores debate, uses judgment & web_search
   skills/
