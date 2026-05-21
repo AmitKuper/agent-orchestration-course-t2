@@ -66,13 +66,31 @@ class DebateOrchestrator:
         """Construct DebateAgent A, B and JudgeAgent with assigned positions."""
         c = self.config
         self._agent_a = DebateAgent(
-            c.name_a, c.model_a, c, self.state, self.cost_tracker, position_a, c.name_b,
+            c.name_a,
+            c.model_a,
+            c,
+            self.state,
+            self.cost_tracker,
+            position_a,
+            c.name_b,
         )
         self._agent_b = DebateAgent(
-            c.name_b, c.model_b, c, self.state, self.cost_tracker, position_b, c.name_a,
+            c.name_b,
+            c.model_b,
+            c,
+            self.state,
+            self.cost_tracker,
+            position_b,
+            c.name_a,
         )
         self._judge = JudgeAgent(
-            "Judge", c.model_judge, c, self.state, self.cost_tracker, c.name_a, c.name_b,
+            "Judge",
+            c.model_judge,
+            c,
+            self.state,
+            self.cost_tracker,
+            c.name_a,
+            c.name_b,
         )
 
     def run_turn(self, agent: DebateAgent, turn_number: int) -> str:
@@ -82,23 +100,33 @@ class DebateOrchestrator:
             Accepted JSONL response string, or empty string if the turn failed.
         """
         turns_remaining = (self.config.turns // 2) - ((turn_number + 1) // 2)
-        prompt = agent.build_prompt(self.state.get_turns(), turn_number, turns_remaining)
+        prompt = agent.build_prompt(
+            self.state.get_turns(), turn_number, turns_remaining
+        )
         timed_out = [False]
 
         def on_timeout() -> None:
             timed_out[0] = True
-            self._logger.warning("Watchdog: %s timed out on turn %d.", agent.name, turn_number)
+            self._logger.warning(
+                "Watchdog: %s timed out on turn %d.", agent.name, turn_number
+            )
 
         with Watchdog(DEBATER_TIMEOUT, on_timeout):
             response = agent.invoke_with_retry(prompt)
 
         if not response:
-            self._logger.warning("Turn %d skipped — %s failed all retries.", turn_number, agent.name)
+            self._logger.warning(
+                "Turn %d skipped — %s failed all retries.", turn_number, agent.name
+            )
             return ""
         if not self._validator.validate_json(response).valid:
-            self._logger.warning("Turn %d: invalid JSON from %s.", turn_number, agent.name)
+            self._logger.warning(
+                "Turn %d: invalid JSON from %s.", turn_number, agent.name
+            )
             return ""
-        self._logger.info("Turn %d/%d accepted from %s.", turn_number, self.config.turns, agent.name)
+        self._logger.info(
+            "Turn %d/%d accepted from %s.", turn_number, self.config.turns, agent.name
+        )
         return response
 
     def _run_turns(self, start_turn: int) -> None:
@@ -147,7 +175,9 @@ class DebateOrchestrator:
 
         with Watchdog(JUDGE_TIMEOUT, on_timeout):
             response = self._judge.invoke_with_retry(
-                self._judge.build_scoring_prompt(self.state.get_turns(), self.config.factcheck)
+                self._judge.build_scoring_prompt(
+                    self.state.get_turns(), self.config.factcheck
+                )
             )
         if timed_out[0] or not response:
             self._logger.error("Judge failed — state preserved for resume.")
@@ -161,5 +191,8 @@ class DebateOrchestrator:
     def _flush_logs(self) -> None:
         """Flush and close all handlers on the orchestrator logger."""
         for handler in self._logger.handlers:
-            handler.flush()
-            handler.close()
+            try:
+                handler.flush()
+                handler.close()
+            except Exception:  # noqa: BLE001
+                pass
