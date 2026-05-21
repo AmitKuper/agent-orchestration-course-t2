@@ -5,11 +5,11 @@ from __future__ import annotations
 import json
 from typing import TYPE_CHECKING
 
-import anthropic
-
 from src.agents.base import BaseAgent
+from src.constants import MAX_TOKENS_JUDGE
 
 if TYPE_CHECKING:
+    from src.backends import Backend
     from src.config import DebateConfig
     from src.cost import CostTracker
     from src.state import ConversationState
@@ -31,22 +31,24 @@ class JudgeAgent(BaseAgent):
         cost_tracker: CostTracker,
         agent_a_name: str,
         agent_b_name: str,
+        backend: Backend,
     ) -> None:
         """Initialise with the display names of both debaters.
 
         Args:
             name: Display name for this judge instance.
-            model: Claude model ID for API calls.
+            model: Claude model ID passed to the backend.
             config: Fully resolved debate configuration.
             state: Shared conversation state.
             cost_tracker: Token usage recorder.
             agent_a_name: Display name of debater A.
             agent_b_name: Display name of debater B.
+            backend: Invocation backend (ApiBackend or CliBackend).
         """
-        super().__init__(name, model, config, state, cost_tracker)
+        super().__init__(name, model, config, state, cost_tracker, backend)
         self.agent_a_name = agent_a_name
         self.agent_b_name = agent_b_name
-        self._client = anthropic.Anthropic()
+        self._max_tokens = MAX_TOKENS_JUDGE
 
     def build_scoring_prompt(self, history: list[dict], factcheck_enabled: bool) -> str:
         """Build the judge scoring prompt from the full debate transcript.
@@ -93,24 +95,3 @@ class JudgeAgent(BaseAgent):
             return json.loads(response)
         except json.JSONDecodeError as exc:
             raise ValueError(f"Judge returned invalid JSON: {exc}") from exc
-
-    def _invoke(self, prompt: str) -> str:
-        """Call the Claude API for judge scoring and record token usage.
-
-        Args:
-            prompt: Full scoring prompt to send to Claude.
-
-        Returns:
-            Raw string response from the model.
-        """
-        message = self._client.messages.create(
-            model=self.model,
-            max_tokens=4096,
-            messages=[{"role": "user", "content": prompt}],
-        )
-        self.cost_tracker.record_call(
-            self.name,
-            message.usage.input_tokens,
-            message.usage.output_tokens,
-        )
-        return message.content[0].text

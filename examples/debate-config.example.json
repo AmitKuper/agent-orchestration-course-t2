@@ -1,0 +1,22 @@
+{
+  "topic": "Messi is a better footballer than Ronaldo",
+  "turns": 6,
+  "debater_a": {
+    "name": "Alex",
+    "model": "haiku"
+  },
+  "debater_b": {
+    "name": "Jordan",
+    "model": "haiku"
+  },
+  "orchestrator": {
+    "model": "sonnet"
+  },
+  "judge": {
+    "model": "sonnet",
+    "factcheck": false
+  },
+  "max_retries": 2,
+  "min_response_len": 200,
+  "outdir": "outputs/messi-ronaldo"
+}

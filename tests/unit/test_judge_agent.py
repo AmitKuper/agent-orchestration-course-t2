@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock
 
 import pytest
 
@@ -44,20 +44,28 @@ def config(tmp_path: Path) -> DebateConfig:
 
 
 @pytest.fixture
-def agent(config, tmp_path) -> JudgeAgent:
-    """Return a JudgeAgent with a patched Anthropic client."""
+def mock_backend() -> MagicMock:
+    """Return a mock backend whose invoke() returns a valid verdict JSON."""
+    backend = MagicMock()
+    backend.invoke.return_value = json.dumps(_VERDICT)
+    return backend
+
+
+@pytest.fixture
+def agent(config, tmp_path, mock_backend) -> JudgeAgent:
+    """Return a JudgeAgent with a mock backend."""
     state = ConversationState(tmp_path / "conv.jsonl")
     cost = CostTracker("test")
-    with patch("anthropic.Anthropic"):
-        return JudgeAgent(
-            name="Judge",
-            model="claude-test",
-            config=config,
-            state=state,
-            cost_tracker=cost,
-            agent_a_name="AgentA",
-            agent_b_name="AgentB",
-        )
+    return JudgeAgent(
+        name="Judge",
+        model="claude-test",
+        config=config,
+        state=state,
+        cost_tracker=cost,
+        agent_a_name="AgentA",
+        agent_b_name="AgentB",
+        backend=mock_backend,
+    )
 
 
 def test_build_scoring_prompt_contains_agent_names(agent: JudgeAgent):
@@ -99,14 +107,10 @@ def test_parse_verdict_invalid_json_raises(agent: JudgeAgent):
         agent.parse_verdict("{not json}")
 
 
-def test_invoke_records_cost(agent: JudgeAgent):
-    """_invoke records token usage to the cost tracker."""
-    mock_resp = MagicMock()
-    mock_resp.content[0].text = json.dumps(_VERDICT)
-    mock_resp.usage.input_tokens = 500
-    mock_resp.usage.output_tokens = 200
-    agent._client.messages.create.return_value = mock_resp
-
+def test_invoke_delegates_to_backend(agent: JudgeAgent, mock_backend: MagicMock):
+    """_invoke calls backend.invoke with max_tokens=4096 for the judge."""
     agent._invoke("score this debate")
 
-    assert agent.cost_tracker.get_run_summary()["total_input_tokens"] == 500
+    mock_backend.invoke.assert_called_once_with(
+        "Judge", "claude-test", "score this debate", agent.cost_tracker, 4096
+    )

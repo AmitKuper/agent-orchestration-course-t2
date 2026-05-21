@@ -10,6 +10,7 @@ from typing import Optional
 
 from src.agents.debate import DebateAgent
 from src.agents.judge import JudgeAgent
+from src.backends import make_backend
 from src.config import DebateConfig
 from src.constants import DEBATER_TIMEOUT, JUDGE_TIMEOUT
 from src.cost import CostTracker
@@ -65,32 +66,18 @@ class DebateOrchestrator:
     def initialize_agents(self, position_a: str, position_b: str) -> None:
         """Construct DebateAgent A, B and JudgeAgent with assigned positions."""
         c = self.config
+        backend = make_backend(c.backend)
         self._agent_a = DebateAgent(
-            c.name_a,
-            c.model_a,
-            c,
-            self.state,
-            self.cost_tracker,
-            position_a,
-            c.name_b,
+            c.name_a, c.model_a, c, self.state, self.cost_tracker,
+            position_a, c.name_b, backend,
         )
         self._agent_b = DebateAgent(
-            c.name_b,
-            c.model_b,
-            c,
-            self.state,
-            self.cost_tracker,
-            position_b,
-            c.name_a,
+            c.name_b, c.model_b, c, self.state, self.cost_tracker,
+            position_b, c.name_a, backend,
         )
         self._judge = JudgeAgent(
-            "Judge",
-            c.model_judge,
-            c,
-            self.state,
-            self.cost_tracker,
-            c.name_a,
-            c.name_b,
+            "Judge", c.model_judge, c, self.state, self.cost_tracker,
+            c.name_a, c.name_b, backend,
         )
 
     def run_turn(self, agent: DebateAgent, turn_number: int) -> str:

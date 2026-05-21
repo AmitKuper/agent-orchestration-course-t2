@@ -11,6 +11,14 @@ Topics to use for generating example debate conversations.
 - Open-source AI models should be freely available without restrictions
 - Governments should regulate AI development
 
+## Geopolitics & Security
+
+- Will a military strike on Iran eliminate the nuclear threat, or will diplomacy achieve it better?
+
+## Sports
+
+- Who is the better football player: Messi or Ronaldo?
+
 ## Ethics & Society
 
 - Universal Basic Income should be implemented globally

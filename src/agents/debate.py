@@ -1,14 +1,13 @@
-"""Debate agent: prompt builder and Claude API invocation for debate turns."""
+"""Debate agent: prompt builder for debate turns."""
 
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-import anthropic
-
 from src.agents.base import BaseAgent
 
 if TYPE_CHECKING:
+    from src.backends import Backend
     from src.config import DebateConfig
     from src.cost import CostTracker
     from src.state import ConversationState
@@ -18,7 +17,7 @@ class DebateAgent(BaseAgent):
     """Argues an assigned position in a structured debate.
 
     Builds a turn prompt from history, position, and turn metadata,
-    then calls the Claude API and parses the JSONL response.
+    then delegates invocation to the configured backend.
     """
 
     def __init__(
@@ -30,22 +29,23 @@ class DebateAgent(BaseAgent):
         cost_tracker: CostTracker,
         position: str,
         opponent_name: str,
+        backend: Backend,
     ) -> None:
         """Initialise with assigned debate position and opponent identity.
 
         Args:
             name: This agent's display name.
-            model: Claude model ID for API calls.
+            model: Claude model ID passed to the backend.
             config: Fully resolved debate configuration.
             state: Shared conversation state.
             cost_tracker: Token usage recorder.
             position: The side this agent must always defend.
             opponent_name: Display name of the opposing debater.
+            backend: Invocation backend (ApiBackend or CliBackend).
         """
-        super().__init__(name, model, config, state, cost_tracker)
+        super().__init__(name, model, config, state, cost_tracker, backend)
         self.position = position
         self.opponent_name = opponent_name
-        self._client = anthropic.Anthropic()
 
     def build_prompt(
         self, history: list[dict], turn_number: int, turns_remaining: int
@@ -58,7 +58,7 @@ class DebateAgent(BaseAgent):
             turns_remaining: How many turns this agent has left after this one.
 
         Returns:
-            Formatted prompt string ready to send to Claude.
+            Formatted prompt string ready to send to the backend.
         """
         return (
             f"You are {self.name}, debating the position: {self.position}\n"
@@ -89,26 +89,3 @@ class DebateAgent(BaseAgent):
             lines.append(t.get("argument", ""))
             lines.append("")
         return "\n".join(lines)
-
-    def _invoke(self, prompt: str) -> str:
-        """Call the Claude API and return the raw response text.
-
-        Records input/output token usage to the cost tracker after each call.
-
-        Args:
-            prompt: Full prompt to send to Claude.
-
-        Returns:
-            Raw string response from the model.
-        """
-        message = self._client.messages.create(
-            model=self.model,
-            max_tokens=2048,
-            messages=[{"role": "user", "content": prompt}],
-        )
-        self.cost_tracker.record_call(
-            self.name,
-            message.usage.input_tokens,
-            message.usage.output_tokens,
-        )
-        return message.content[0].text

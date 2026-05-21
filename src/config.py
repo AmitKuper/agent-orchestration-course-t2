@@ -11,6 +11,7 @@ from typing import Optional
 import yaml
 
 from src.constants import (
+    DEFAULT_BACKEND,
     DEFAULT_LOG_LEVEL,
     DEFAULT_MODEL,
     DEFAULT_NAME_A,
@@ -40,6 +41,7 @@ class DebateConfig:
     log_level: str = DEFAULT_LOG_LEVEL
     resume: bool = False
     config_file: Optional[str] = None
+    backend: str = DEFAULT_BACKEND
 
 
 def build_cli_parser() -> argparse.ArgumentParser:
@@ -72,6 +74,12 @@ def build_cli_parser() -> argparse.ArgumentParser:
     )
     p.add_argument(
         "--config", dest="config_file", type=str, help="Path to YAML config file"
+    )
+    p.add_argument(
+        "--backend",
+        choices=["api", "cli"],
+        default=None,
+        help="Invocation backend: 'api' (Anthropic SDK) or 'cli' (claude --print)",
     )
     return p
 

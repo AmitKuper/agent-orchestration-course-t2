@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from pathlib import Path
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock
 
 import pytest
 
@@ -32,18 +32,28 @@ def cost() -> CostTracker:
 
 
 @pytest.fixture
-def agent(config, state, cost) -> DebateAgent:
-    """Return a DebateAgent with a patched Anthropic client."""
-    with patch("anthropic.Anthropic"):
-        return DebateAgent(
-            name="AgentA",
-            model="claude-test",
-            config=config,
-            state=state,
-            cost_tracker=cost,
-            position="FOR the motion",
-            opponent_name="AgentB",
-        )
+def mock_backend() -> MagicMock:
+    """Return a mock backend whose invoke() returns a valid JSONL response."""
+    backend = MagicMock()
+    backend.invoke.return_value = (
+        '{"agent":"AgentA","turn":1,"argument":"test argument here","references":[]}'
+    )
+    return backend
+
+
+@pytest.fixture
+def agent(config, state, cost, mock_backend) -> DebateAgent:
+    """Return a DebateAgent with a mock backend."""
+    return DebateAgent(
+        name="AgentA",
+        model="claude-test",
+        config=config,
+        state=state,
+        cost_tracker=cost,
+        position="FOR the motion",
+        opponent_name="AgentB",
+        backend=mock_backend,
+    )
 
 
 def test_build_prompt_contains_position(agent: DebateAgent):
@@ -87,18 +97,11 @@ def test_format_history_includes_arguments(agent: DebateAgent):
     assert "Counter argument." in result
 
 
-def test_invoke_calls_api_and_records_cost(agent: DebateAgent):
-    """_invoke calls the Anthropic API and records token usage."""
-    mock_response = MagicMock()
-    mock_response.content[
-        0
-    ].text = '{"agent":"AgentA","turn":1,"argument":"test","references":[]}'
-    mock_response.usage.input_tokens = 100
-    mock_response.usage.output_tokens = 50
-    agent._client.messages.create.return_value = mock_response
-
+def test_invoke_delegates_to_backend(agent: DebateAgent, mock_backend: MagicMock):
+    """_invoke calls backend.invoke with the correct arguments."""
     result = agent._invoke("some prompt")
 
-    agent._client.messages.create.assert_called_once()
-    assert result == mock_response.content[0].text
-    assert agent.cost_tracker.get_run_summary()["total_input_tokens"] == 100
+    mock_backend.invoke.assert_called_once_with(
+        "AgentA", "claude-test", "some prompt", agent.cost_tracker, 2048
+    )
+    assert result == mock_backend.invoke.return_value

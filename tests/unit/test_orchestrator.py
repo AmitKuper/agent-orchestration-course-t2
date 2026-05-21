@@ -77,7 +77,7 @@ def test_validate_topic_raises_on_invalid(orch):
 
 def test_initialize_agents_sets_agents(orch):
     """initialize_agents creates _agent_a, _agent_b and _judge."""
-    with patch("anthropic.Anthropic"):
+    with patch("orchestrator.make_backend"):
         orch.initialize_agents("FOR", "AGAINST")
     assert orch._agent_a is not None
     assert orch._agent_b is not None
@@ -86,7 +86,7 @@ def test_initialize_agents_sets_agents(orch):
 
 def test_initialize_agents_assigns_positions(orch):
     """Agent A gets position_a, Agent B gets position_b."""
-    with patch("anthropic.Anthropic"):
+    with patch("orchestrator.make_backend"):
         orch.initialize_agents("FOR", "AGAINST")
     assert orch._agent_a.position == "FOR"
     assert orch._agent_b.position == "AGAINST"
@@ -97,23 +97,23 @@ def test_initialize_agents_assigns_positions(orch):
 
 def test_run_turn_returns_response(orch):
     """run_turn returns the agent's JSONL response when it is valid."""
-    with patch("anthropic.Anthropic"):
+    mock_backend = MagicMock()
+    with patch("orchestrator.make_backend", return_value=mock_backend):
         orch.initialize_agents("FOR", "AGAINST")
 
     response = _fake_turn("AgentA", 1)
-    orch._agent_a._client.messages.create.return_value = _mock_api(response)
+    mock_backend.invoke.return_value = response
     result = orch.run_turn(orch._agent_a, 1)
     assert result == response
 
 
 def test_run_turn_returns_empty_on_bad_json(orch):
     """run_turn returns empty string when the agent returns invalid JSON."""
-    with patch("anthropic.Anthropic"):
+    mock_backend = MagicMock()
+    with patch("orchestrator.make_backend", return_value=mock_backend):
         orch.initialize_agents("FOR", "AGAINST")
 
-    orch._agent_a._client.messages.create.return_value = _mock_api(
-        "not json at all here!"
-    )
+    mock_backend.invoke.return_value = "not json at all here!"
     result = orch.run_turn(orch._agent_a, 1)
     assert result == ""
 
@@ -123,7 +123,7 @@ def test_run_turn_returns_empty_on_bad_json(orch):
 
 def test_run_turns_alternates_ab(orch):
     """_run_turns assigns even turns to B and odd turns to A."""
-    with patch("anthropic.Anthropic"):
+    with patch("orchestrator.make_backend"):
         orch.initialize_agents("FOR", "AGAINST")
 
     calls = []
