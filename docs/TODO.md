@@ -58,7 +58,7 @@
 - [x] `tests/integration/test_judge_standalone.py`
 - [x] Coverage ≥ 85% (96% achieved, 94 tests passing)
 
-## Phase 7 — Polish & Documentation ✅ Complete
+## Phase 7 — Polish & Documentation ✅ Complete (9e64ff3)
 - [x] Zero Ruff violations (`ruff check` + `ruff format`)
 - [x] All docstrings complete (every class, method, function)
 - [x] `README.md` — setup, `.env` config, usage examples
