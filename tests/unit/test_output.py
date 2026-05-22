@@ -47,11 +47,11 @@ def test_log_path(manager: OutputManager):
     assert manager.log_path == manager.folder / FILE_LOG
 
 
-def test_result_path_unique(manager: OutputManager):
-    """Two successive result_path() calls return different paths."""
+def test_result_path_fixed(manager: OutputManager):
+    """result_path() always returns the same fixed path (folder has the timestamp)."""
     p1 = manager.result_path()
     p2 = manager.result_path()
-    assert p1 != p2
+    assert p1 == p2
 
 
 def test_result_path_prefix(manager: OutputManager):
@@ -75,10 +75,9 @@ def test_write_result_creates_file(manager: OutputManager):
     assert json.loads(path.read_text())["winner"] == "A"
 
 
-def test_write_result_does_not_overwrite(manager: OutputManager):
-    """Two write_result calls produce two separate files."""
-    v = {"winner": "A", "scores": {}, "explanation": ""}
-    p1 = manager.write_result(v)
-    p2 = manager.write_result(v)
-    assert p1 != p2
-    assert p1.exists() and p2.exists()
+def test_write_result_overwrites(manager: OutputManager):
+    """Two write_result calls write to the same file (latest verdict wins)."""
+    p1 = manager.write_result({"winner": "A", "scores": {}, "explanation": ""})
+    p2 = manager.write_result({"winner": "B", "scores": {}, "explanation": ""})
+    assert p1 == p2
+    assert json.loads(p1.read_text())["winner"] == "B"

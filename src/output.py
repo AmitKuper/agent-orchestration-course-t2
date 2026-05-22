@@ -62,9 +62,8 @@ class OutputManager:
         return self._folder / FILE_LOG
 
     def result_path(self) -> Path:
-        """Return a unique timestamped path for a judge result file."""
-        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S_%f")
-        return self._folder / f"{FILE_RESULT_PREFIX}_{timestamp}.json"
+        """Return the result file path (fixed name — folder already has the timestamp)."""
+        return self._folder / f"{FILE_RESULT_PREFIX}.json"
 
     def write_config(self, config_dict: dict) -> None:
         """Serialize and write a config dict as JSON to the config file."""

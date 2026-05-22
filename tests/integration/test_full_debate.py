@@ -133,7 +133,7 @@ def test_full_debate_writes_result_file(setup, tmp_path):
 
         orch.run_debate()
 
-    result_files = list(output.folder.glob("result_*.json"))
+    result_files = list(output.folder.glob("result.json"))
     assert len(result_files) == 1
     verdict = json.loads(result_files[0].read_text())
     assert verdict["winner"] == "Agent A"
