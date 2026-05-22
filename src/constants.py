@@ -8,6 +8,7 @@ DEFAULT_NAME_B = "Agent B"
 DEFAULT_OUTDIR = "outputs"
 DEFAULT_LOG_LEVEL = "INFO"
 DEFAULT_BACKEND = "api"
+DEFAULT_TEMPERATURE: float | None = None  # None = model default
 
 # Token limits per agent type
 MAX_TOKENS_DEBATE = 2048

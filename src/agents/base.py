@@ -107,7 +107,8 @@ class BaseAgent(ABC):
                 f"{type(self).__name__} must either provide a backend or override _invoke()."
             )
         return self._backend.invoke(
-            self.name, self.model, prompt, self.cost_tracker, self._max_tokens
+            self.name, self.model, prompt, self.cost_tracker, self._max_tokens,
+            self.config.temperature,
         )
 
     def _build_retry_prompt(self, original_prompt: str, violation_reason: str) -> str:

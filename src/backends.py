@@ -34,6 +34,7 @@ class Backend(ABC):
         prompt: str,
         cost_tracker: CostTracker,
         max_tokens: int,
+        temperature: float | None = None,
     ) -> str:
         """Send prompt and return raw response text.
 
@@ -43,6 +44,7 @@ class Backend(ABC):
             prompt: Full prompt string to send.
             cost_tracker: Records token usage after the call.
             max_tokens: Maximum tokens allowed in the response.
+            temperature: Sampling temperature; None = model default.
 
         Returns:
             Raw response string from the model.
@@ -56,13 +58,12 @@ class ApiBackend(Backend):
         """Initialise the Anthropic SDK client."""
         self._client = anthropic.Anthropic()
 
-    def invoke(self, name, model, prompt, cost_tracker, max_tokens) -> str:
+    def invoke(self, name, model, prompt, cost_tracker, max_tokens, temperature=None) -> str:
         """Call the Anthropic API and record token usage."""
-        message = self._client.messages.create(
-            model=model,
-            max_tokens=max_tokens,
-            messages=[{"role": "user", "content": prompt}],
-        )
+        kwargs = {"model": model, "max_tokens": max_tokens, "messages": [{"role": "user", "content": prompt}]}
+        if temperature is not None:
+            kwargs["temperature"] = temperature
+        message = self._client.messages.create(**kwargs)
         cost_tracker.record_call(name, message.usage.input_tokens, message.usage.output_tokens)
         return message.content[0].text
 
@@ -75,7 +76,7 @@ class CliBackend(Backend):
     Token counts are unavailable; records zeros to the cost tracker.
     """
 
-    def invoke(self, name, model, prompt, cost_tracker, max_tokens) -> str:
+    def invoke(self, name, model, prompt, cost_tracker, max_tokens, temperature=None) -> str:
         """Run `claude --print` with prompt on stdin and return stdout."""
         result = subprocess.run(
             ["claude", "--print", "--dangerously-skip-permissions"],
@@ -110,13 +111,16 @@ class OllamaBackend(Backend):
             ) from exc
         self._base_url = os.getenv("OLLAMA_BASE_URL", _OLLAMA_DEFAULT_URL).rstrip("/")
 
-    def invoke(self, name, model, prompt, cost_tracker, max_tokens) -> str:
+    def invoke(self, name, model, prompt, cost_tracker, max_tokens, temperature=None) -> str:
         """POST to Ollama's /v1/chat/completions and return the response text."""
+        options: dict = {"num_predict": max_tokens}
+        if temperature is not None:
+            options["temperature"] = temperature
         payload = {
             "model": model,
             "messages": [{"role": "user", "content": prompt}],
             "stream": False,
-            "options": {"num_predict": max_tokens},
+            "options": options,
         }
         response = self._requests.post(
             f"{self._base_url}/v1/chat/completions",

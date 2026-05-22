@@ -17,6 +17,7 @@ from src.constants import (
     DEFAULT_NAME_A,
     DEFAULT_NAME_B,
     DEFAULT_OUTDIR,
+    DEFAULT_TEMPERATURE,
     DEFAULT_TURNS,
     MAX_RETRIES,
     MIN_RESPONSE_LEN,
@@ -42,6 +43,7 @@ class DebateConfig:
     resume: bool = False
     config_file: Optional[str] = None
     backend: str = DEFAULT_BACKEND
+    temperature: Optional[float] = DEFAULT_TEMPERATURE
 
 
 def build_cli_parser() -> argparse.ArgumentParser:
@@ -80,6 +82,12 @@ def build_cli_parser() -> argparse.ArgumentParser:
         choices=["api", "cli", "ollama"],
         default=None,
         help="Invocation backend: 'api' (Anthropic SDK), 'cli' (claude --print), or 'ollama'",
+    )
+    p.add_argument(
+        "--temperature",
+        type=float,
+        default=None,
+        help="Sampling temperature (0.0–1.0). Supported by api and ollama backends.",
     )
     return p
 
