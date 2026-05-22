@@ -20,16 +20,17 @@ def manager(tmp_path: Path) -> OutputManager:
 
 
 def test_create_run_folder_creates_directory(tmp_path: Path):
-    """create_run_folder creates a subdirectory inside outdir."""
-    om = OutputManager.create_run_folder(str(tmp_path), "test topic")
+    """create_run_folder creates a timestamped subdirectory inside outdir."""
+    om = OutputManager.create_run_folder(str(tmp_path))
     assert om.folder.exists()
     assert om.folder.is_dir()
 
 
-def test_create_run_folder_slug_in_name(tmp_path: Path):
-    """Folder name includes a slug derived from the topic."""
-    om = OutputManager.create_run_folder(str(tmp_path), "Messi vs Ronaldo")
-    assert "messi" in om.folder.name.lower()
+def test_create_run_folder_timestamp_in_name(tmp_path: Path):
+    """Folder name is a timestamp (YYYYMMDD_HHMMSS format)."""
+    om = OutputManager.create_run_folder(str(tmp_path))
+    import re
+    assert re.match(r"\d{8}_\d{6}", om.folder.name)
 
 
 def test_config_path(manager: OutputManager):

@@ -25,19 +25,20 @@ class OutputManager:
         self._folder = run_folder
 
     @classmethod
-    def create_run_folder(cls, outdir: str, topic: str) -> OutputManager:
+    def create_run_folder(cls, outdir: str) -> OutputManager:
         """Create a timestamped output folder for a new debate run.
 
+        The caller is responsible for encoding the topic in outdir
+        (e.g. "outputs/messi-ronaldo"). The run subfolder is date only.
+
         Args:
-            outdir: Base output directory from config.
-            topic: Debate topic, used to name the folder for readability.
+            outdir: Base output directory (already includes topic path).
 
         Returns:
             OutputManager bound to the newly created folder.
         """
-        slug = topic[:40].lower().replace(" ", "_").replace("/", "-").replace(":", "").replace("?", "").replace("\\", "-")
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        folder = Path(outdir) / f"{timestamp}_{slug}"
+        folder = Path(outdir) / timestamp
         folder.mkdir(parents=True, exist_ok=True)
         return cls(folder)
 
@@ -66,8 +67,46 @@ class OutputManager:
         return self._folder / f"{FILE_RESULT_PREFIX}.json"
 
     def write_config(self, config_dict: dict) -> None:
-        """Serialize and write a config dict as JSON to the config file."""
-        self.config_path.write_text(json.dumps(config_dict, indent=2), encoding="utf-8")
+        """Serialize config as nested JSON (matching debate-config.example.json format)."""
+        nested = {
+            "topic": config_dict.get("topic"),
+            "turns": config_dict.get("turns"),
+            "debater_a": {
+                "name": config_dict.get("name_a"),
+                "model": config_dict.get("model_a"),
+            },
+            "debater_b": {
+                "name": config_dict.get("name_b"),
+                "model": config_dict.get("model_b"),
+            },
+            "judge": {
+                "model": config_dict.get("model_judge"),
+                "factcheck": config_dict.get("factcheck"),
+            },
+            "max_retries": config_dict.get("max_retries"),
+            "min_response_len": config_dict.get("min_response_len"),
+            "outdir": config_dict.get("outdir"),
+            "backend": config_dict.get("backend"),
+            "temperature": config_dict.get("temperature"),
+            "log_level": config_dict.get("log_level"),
+        }
+        self.config_path.write_text(json.dumps(nested, indent=2), encoding="utf-8")
+
+    def write_run_info(self, backend: str, argv: list[str]) -> None:
+        """Write run metadata (backend, full command) to run_info.json.
+
+        Args:
+            backend: Backend type string used for this run.
+            argv: sys.argv captured at startup.
+        """
+        info = {
+            "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            "backend": backend,
+            "command": " ".join(argv),
+            "argv": argv,
+        }
+        path = self._folder / "run_info.json"
+        path.write_text(json.dumps(info, indent=2), encoding="utf-8")
 
     def write_result(self, verdict: dict) -> Path:
         """Write a judge verdict to a unique timestamped result file.

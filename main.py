@@ -32,7 +32,8 @@ def main() -> None:
         output_manager = OutputManager(folder)
         state = ConversationState.load_from_file(folder / FILE_CONVERSATION)
     else:
-        output_manager = OutputManager.create_run_folder(config.outdir, config.topic)
+        output_manager = OutputManager.create_run_folder(config.outdir)
+        output_manager.write_run_info(config.backend, sys.argv)
         state = ConversationState(output_manager.conversation_path)
 
     cost_tracker = CostTracker(output_manager.folder.name)
