@@ -77,9 +77,9 @@ def build_cli_parser() -> argparse.ArgumentParser:
     )
     p.add_argument(
         "--backend",
-        choices=["api", "cli"],
+        choices=["api", "cli", "ollama"],
         default=None,
-        help="Invocation backend: 'api' (Anthropic SDK) or 'cli' (claude --print)",
+        help="Invocation backend: 'api' (Anthropic SDK), 'cli' (claude --print), or 'ollama'",
     )
     return p
 

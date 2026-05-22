@@ -1,11 +1,16 @@
 """API and CLI backends for agent invocations.
 
-ApiBackend calls the Anthropic SDK directly (requires ANTHROPIC_API_KEY).
-CliBackend shells out to `claude --print` using the Pro OAuth subscription.
+ApiBackend  — Anthropic SDK directly (requires ANTHROPIC_API_KEY).
+CliBackend  — shells out to `claude --print` via Pro OAuth.
+OllamaBackend — calls Ollama's OpenAI-compatible endpoint directly
+                (requires `requests`; install with `pip install requests`).
+                Set OLLAMA_BASE_URL env var to override the default
+                http://localhost:11434.
 """
 
 from __future__ import annotations
 
+import os
 import subprocess
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
@@ -14,6 +19,8 @@ import anthropic
 
 if TYPE_CHECKING:
     from src.cost import CostTracker
+
+_OLLAMA_DEFAULT_URL = "http://localhost:11434"
 
 
 class Backend(ABC):
@@ -32,7 +39,7 @@ class Backend(ABC):
 
         Args:
             name: Agent display name (for cost tracking).
-            model: Model identifier (used by ApiBackend; ignored by CliBackend).
+            model: Model identifier (used by ApiBackend and OllamaBackend).
             prompt: Full prompt string to send.
             cost_tracker: Records token usage after the call.
             max_tokens: Maximum tokens allowed in the response.
@@ -63,6 +70,8 @@ class ApiBackend(Backend):
 class CliBackend(Backend):
     """Shells out to `claude --print` — uses Pro OAuth, no API key required.
 
+    If `ollama launch claude` has been run beforehand, this backend will
+    route through Ollama automatically via the Claude Code integration.
     Token counts are unavailable; records zeros to the cost tracker.
     """
 
@@ -81,11 +90,55 @@ class CliBackend(Backend):
         return result.stdout.strip()
 
 
+class OllamaBackend(Backend):
+    """Calls Ollama's OpenAI-compatible REST API directly.
+
+    Uses the model name passed per-call (e.g. "llama3.2"), so set
+    --model-a / --model-b / --model-judge to your Ollama model names.
+    Base URL is read from OLLAMA_BASE_URL (default http://localhost:11434).
+    Requires: pip install requests
+    """
+
+    def __init__(self) -> None:
+        """Import requests and resolve the Ollama base URL."""
+        try:
+            import requests as _requests
+            self._requests = _requests
+        except ImportError as exc:
+            raise ImportError(
+                "OllamaBackend requires the 'requests' package: pip install requests"
+            ) from exc
+        self._base_url = os.getenv("OLLAMA_BASE_URL", _OLLAMA_DEFAULT_URL).rstrip("/")
+
+    def invoke(self, name, model, prompt, cost_tracker, max_tokens) -> str:
+        """POST to Ollama's /v1/chat/completions and return the response text."""
+        payload = {
+            "model": model,
+            "messages": [{"role": "user", "content": prompt}],
+            "stream": False,
+            "options": {"num_predict": max_tokens},
+        }
+        response = self._requests.post(
+            f"{self._base_url}/v1/chat/completions",
+            json=payload,
+            timeout=120,
+        )
+        response.raise_for_status()
+        data = response.json()
+        usage = data.get("usage", {})
+        cost_tracker.record_call(
+            name,
+            usage.get("prompt_tokens", 0),
+            usage.get("completion_tokens", 0),
+        )
+        return data["choices"][0]["message"]["content"]
+
+
 def make_backend(backend_type: str) -> Backend:
-    """Return an ApiBackend or CliBackend based on the backend_type string.
+    """Instantiate the correct backend from a type string.
 
     Args:
-        backend_type: Either "api" or "cli".
+        backend_type: One of "api", "cli", or "ollama".
 
     Returns:
         Configured backend instance.
@@ -93,8 +146,10 @@ def make_backend(backend_type: str) -> Backend:
     Raises:
         ValueError: If backend_type is not recognised.
     """
-    if backend_type == "cli":
-        return CliBackend()
     if backend_type == "api":
         return ApiBackend()
-    raise ValueError(f"Unknown backend: {backend_type!r}. Choose 'api' or 'cli'.")
+    if backend_type == "cli":
+        return CliBackend()
+    if backend_type == "ollama":
+        return OllamaBackend()
+    raise ValueError(f"Unknown backend: {backend_type!r}. Choose 'api', 'cli', or 'ollama'.")
