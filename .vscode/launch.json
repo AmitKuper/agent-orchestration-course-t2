@@ -29,7 +29,7 @@
       "type": "debugpy",
       "request": "launch",
       "program": "${workspaceFolder}/main.py",
-      "args": ["--config", "examples/configs/ai-jobs.json", "--backend", "ollama", "--model-a", "llama3.2", "--model-b", "llama3.2", "--model-judge", "llama3.2", "--outdir", "outputs/ai-jobs/ollama"]
+      "args": ["--config", "examples/configs/ai-jobs.json", "--backend", "ollama", "--model-a", "Qwen3:14b", "--model-b", "Qwen3:14b", "--model-judge", "Qwen3:14b", "--outdir", "outputs/ai-jobs/ollama"]
     },
 
     // ── Social Media ────────────────────────────────────────────────────────
@@ -59,7 +59,7 @@
       "type": "debugpy",
       "request": "launch",
       "program": "${workspaceFolder}/main.py",
-      "args": ["--config", "examples/configs/social-media.json", "--backend", "ollama", "--model-a", "llama3.2", "--model-b", "llama3.2", "--model-judge", "llama3.2", "--outdir", "outputs/social-media/ollama"]
+      "args": ["--config", "examples/configs/social-media.json", "--backend", "ollama", "--model-a", "Qwen3:14b", "--model-b", "Qwen3:14b", "--model-judge", "Qwen3:14b", "--outdir", "outputs/social-media/ollama"]
     },
 
     // ── Iran Nuclear ────────────────────────────────────────────────────────
@@ -89,7 +89,7 @@
       "type": "debugpy",
       "request": "launch",
       "program": "${workspaceFolder}/main.py",
-      "args": ["--config", "examples/configs/iran-nuclear.json", "--backend", "ollama", "--model-a", "llama3.2", "--model-b", "llama3.2", "--model-judge", "llama3.2", "--outdir", "outputs/iran-nuclear/ollama"]
+      "args": ["--config", "examples/configs/iran-nuclear.json", "--backend", "ollama", "--model-a", "Qwen3:14b", "--model-b", "Qwen3:14b", "--model-judge", "Qwen3:14b", "--outdir", "outputs/iran-nuclear/ollama"]
     },
 
     // ── Messi vs Ronaldo ────────────────────────────────────────────────────
@@ -119,7 +119,7 @@
       "type": "debugpy",
       "request": "launch",
       "program": "${workspaceFolder}/main.py",
-      "args": ["--config", "examples/configs/messi-ronaldo.json", "--backend", "ollama", "--model-a", "llama3.2", "--model-b", "llama3.2", "--model-judge", "llama3.2", "--outdir", "outputs/messi-ronaldo/ollama"]
+      "args": ["--config", "examples/configs/messi-ronaldo.json", "--backend", "ollama", "--model-a", "Qwen3:14b", "--model-b", "Qwen3:14b", "--model-judge", "Qwen3:14b", "--outdir", "outputs/messi-ronaldo/ollama"]
     },
 
     // ── Universal Basic Income ───────────────────────────────────────────────
@@ -149,7 +149,7 @@
       "type": "debugpy",
       "request": "launch",
       "program": "${workspaceFolder}/main.py",
-      "args": ["--config", "examples/configs/ubi.json", "--backend", "ollama", "--model-a", "llama3.2", "--model-b", "llama3.2", "--model-judge", "llama3.2", "--outdir", "outputs/ubi/ollama"]
+      "args": ["--config", "examples/configs/ubi.json", "--backend", "ollama", "--model-a", "Qwen3:14b", "--model-b", "Qwen3:14b", "--model-judge", "Qwen3:14b", "--outdir", "outputs/ubi/ollama"]
     },
 
     // ── Nuclear Energy ──────────────────────────────────────────────────────
@@ -179,7 +179,7 @@
       "type": "debugpy",
       "request": "launch",
       "program": "${workspaceFolder}/main.py",
-      "args": ["--config", "examples/configs/nuclear-energy.json", "--backend", "ollama", "--model-a", "llama3.2", "--model-b", "llama3.2", "--model-judge", "llama3.2", "--outdir", "outputs/nuclear-energy/ollama"]
+      "args": ["--config", "examples/configs/nuclear-energy.json", "--backend", "ollama", "--model-a", "Qwen3:14b", "--model-b", "Qwen3:14b", "--model-judge", "Qwen3:14b", "--outdir", "outputs/nuclear-energy/ollama"]
     }
 
   ]
