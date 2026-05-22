@@ -1,44 +1,55 @@
-"""Validates debate topics and extracts opposing positions via a Claude API call."""
+"""Validates debate topics and extracts opposing positions."""
 
 from __future__ import annotations
 
 import json
 
-import anthropic
-
 from src.exceptions import InvalidTopicError
 
 
-def validate_topic(topic: str, model: str) -> tuple[str, str]:
-    """Ask Claude whether a topic can be split into two opposing debatable sides.
-
-    Makes a single Claude API call to evaluate the topic and extract positions.
+def validate_topic(
+    topic: str, model: str, backend: "Backend | None" = None
+) -> tuple[str, str]:
+    """Ask a model whether a topic can be split into two opposing debatable sides.
 
     Args:
         topic: The raw debate topic string to evaluate.
-        model: Claude model ID to use for the validation call.
+        model: Model ID to use for the validation call.
+        backend: Invocation backend. If None, falls back to the Anthropic SDK.
 
     Returns:
         Tuple of (position_a, position_b) — the two opposing sides.
 
     Raises:
-        InvalidTopicError: If Claude determines the topic is not clearly debatable.
+        InvalidTopicError: If the model determines the topic is not clearly debatable.
     """
-    msg = anthropic.Anthropic().messages.create(
-        model=model,
-        max_tokens=256,
-        messages=[
-            {
-                "role": "user",
-                "content": (
-                    f"Does '{topic}' split into two opposing debatable positions? "
-                    f'JSON only: {{"valid":true,"position_a":"...","position_b":"..."}} '
-                    f'or {{"valid":false,"reason":"..."}}'
-                ),
-            }
-        ],
+    prompt = (
+        f"Does '{topic}' split into two opposing debatable positions? "
+        f'JSON only: {{"valid":true,"position_a":"...","position_b":"..."}} '
+        f'or {{"valid":false,"reason":"..."}}'
     )
-    result = json.loads(msg.content[0].text)
+
+    if backend is not None:
+        from src.cost import CostTracker
+        raw = backend.invoke("validator", model, prompt, CostTracker("validator"), 256)
+    else:
+        import anthropic
+        msg = anthropic.Anthropic().messages.create(
+            model=model,
+            max_tokens=256,
+            messages=[{"role": "user", "content": prompt}],
+        )
+        raw = msg.content[0].text
+
+    # Strip markdown code fences if the model wrapped the JSON
+    text = raw.strip()
+    if text.startswith("```"):
+        text = text.split("```")[1]
+        if text.startswith("json"):
+            text = text[4:]
+        text = text.strip()
+
+    result = json.loads(text)
     if not result.get("valid"):
         raise InvalidTopicError(result.get("reason", "Topic is not debatable."))
     return result["position_a"], result["position_b"]

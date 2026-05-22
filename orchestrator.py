@@ -61,7 +61,8 @@ class DebateOrchestrator:
         Raises:
             InvalidTopicError: If the topic cannot be split into two clear sides.
         """
-        return validate_topic(topic, self.config.model_judge)
+        backend = make_backend(self.config.backend)
+        return validate_topic(topic, self.config.model_judge, backend)
 
     def initialize_agents(self, position_a: str, position_b: str) -> None:
         """Construct DebateAgent A, B and JudgeAgent with assigned positions."""
@@ -104,11 +105,6 @@ class DebateOrchestrator:
         if not response:
             self._logger.warning(
                 "Turn %d skipped — %s failed all retries.", turn_number, agent.name
-            )
-            return ""
-        if not self._validator.validate_json(response).valid:
-            self._logger.warning(
-                "Turn %d: invalid JSON from %s.", turn_number, agent.name
             )
             return ""
         self._logger.info(

@@ -56,18 +56,23 @@ def _make_agent(responses: list[str], config, state, cost) -> _StubAgent:
     )
 
 
+_VALID = '{"agent":"A","turn":1,"argument":"' + "x" * 20 + '","references":[]}'
+_VALID2 = '{"agent":"A","turn":1,"argument":"' + "y" * 20 + '","references":[]}'
+_VALID3 = '{"agent":"A","turn":1,"argument":"' + "z" * 20 + '","references":[]}'
+
+
 def test_returns_on_first_valid_response(config, state, cost):
     """invoke_with_retry returns on the first response that passes validation."""
-    agent = _make_agent(["x" * 20], config, state, cost)
+    agent = _make_agent([_VALID], config, state, cost)
     result = agent.invoke_with_retry("prompt")
-    assert result == "x" * 20
+    assert result == _VALID
 
 
 def test_retries_on_short_response(config, state, cost):
     """A too-short first response triggers a retry; second attempt succeeds."""
-    agent = _make_agent(["hi", "y" * 20], config, state, cost)
+    agent = _make_agent(["hi", _VALID2], config, state, cost)
     result = agent.invoke_with_retry("prompt")
-    assert result == "y" * 20
+    assert result == _VALID2
 
 
 def test_returns_empty_after_max_retries(config, state, cost):
@@ -87,7 +92,6 @@ def test_retry_prompt_contains_violation(config, state, cost):
 
 def test_succeeds_on_last_allowed_attempt(config, state, cost):
     """Succeeds on the max_retries-th attempt (3rd total with max_retries=2)."""
-    long = "z" * 20
-    agent = _make_agent(["x", "x", long], config, state, cost)
+    agent = _make_agent(["x", "x", _VALID3], config, state, cost)
     result = agent.invoke_with_retry("prompt")
-    assert result == long
+    assert result == _VALID3

@@ -121,6 +121,7 @@ class BaseAgent(ABC):
             New prompt string with the violation explanation prepended.
         """
         return (
-            f"Your previous response was rejected: {violation_reason}\n\n"
-            f"Please try again.\n\n{original_prompt}"
+            f"Your previous response was rejected: {violation_reason}\n"
+            f"Output ONLY the raw JSON line — no markdown, no explanation, no code fences.\n\n"
+            f"{original_prompt}"
         )

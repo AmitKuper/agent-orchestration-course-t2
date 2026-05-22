@@ -45,7 +45,7 @@ class ResponseValidator:
             return ValidationResult(False, "Response contains an API error message.")
         if self._contains_disrespectful_language(response):
             return ValidationResult(False, "Response contains disrespectful language.")
-        return ValidationResult(True)
+        return self.validate_json(response)
 
     def validate_json(self, response: str) -> ValidationResult:
         """Verify that response is well-formed JSON using json.loads.

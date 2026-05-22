@@ -121,7 +121,7 @@ class OllamaBackend(Backend):
         response = self._requests.post(
             f"{self._base_url}/v1/chat/completions",
             json=payload,
-            timeout=120,
+            timeout=300,
         )
         response.raise_for_status()
         data = response.json()

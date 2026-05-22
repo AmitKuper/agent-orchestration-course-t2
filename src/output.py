@@ -35,7 +35,7 @@ class OutputManager:
         Returns:
             OutputManager bound to the newly created folder.
         """
-        slug = topic[:40].lower().replace(" ", "_").replace("/", "-")
+        slug = topic[:40].lower().replace(" ", "_").replace("/", "-").replace(":", "").replace("?", "").replace("\\", "-")
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         folder = Path(outdir) / f"{timestamp}_{slug}"
         folder.mkdir(parents=True, exist_ok=True)
