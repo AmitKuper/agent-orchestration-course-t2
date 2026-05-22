@@ -1,0 +1,8 @@
+{
+  "topic": "Will a military strike on Iran eliminate the nuclear threat, or will diplomacy achieve it better?",
+  "turns": 6,
+  "name_a": "Alex",
+  "name_b": "Jordan",
+  "max_retries": 2,
+  "min_response_len": 200
+}

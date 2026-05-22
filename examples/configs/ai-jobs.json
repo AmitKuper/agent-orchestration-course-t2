@@ -1,0 +1,8 @@
+{
+  "topic": "AI will replace most human jobs within 20 years",
+  "turns": 6,
+  "name_a": "Alex",
+  "name_b": "Jordan",
+  "max_retries": 2,
+  "min_response_len": 200
+}

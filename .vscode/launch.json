@@ -1,0 +1,186 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+
+    // ── AI Jobs ─────────────────────────────────────────────────────────────
+    {
+      "name": "AI Jobs [api]",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/main.py",
+      "args": ["--config", "examples/configs/ai-jobs.json", "--backend", "api", "--outdir", "outputs/ai-jobs/api"]
+    },
+    {
+      "name": "AI Jobs [cli]",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/main.py",
+      "args": ["--config", "examples/configs/ai-jobs.json", "--backend", "cli", "--outdir", "outputs/ai-jobs/cli"]
+    },
+    {
+      "name": "AI Jobs [cli + ollama] (run: ollama launch claude)",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/main.py",
+      "args": ["--config", "examples/configs/ai-jobs.json", "--backend", "cli", "--outdir", "outputs/ai-jobs/cli-ollama"]
+    },
+    {
+      "name": "AI Jobs [ollama]",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/main.py",
+      "args": ["--config", "examples/configs/ai-jobs.json", "--backend", "ollama", "--model-a", "llama3.2", "--model-b", "llama3.2", "--model-judge", "llama3.2", "--outdir", "outputs/ai-jobs/ollama"]
+    },
+
+    // ── Social Media ────────────────────────────────────────────────────────
+    {
+      "name": "Social Media [api]",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/main.py",
+      "args": ["--config", "examples/configs/social-media.json", "--backend", "api", "--outdir", "outputs/social-media/api"]
+    },
+    {
+      "name": "Social Media [cli]",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/main.py",
+      "args": ["--config", "examples/configs/social-media.json", "--backend", "cli", "--outdir", "outputs/social-media/cli"]
+    },
+    {
+      "name": "Social Media [cli + ollama] (run: ollama launch claude)",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/main.py",
+      "args": ["--config", "examples/configs/social-media.json", "--backend", "cli", "--outdir", "outputs/social-media/cli-ollama"]
+    },
+    {
+      "name": "Social Media [ollama]",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/main.py",
+      "args": ["--config", "examples/configs/social-media.json", "--backend", "ollama", "--model-a", "llama3.2", "--model-b", "llama3.2", "--model-judge", "llama3.2", "--outdir", "outputs/social-media/ollama"]
+    },
+
+    // ── Iran Nuclear ────────────────────────────────────────────────────────
+    {
+      "name": "Iran Nuclear [api]",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/main.py",
+      "args": ["--config", "examples/configs/iran-nuclear.json", "--backend", "api", "--outdir", "outputs/iran-nuclear/api"]
+    },
+    {
+      "name": "Iran Nuclear [cli]",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/main.py",
+      "args": ["--config", "examples/configs/iran-nuclear.json", "--backend", "cli", "--outdir", "outputs/iran-nuclear/cli"]
+    },
+    {
+      "name": "Iran Nuclear [cli + ollama] (run: ollama launch claude)",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/main.py",
+      "args": ["--config", "examples/configs/iran-nuclear.json", "--backend", "cli", "--outdir", "outputs/iran-nuclear/cli-ollama"]
+    },
+    {
+      "name": "Iran Nuclear [ollama]",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/main.py",
+      "args": ["--config", "examples/configs/iran-nuclear.json", "--backend", "ollama", "--model-a", "llama3.2", "--model-b", "llama3.2", "--model-judge", "llama3.2", "--outdir", "outputs/iran-nuclear/ollama"]
+    },
+
+    // ── Messi vs Ronaldo ────────────────────────────────────────────────────
+    {
+      "name": "Messi vs Ronaldo [api]",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/main.py",
+      "args": ["--config", "examples/configs/messi-ronaldo.json", "--backend", "api", "--outdir", "outputs/messi-ronaldo/api"]
+    },
+    {
+      "name": "Messi vs Ronaldo [cli]",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/main.py",
+      "args": ["--config", "examples/configs/messi-ronaldo.json", "--backend", "cli", "--outdir", "outputs/messi-ronaldo/cli"]
+    },
+    {
+      "name": "Messi vs Ronaldo [cli + ollama] (run: ollama launch claude)",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/main.py",
+      "args": ["--config", "examples/configs/messi-ronaldo.json", "--backend", "cli", "--outdir", "outputs/messi-ronaldo/cli-ollama"]
+    },
+    {
+      "name": "Messi vs Ronaldo [ollama]",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/main.py",
+      "args": ["--config", "examples/configs/messi-ronaldo.json", "--backend", "ollama", "--model-a", "llama3.2", "--model-b", "llama3.2", "--model-judge", "llama3.2", "--outdir", "outputs/messi-ronaldo/ollama"]
+    },
+
+    // ── Universal Basic Income ───────────────────────────────────────────────
+    {
+      "name": "Universal Basic Income [api]",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/main.py",
+      "args": ["--config", "examples/configs/ubi.json", "--backend", "api", "--outdir", "outputs/ubi/api"]
+    },
+    {
+      "name": "Universal Basic Income [cli]",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/main.py",
+      "args": ["--config", "examples/configs/ubi.json", "--backend", "cli", "--outdir", "outputs/ubi/cli"]
+    },
+    {
+      "name": "Universal Basic Income [cli + ollama] (run: ollama launch claude)",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/main.py",
+      "args": ["--config", "examples/configs/ubi.json", "--backend", "cli", "--outdir", "outputs/ubi/cli-ollama"]
+    },
+    {
+      "name": "Universal Basic Income [ollama]",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/main.py",
+      "args": ["--config", "examples/configs/ubi.json", "--backend", "ollama", "--model-a", "llama3.2", "--model-b", "llama3.2", "--model-judge", "llama3.2", "--outdir", "outputs/ubi/ollama"]
+    },
+
+    // ── Nuclear Energy ──────────────────────────────────────────────────────
+    {
+      "name": "Nuclear Energy [api]",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/main.py",
+      "args": ["--config", "examples/configs/nuclear-energy.json", "--backend", "api", "--outdir", "outputs/nuclear-energy/api"]
+    },
+    {
+      "name": "Nuclear Energy [cli]",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/main.py",
+      "args": ["--config", "examples/configs/nuclear-energy.json", "--backend", "cli", "--outdir", "outputs/nuclear-energy/cli"]
+    },
+    {
+      "name": "Nuclear Energy [cli + ollama] (run: ollama launch claude)",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/main.py",
+      "args": ["--config", "examples/configs/nuclear-energy.json", "--backend", "cli", "--outdir", "outputs/nuclear-energy/cli-ollama"]
+    },
+    {
+      "name": "Nuclear Energy [ollama]",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/main.py",
+      "args": ["--config", "examples/configs/nuclear-energy.json", "--backend", "ollama", "--model-a", "llama3.2", "--model-b", "llama3.2", "--model-judge", "llama3.2", "--outdir", "outputs/nuclear-energy/ollama"]
+    }
+
+  ]
+}
