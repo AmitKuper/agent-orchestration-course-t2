@@ -98,12 +98,35 @@ def _load_yaml(path: str) -> dict:
         return yaml.safe_load(f) or {}
 
 
+def _flatten_nested(raw: dict) -> dict:
+    """Convert nested config format to flat DebateConfig keys.
+
+    Accepts both the nested format (debater_a.name, judge.model, …) and
+    the flat format (name_a, model_judge, …) so either works as input.
+    """
+    out = {k: v for k, v in raw.items() if not isinstance(v, dict)}
+    if "debater_a" in raw:
+        out.setdefault("name_a", raw["debater_a"].get("name"))
+        out.setdefault("model_a", raw["debater_a"].get("model"))
+    if "debater_b" in raw:
+        out.setdefault("name_b", raw["debater_b"].get("name"))
+        out.setdefault("model_b", raw["debater_b"].get("model"))
+    if "judge" in raw:
+        out.setdefault("model_judge", raw["judge"].get("model"))
+        out.setdefault("factcheck", raw["judge"].get("factcheck"))
+    if "orchestrator" in raw:
+        # orchestrator.model is not a separate field — no-op for now
+        pass
+    return {k: v for k, v in out.items() if v is not None}
+
+
 def load_config(args: argparse.Namespace) -> DebateConfig:
-    """Merge YAML config file with CLI overrides and return a DebateConfig.
+    """Merge YAML/JSON config file with CLI overrides and return a DebateConfig.
 
     CLI flags always take precedence. Topic is required from either source.
+    Accepts both nested (debater_a/debater_b/judge) and flat key formats.
     """
-    base: dict = _load_yaml(args.config_file) if args.config_file else {}
+    base: dict = _flatten_nested(_load_yaml(args.config_file)) if args.config_file else {}
     cli = {k: v for k, v in vars(args).items() if v is not None and k != "config_file"}
     merged = {**base, **cli}
 

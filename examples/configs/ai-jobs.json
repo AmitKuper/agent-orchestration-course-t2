@@ -1,8 +1,19 @@
 {
   "topic": "AI will replace most human jobs within 20 years",
-  "turns": 6,
-  "name_a": "Alex",
-  "name_b": "Jordan",
+  "turns": 20,
+  "debater_a": {
+    "name": "Alex",
+    "model": "claude-haiku-4-5-20251001"
+  },
+  "debater_b": {
+    "name": "Jordan",
+    "model": "claude-haiku-4-5-20251001"
+  },
+  "judge": {
+    "model": "claude-sonnet-4-6",
+    "factcheck": false
+  },
   "max_retries": 2,
-  "min_response_len": 200
+  "min_response_len": 200,
+  "outdir": "outputs/ai-jobs"
 }

@@ -112,5 +112,5 @@ def test_invoke_delegates_to_backend(agent: JudgeAgent, mock_backend: MagicMock)
     agent._invoke("score this debate")
 
     mock_backend.invoke.assert_called_once_with(
-        "Judge", "claude-test", "score this debate", agent.cost_tracker, 4096
+        "Judge", "claude-test", "score this debate", agent.cost_tracker, 4096, None
     )

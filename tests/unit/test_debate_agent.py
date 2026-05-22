@@ -102,6 +102,6 @@ def test_invoke_delegates_to_backend(agent: DebateAgent, mock_backend: MagicMock
     result = agent._invoke("some prompt")
 
     mock_backend.invoke.assert_called_once_with(
-        "AgentA", "claude-test", "some prompt", agent.cost_tracker, 2048
+        "AgentA", "claude-test", "some prompt", agent.cost_tracker, 2048, None
     )
     assert result == mock_backend.invoke.return_value
