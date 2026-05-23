@@ -3,11 +3,11 @@
   "turns": 6,
   "debater_a": {
     "name": "Alex",
-    "model": "haiku"
+    "model": "claude-sonnet-4-6"
   },
   "debater_b": {
     "name": "Jordan",
-    "model": "haiku"
+    "model": "claude-sonnet-4-6"
   },
   "orchestrator": {
     "model": "sonnet"
