@@ -9,11 +9,8 @@
     "name": "Jordan",
     "model": "claude-sonnet-4-6"
   },
-  "orchestrator": {
-    "model": "sonnet"
-  },
   "judge": {
-    "model": "sonnet",
+    "model": "claude-sonnet-4-6",
     "factcheck": false
   },
   "max_retries": 2,
