@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from src.agents.base import BaseAgent
+from src.agents.base import BaseAgent, load_agent_def
 
 if TYPE_CHECKING:
     from src.backends import Backend
@@ -43,7 +43,13 @@ class DebateAgent(BaseAgent):
             opponent_name: Display name of the opposing debater.
             backend: Invocation backend (ApiBackend or CliBackend).
         """
-        super().__init__(name, model, config, state, cost_tracker, backend)
+        system = load_agent_def(".claude/agents/debate-agent.md", {
+            "AGENT_NAME": name,
+            "OPPONENT_NAME": opponent_name,
+            "POSITION": position,
+            "MIN_RESPONSE_LEN": str(config.min_response_len),
+        })
+        super().__init__(name, model, config, state, cost_tracker, backend, system or None)
         self.position = position
         self.opponent_name = opponent_name
 

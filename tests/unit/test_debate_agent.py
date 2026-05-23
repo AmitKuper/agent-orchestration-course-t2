@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from pathlib import Path
-from unittest.mock import MagicMock
+from unittest.mock import ANY, MagicMock
 
 import pytest
 
@@ -102,6 +102,6 @@ def test_invoke_delegates_to_backend(agent: DebateAgent, mock_backend: MagicMock
     result = agent._invoke("some prompt")
 
     mock_backend.invoke.assert_called_once_with(
-        "AgentA", "claude-test", "some prompt", agent.cost_tracker, 2048, None
+        "AgentA", "claude-test", "some prompt", agent.cost_tracker, 2048, None, ANY
     )
     assert result == mock_backend.invoke.return_value

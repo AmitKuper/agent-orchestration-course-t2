@@ -5,7 +5,7 @@ from __future__ import annotations
 import json
 from typing import TYPE_CHECKING
 
-from src.agents.base import BaseAgent
+from src.agents.base import BaseAgent, load_agent_def
 from src.constants import MAX_TOKENS_JUDGE
 
 if TYPE_CHECKING:
@@ -45,7 +45,12 @@ class JudgeAgent(BaseAgent):
             agent_b_name: Display name of debater B.
             backend: Invocation backend (ApiBackend or CliBackend).
         """
-        super().__init__(name, model, config, state, cost_tracker, backend)
+        system = load_agent_def(".claude/agents/debate-judge.md", {
+            "AGENT_A_NAME": agent_a_name,
+            "AGENT_B_NAME": agent_b_name,
+            "FACTCHECK_ENABLED": str(config.factcheck).lower(),
+        })
+        super().__init__(name, model, config, state, cost_tracker, backend, system or None)
         self.agent_a_name = agent_a_name
         self.agent_b_name = agent_b_name
         self._max_tokens = MAX_TOKENS_JUDGE

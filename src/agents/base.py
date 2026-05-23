@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import logging
 from abc import ABC
+from pathlib import Path
 from typing import TYPE_CHECKING, Optional
 
 from src.validator import ResponseValidator
@@ -15,6 +16,28 @@ if TYPE_CHECKING:
     from src.state import ConversationState
 
 from src.constants import MAX_TOKENS_DEBATE
+
+
+def load_agent_def(path: str | Path, subs: dict[str, str]) -> str:
+    """Load an agent definition file, strip YAML frontmatter, substitute variables.
+
+    Args:
+        path: Path to the .md agent definition file.
+        subs: Mapping of VARIABLE_NAME → value to replace $VARIABLE_NAME.
+
+    Returns:
+        Rendered system prompt string, or empty string if file not found.
+    """
+    p = Path(path)
+    if not p.exists():
+        return ""
+    text = p.read_text(encoding="utf-8")
+    if text.startswith("---"):
+        end = text.index("---", 3)
+        text = text[end + 3:].lstrip()
+    for key, value in subs.items():
+        text = text.replace(f"${key}", str(value))
+    return text
 
 
 class BaseAgent(ABC):
@@ -36,6 +59,7 @@ class BaseAgent(ABC):
         state: ConversationState,
         cost_tracker: CostTracker,
         backend: Optional[Backend] = None,
+        system_prompt: Optional[str] = None,
     ) -> None:
         """Initialise with shared infrastructure references.
 
@@ -47,6 +71,8 @@ class BaseAgent(ABC):
             cost_tracker: Token usage recorder for cost accounting.
             backend: Invocation backend (ApiBackend or CliBackend). Required
                 unless the subclass overrides _invoke() directly.
+            system_prompt: Optional system prompt injected on every call.
+                Loaded from .claude/agents/ definitions by subclasses.
         """
         self.name = name
         self.model = model
@@ -54,6 +80,7 @@ class BaseAgent(ABC):
         self.state = state
         self.cost_tracker = cost_tracker
         self._backend = backend
+        self._system_prompt = system_prompt or None
         self._max_tokens: int = MAX_TOKENS_DEBATE
         self._validator = ResponseValidator()
         self._logger = logging.getLogger(f"debate.agent.{name}")
@@ -108,7 +135,7 @@ class BaseAgent(ABC):
             )
         return self._backend.invoke(
             self.name, self.model, prompt, self.cost_tracker, self._max_tokens,
-            self.config.temperature,
+            self.config.temperature, self._system_prompt,
         )
 
     def _build_retry_prompt(self, original_prompt: str, violation_reason: str) -> str:

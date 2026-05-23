@@ -35,6 +35,7 @@ class Backend(ABC):
         cost_tracker: CostTracker,
         max_tokens: int,
         temperature: float | None = None,
+        system: str | None = None,
     ) -> str:
         """Send prompt and return raw response text.
 
@@ -45,6 +46,7 @@ class Backend(ABC):
             cost_tracker: Records token usage after the call.
             max_tokens: Maximum tokens allowed in the response.
             temperature: Sampling temperature; None = model default.
+            system: Optional system prompt injected before the user message.
 
         Returns:
             Raw response string from the model.
@@ -58,11 +60,13 @@ class ApiBackend(Backend):
         """Initialise the Anthropic SDK client."""
         self._client = anthropic.Anthropic()
 
-    def invoke(self, name, model, prompt, cost_tracker, max_tokens, temperature=None) -> str:
+    def invoke(self, name, model, prompt, cost_tracker, max_tokens, temperature=None, system=None) -> str:
         """Call the Anthropic API and record token usage."""
         kwargs = {"model": model, "max_tokens": max_tokens, "messages": [{"role": "user", "content": prompt}]}
         if temperature is not None:
             kwargs["temperature"] = temperature
+        if system is not None:
+            kwargs["system"] = system
         message = self._client.messages.create(**kwargs)
         cost_tracker.record_call(name, message.usage.input_tokens, message.usage.output_tokens)
         return message.content[0].text
@@ -76,8 +80,8 @@ class CliBackend(Backend):
     Token counts are unavailable; records zeros to the cost tracker.
     """
 
-    def invoke(self, name, model, prompt, cost_tracker, max_tokens, temperature=None) -> str:
-        """Run `claude --print` with prompt on stdin and return stdout."""
+    def invoke(self, name, model, prompt, cost_tracker, max_tokens, temperature=None, system=None) -> str:
+        """Run `claude --print` with prompt on stdin and return stdout. system is ignored."""
         # Strip CLAUDE*/ANTHROPIC* vars so the subprocess isn't treated as
         # a recursive Claude Code call (CLAUDECODE=1 causes non-zero exit).
         env = {k: v for k, v in os.environ.items()
@@ -116,14 +120,18 @@ class OllamaBackend(Backend):
             ) from exc
         self._base_url = os.getenv("OLLAMA_BASE_URL", _OLLAMA_DEFAULT_URL).rstrip("/")
 
-    def invoke(self, name, model, prompt, cost_tracker, max_tokens, temperature=None) -> str:
+    def invoke(self, name, model, prompt, cost_tracker, max_tokens, temperature=None, system=None) -> str:
         """POST to Ollama's /v1/chat/completions and return the response text."""
         options: dict = {"num_predict": max_tokens}
         if temperature is not None:
             options["temperature"] = temperature
+        messages = []
+        if system is not None:
+            messages.append({"role": "system", "content": system})
+        messages.append({"role": "user", "content": prompt})
         payload = {
             "model": model,
-            "messages": [{"role": "user", "content": prompt}],
+            "messages": messages,
             "stream": False,
             "options": options,
         }

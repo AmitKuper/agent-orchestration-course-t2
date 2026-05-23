@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+from unittest.mock import ANY
 from pathlib import Path
 from unittest.mock import MagicMock
 
@@ -112,5 +113,5 @@ def test_invoke_delegates_to_backend(agent: JudgeAgent, mock_backend: MagicMock)
     agent._invoke("score this debate")
 
     mock_backend.invoke.assert_called_once_with(
-        "Judge", "claude-test", "score this debate", agent.cost_tracker, 4096, None
+        "Judge", "claude-test", "score this debate", agent.cost_tracker, 4096, None, ANY
     )
