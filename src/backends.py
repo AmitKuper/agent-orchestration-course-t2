@@ -78,15 +78,20 @@ class CliBackend(Backend):
 
     def invoke(self, name, model, prompt, cost_tracker, max_tokens, temperature=None) -> str:
         """Run `claude --print` with prompt on stdin and return stdout."""
+        # Strip CLAUDE*/ANTHROPIC* vars so the subprocess isn't treated as
+        # a recursive Claude Code call (CLAUDECODE=1 causes non-zero exit).
+        env = {k: v for k, v in os.environ.items()
+               if not k.startswith("CLAUDE") and not k.startswith("ANTHROPIC")}
         result = subprocess.run(
             ["claude", "--print", "--dangerously-skip-permissions"],
             input=prompt,
             capture_output=True,
             text=True,
             encoding="utf-8",
+            env=env,
         )
         if result.returncode != 0:
-            raise RuntimeError(f"claude CLI failed: {result.stderr[:200]}")
+            raise RuntimeError(f"claude CLI failed (rc={result.returncode}): {result.stderr[:200]}")
         cost_tracker.record_call(name, 0, 0)
         return result.stdout.strip()
 
