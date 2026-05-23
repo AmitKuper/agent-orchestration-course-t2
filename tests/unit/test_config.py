@@ -88,3 +88,39 @@ def test_log_level_choices():
     """Invalid log level is rejected by argparse."""
     with pytest.raises(SystemExit):
         _parse(["--topic", "T", "--log-level", "INVALID"])
+
+
+def test_flatten_nested_with_orchestrator_key():
+    """_flatten_nested ignores unknown 'orchestrator' sub-dict (no-op branch)."""
+    from src.config import _flatten_nested
+
+    raw = {
+        "topic": "T",
+        "orchestrator": {"model": "claude-test"},
+        "debater_a": {"name": "A", "model": "ma"},
+    }
+    result = _flatten_nested(raw)
+    assert result["topic"] == "T"
+    assert result["name_a"] == "A"
+    # orchestrator sub-dict itself must not appear as a key
+    assert "orchestrator" not in result
+
+
+def test_flatten_nested_complete_nested_format():
+    """_flatten_nested converts a fully nested config dict to flat DebateConfig keys."""
+    from src.config import _flatten_nested
+
+    raw = {
+        "topic": "AI debate",
+        "turns": 10,
+        "debater_a": {"name": "Alex", "model": "model-a"},
+        "debater_b": {"name": "Jordan", "model": "model-b"},
+        "judge": {"model": "model-j", "factcheck": True},
+    }
+    result = _flatten_nested(raw)
+    assert result["name_a"] == "Alex"
+    assert result["model_a"] == "model-a"
+    assert result["name_b"] == "Jordan"
+    assert result["model_b"] == "model-b"
+    assert result["model_judge"] == "model-j"
+    assert result["factcheck"] is True

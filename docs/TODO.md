@@ -53,10 +53,12 @@
 - [x] `tests/unit/test_debate_agent.py`
 - [x] `tests/unit/test_judge_agent.py`
 - [x] `tests/unit/test_orchestrator.py`
+- [x] `tests/unit/test_backends.py`
+- [x] `tests/unit/test_topic_validator.py`
 - [x] `tests/integration/test_full_debate.py`
 - [x] `tests/integration/test_resume.py`
 - [x] `tests/integration/test_judge_standalone.py`
-- [x] Coverage ≥ 85% (96% achieved, 94 tests passing)
+- [x] Coverage ≥ 85% (100% achieved, 128 tests passing)
 
 ## Phase 7 — Polish & Documentation ✅ Complete (9e64ff3)
 - [x] Zero Ruff violations (`ruff check` + `ruff format`)

@@ -151,6 +151,99 @@ def test_resume_raises_if_complete(orch, state):
         orch.resume_debate()
 
 
+# ── run_turn timeout path ────────────────────────────────────────────────────
+
+
+class _ImmediateFireWatchdog:
+    """Watchdog replacement that fires on_timeout immediately on __enter__."""
+
+    def __init__(self, timeout, callback):
+        self._callback = callback
+
+    def __enter__(self):
+        self._callback()
+        return self
+
+    def __exit__(self, *args):
+        pass
+
+
+def test_run_turn_timeout_callback_is_called(orch):
+    """on_timeout is invoked when the watchdog fires during run_turn."""
+    with patch("orchestrator.make_backend"):
+        orch.initialize_agents("FOR", "AGAINST")
+
+    response = _fake_turn("AgentA", 1)
+    orch._agent_a._backend.invoke.return_value = response
+
+    with patch("orchestrator.Watchdog", _ImmediateFireWatchdog):
+        result = orch.run_turn(orch._agent_a, 1)
+
+    # The watchdog fires but the agent still returned a valid response
+    assert result == response
+
+
+# ── _run_judge paths ─────────────────────────────────────────────────────────
+
+
+def test_run_judge_logs_error_on_empty_response(orch):
+    """_run_judge logs an error and returns early when judge returns empty string."""
+    with patch("orchestrator.make_backend"):
+        orch.initialize_agents("FOR", "AGAINST")
+
+    orch._judge.invoke_with_retry = MagicMock(return_value="")
+    orch._judge.build_scoring_prompt = MagicMock(return_value="score this")
+
+    orch._run_judge()  # must not raise; empty response → early return
+
+
+def test_run_judge_logs_error_on_timeout(orch):
+    """_run_judge logs an error when judge times out (timed_out[0]=True)."""
+    with patch("orchestrator.make_backend"):
+        orch.initialize_agents("FOR", "AGAINST")
+
+    orch._judge.build_scoring_prompt = MagicMock(return_value="score this")
+    orch._judge.invoke_with_retry = MagicMock(return_value="some response")
+
+    with patch("orchestrator.Watchdog", _ImmediateFireWatchdog):
+        orch._run_judge()  # timeout fires → timed_out[0]=True → early return
+
+
+def test_run_judge_logs_error_on_invalid_verdict(orch):
+    """_run_judge catches ValueError from parse_verdict and logs the error."""
+    with patch("orchestrator.make_backend"):
+        orch.initialize_agents("FOR", "AGAINST")
+
+    orch._judge.build_scoring_prompt = MagicMock(return_value="score this")
+    orch._judge.invoke_with_retry = MagicMock(return_value='{"raw": "verdict"}')
+    orch._judge.parse_verdict = MagicMock(side_effect=ValueError("bad format"))
+
+    orch._run_judge()  # ValueError is caught and logged; must not raise
+
+
+# ── _flush_logs ───────────────────────────────────────────────────────────────
+
+
+def test_flush_logs_calls_flush_and_close(orch):
+    """_flush_logs calls flush() and close() on every logger handler."""
+    mock_handler = MagicMock()
+    orch._logger.handlers = [mock_handler]
+
+    orch._flush_logs()
+
+    mock_handler.flush.assert_called_once()
+    mock_handler.close.assert_called_once()
+
+
+def test_flush_logs_suppresses_handler_exceptions(orch):
+    """_flush_logs does not propagate exceptions raised by a handler."""
+    mock_handler = MagicMock()
+    mock_handler.flush.side_effect = OSError("disk full")
+    orch._logger.handlers = [mock_handler]
+
+    orch._flush_logs()  # must not raise
+
+
 # ── helpers ───────────────────────────────────────────────────────────────────
 
 

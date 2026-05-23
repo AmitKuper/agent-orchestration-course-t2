@@ -95,3 +95,35 @@ def test_succeeds_on_last_allowed_attempt(config, state, cost):
     agent = _make_agent(["x", "x", _VALID3], config, state, cost)
     result = agent.invoke_with_retry("prompt")
     assert result == _VALID3
+
+
+# ── load_agent_def ────────────────────────────────────────────────────────────
+
+
+def test_load_agent_def_missing_file():
+    """load_agent_def returns empty string when the file does not exist."""
+    from src.agents.base import load_agent_def
+
+    result = load_agent_def("/nonexistent/path/agent.md", {})
+    assert result == ""
+
+
+# ── _invoke without backend ───────────────────────────────────────────────────
+
+
+def test_invoke_raises_not_implemented_without_backend(config, state, cost):
+    """BaseAgent._invoke raises NotImplementedError when no backend is provided."""
+
+    class _NoBackendAgent(BaseAgent):
+        pass  # does not override _invoke
+
+    agent = _NoBackendAgent(
+        name="NB",
+        model="m",
+        config=config,
+        state=state,
+        cost_tracker=cost,
+        backend=None,
+    )
+    with pytest.raises(NotImplementedError):
+        agent._invoke("some prompt")

@@ -82,3 +82,15 @@ def test_write_result_overwrites(manager: OutputManager):
     p2 = manager.write_result({"winner": "B", "scores": {}, "explanation": ""})
     assert p1 == p2
     assert json.loads(p1.read_text())["winner"] == "B"
+
+
+def test_write_run_info_creates_file(manager: OutputManager):
+    """write_run_info creates run_info.json with backend and command fields."""
+    manager.write_run_info("api", ["main.py", "--topic", "test"])
+    path = manager.folder / "run_info.json"
+    assert path.exists()
+    data = json.loads(path.read_text())
+    assert data["backend"] == "api"
+    assert "main.py" in data["command"]
+    assert data["argv"] == ["main.py", "--topic", "test"]
+    assert "timestamp" in data

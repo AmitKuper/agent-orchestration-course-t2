@@ -193,3 +193,75 @@ def test_ollama_backend_missing_requests_raises():
     with patch.dict("sys.modules", {"requests": None}):
         with pytest.raises(ImportError, match="requests"):
             OllamaBackend()
+
+
+# ---------------------------------------------------------------------------
+# ApiBackend — temperature and system params
+# ---------------------------------------------------------------------------
+
+
+def test_api_backend_passes_temperature(cost: CostTracker):
+    """ApiBackend.invoke includes temperature in the API call when provided."""
+    mock_message = MagicMock()
+    mock_message.content[0].text = "ok"
+    mock_message.usage.input_tokens = 5
+    mock_message.usage.output_tokens = 5
+
+    with patch("src.backends.anthropic.Anthropic"):
+        backend = ApiBackend()
+        backend._client.messages.create.return_value = mock_message
+        backend.invoke("A", "model", "prompt", cost, 256, temperature=0.7)
+
+    call_kwargs = backend._client.messages.create.call_args.kwargs
+    assert call_kwargs.get("temperature") == 0.7
+
+
+def test_api_backend_passes_system(cost: CostTracker):
+    """ApiBackend.invoke includes system prompt in the API call when provided."""
+    mock_message = MagicMock()
+    mock_message.content[0].text = "ok"
+    mock_message.usage.input_tokens = 5
+    mock_message.usage.output_tokens = 5
+
+    with patch("src.backends.anthropic.Anthropic"):
+        backend = ApiBackend()
+        backend._client.messages.create.return_value = mock_message
+        backend.invoke("A", "model", "prompt", cost, 256, system="You are helpful.")
+
+    call_kwargs = backend._client.messages.create.call_args.kwargs
+    assert call_kwargs.get("system") == "You are helpful."
+
+
+# ---------------------------------------------------------------------------
+# OllamaBackend — temperature and system params
+# ---------------------------------------------------------------------------
+
+
+def test_ollama_backend_passes_temperature(ollama_backend, cost):
+    """OllamaBackend.invoke adds temperature to options when provided."""
+    mock_response = MagicMock()
+    mock_response.json.return_value = {
+        "choices": [{"message": {"content": "ok"}}],
+        "usage": {},
+    }
+    ollama_backend._requests.post.return_value = mock_response
+
+    ollama_backend.invoke("A", "llama3", "prompt", cost, 256, temperature=0.5)
+
+    payload = ollama_backend._requests.post.call_args.kwargs["json"]
+    assert payload["options"]["temperature"] == 0.5
+
+
+def test_ollama_backend_passes_system(ollama_backend, cost):
+    """OllamaBackend.invoke prepends a system message when system is provided."""
+    mock_response = MagicMock()
+    mock_response.json.return_value = {
+        "choices": [{"message": {"content": "ok"}}],
+        "usage": {},
+    }
+    ollama_backend._requests.post.return_value = mock_response
+
+    ollama_backend.invoke("A", "llama3", "prompt", cost, 256, system="Be concise.")
+
+    payload = ollama_backend._requests.post.call_args.kwargs["json"]
+    assert payload["messages"][0] == {"role": "system", "content": "Be concise."}
