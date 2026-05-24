@@ -111,6 +111,66 @@ Qwen3:14b. The judge invocation (single call with full transcript context) added
 
 ---
 
+## API vs CLI Backend Comparison
+
+The same three debates were re-run using `ollama` (HTTP API backend) to isolate the
+effect of how the agent definition reaches the model.
+
+### How the backends differ
+
+| Dimension | `ollama-cli` | `ollama` (HTTP API) |
+|-----------|-------------|---------------------|
+| Agent def delivery | Python writes model into `.claude/agents/*.md` frontmatter; `ollama run` subprocess reads nothing — model gets prompt text only | Python loads `src/agents/loader.py → load_agent_def()` and sends it as `system=` field in the HTTP body |
+| System prompt control | None — no system field in subprocess call | Full — explicit `system=` per request |
+| Token counts | Unavailable | Available via `usage.prompt_tokens` / `usage.completion_tokens` |
+| Auth | None (local) | None (local) |
+
+### Results comparison
+
+| Debate | ollama-cli winner | ollama-api winner | Flipped? |
+|--------|-------------------|-------------------|---------|
+| Iran nuclear | Dove (37–35) | Dove (32–24) | No — same winner, wider margin |
+| AI jobs | Pessimist (35–31) | Optimist (35–32) | **Yes** |
+| Messi vs. Ronaldo | TeamMessi (36–32) | TeamMessi (34–33) | No — same winner, narrower margin |
+
+### Key findings
+
+**1. Reliability: zero retries on API vs ~10–15% on CLI**
+
+All three API runs completed with zero retries and zero skipped turns. The CLI runs had
+4 retries across the iran-nuclear debate and 1 skipped turn. The difference is explained
+by system prompt delivery: with `ollama-cli`, the model receives only the user-turn text,
+so JSON format instructions compete with the task prompt. With the HTTP API backend, the
+format instructions arrive in the dedicated `system` role — the model treats them as
+standing rules rather than suggestions embedded in conversation.
+
+**2. Verdict non-determinism: AI-jobs winner flipped**
+
+The Pessimist won the AI-jobs debate on `ollama-cli` (35–31); the Optimist won the same
+debate on `ollama-api` (35–32) with identical configs and topic text. This is not a backend
+artifact — both runs completed cleanly with no skips. It demonstrates that LLM outputs are
+stochastic: even with the same model and the same topic, debate outcomes can reverse between
+runs. Verdicts should be treated as one sample from a distribution, not a ground truth.
+
+**3. Factcheck quality: structured objects vs. plain strings**
+
+The `ollama-cli` runs produced factcheck flags as plain strings (or no flags at all in
+AI-jobs/Messi-Ronaldo). The `ollama-api` runs consistently produced structured
+`{agent, claim, issue}` objects — the richer format specified in the judge prompt — because
+the system prompt was delivered intact. The API run caught a concrete factual error
+(TeamRonaldo claimed Ronaldo won the 2023 Serie A with Juventus; he had already moved to
+Al Nassr) that the CLI run missed entirely.
+
+**4. Score range: API used wider spread**
+
+`ollama-cli` scores clustered in the 31–37 range (6-point spread). `ollama-api` scores
+spanned 24–35 (11-point spread), with the Hawk receiving a 24 in the iran-nuclear debate —
+the lowest score across all runs. The wider range suggests better discrimination, likely
+because the judge received clearer formatting instructions via the system prompt and felt
+"licensed" to use the full rubric range.
+
+---
+
 ## Conclusions
 
 1. Qwen3:14b is a viable model for this platform but requires ANSI output cleaning and
@@ -127,3 +187,7 @@ Qwen3:14b. The judge invocation (single call with full transcript context) added
 
 4. The retry system performed its core function: one skipped turn in three 20-turn debates
    (~0.3% skip rate) is an acceptable reliability level for a local open-source model.
+
+5. **Prefer the HTTP API backend over CLI for production use.** It delivers the system
+   prompt reliably, eliminates format retries, produces richer factcheck output, and records
+   real token counts — all with no additional cost for local models.
