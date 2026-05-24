@@ -86,7 +86,7 @@ class BaseAgent:
                     current_prompt = self._build_format_retry_prompt(prompt, result.reason)
                 else:
                     current_prompt = self._build_content_retry_prompt(full_prompt, result.reason)
-        self._logger.warning("All retries exhausted for %s — skipping turn.", self.name)
+        self._logger.error("All retries exhausted for %s — skipping turn.", self.name)
         return ""
 
     def _invoke(self, prompt: str) -> str:

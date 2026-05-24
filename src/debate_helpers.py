@@ -45,7 +45,7 @@ def execute_turn(
     with Watchdog(DEBATER_TIMEOUT, on_timeout):
         response = agent.invoke_with_retry(prompt)
     if not response:
-        logger.warning("Turn %d skipped — %s failed all retries.", turn_number, agent.name)
+        logger.error("Turn %d skipped — %s failed all retries.", turn_number, agent.name)
         return ""
     logger.info("Turn %d/%d accepted from %s.", turn_number, total_turns, agent.name)
     return response
