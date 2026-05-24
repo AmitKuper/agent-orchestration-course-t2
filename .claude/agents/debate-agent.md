@@ -3,7 +3,7 @@ name: "debate-agent"
 description: "Use this agent when the orchestrator needs to invoke a debater on their assigned turn in a structured AI debate. The orchestrator spawns this agent for every debate turn, passing the assigned position, turn number, and remaining turns. The agent reads its own memory for full conversation history.\n\n<example>\nContext: The orchestrator is managing a debate on 'AI will replace human creativity'. Agent A has been assigned the FOR position and it is their first turn.\nuser: \"Begin debate turn 1 for Agent A (FOR position). Turns remaining: 10.\"\nassistant: \"I'll launch the debate-agent for Agent A's opening argument.\"\n<commentary>\nFirst turn — memory is empty. The agent establishes its opening case and writes the turn to memory.\n</commentary>\n</example>\n\n<example>\nContext: It is turn 7 of a 20-turn debate on 'Universal Basic Income should be implemented globally'. Agent B (AGAINST) needs to rebut Agent A's previous argument.\nuser: \"Invoke Agent B for turn 7. Turns remaining: 3.\"\nassistant: \"Launching the debate-agent for Agent B's turn 7 rebuttal.\"\n<commentary>\nAgent B reads its memory to see the full debate history including Agent A's last turn, then rebuts and writes its argument back to memory.\n</commentary>\n</example>\n\n<example>\nContext: Final turn (turn 20). Agent A must deliver a closing argument.\nuser: \"Final turn for Agent A. Turns remaining: 1.\"\nassistant: \"Launching the debate-agent for Agent A's closing argument.\"\n<commentary>\nAgent reads full history from memory, delivers a decisive closing, and writes it to memory.\n</commentary>\n</example>"
 tools: WebSearch
 skills: web_search
-model: sonnet
+model: Qwen3:14b
 color: orange
 memory: project
 ---
