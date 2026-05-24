@@ -8,6 +8,8 @@ from typing import TYPE_CHECKING
 from src.agents.base import BaseAgent, load_agent_def
 from src.constants import MAX_TOKENS_JUDGE
 
+_SCORE_KEYS = ("logic", "evidence", "clarity", "persuasiveness")
+
 if TYPE_CHECKING:
     from src.backends import Backend
     from src.config import DebateConfig
@@ -85,18 +87,62 @@ class JudgeAgent(BaseAgent):
         )
 
     def parse_verdict(self, response: str) -> dict:
-        """Extract and return the structured verdict dict from the judge response.
+        """Parse and validate the judge response against the required schema.
+
+        Accepts score keys in any case (e.g. 'Logic' or 'logic') and
+        normalises them to lowercase. Computes 'total' from the four criteria
+        so the model never needs to sum correctly itself.
 
         Args:
-            response: Raw string expected to be a valid JSON object.
+            response: Raw JSON string from the judge backend.
 
         Returns:
-            Parsed verdict dict with winner, scores, and explanation.
+            Validated, normalised verdict dict.
 
         Raises:
-            ValueError: If the response cannot be parsed as valid JSON.
+            ValueError: If JSON is invalid or the schema is not satisfied.
         """
         try:
-            return json.loads(response)
+            data = json.loads(response)
         except json.JSONDecodeError as exc:
             raise ValueError(f"Judge returned invalid JSON: {exc}") from exc
+        return self._validate_verdict(data)
+
+    def _validate_verdict(self, data: dict) -> dict:
+        """Enforce the verdict schema and normalise score keys to lowercase.
+
+        Args:
+            data: Parsed JSON dict from the judge.
+
+        Returns:
+            Normalised verdict dict with computed totals.
+
+        Raises:
+            ValueError: On any missing or incorrectly typed field.
+        """
+        if not isinstance(data.get("winner"), str) or not data["winner"].strip():
+            raise ValueError("'winner' must be a non-empty string.")
+        scores = data.get("scores")
+        if not isinstance(scores, dict):
+            raise ValueError("'scores' must be a dict keyed by agent name.")
+        for agent in (self.agent_a_name, self.agent_b_name):
+            if agent not in scores:
+                raise ValueError(f"'scores' missing entry for '{agent}'.")
+            entry = scores[agent]
+            if not isinstance(entry, dict):
+                raise ValueError(f"scores['{agent}'] must be a dict of criteria.")
+            normed: dict = {}
+            for key in _SCORE_KEYS:
+                val = entry.get(key, entry.get(key.capitalize()))
+                if val is None:
+                    raise ValueError(f"scores['{agent}'] missing '{key}'.")
+                if not isinstance(val, (int, float)) or not 0 <= val <= 10:
+                    raise ValueError(f"scores['{agent}']['{key}'] must be 0–10.")
+                normed[key] = int(val)
+            normed["total"] = sum(normed.values())
+            scores[agent] = normed
+        if not isinstance(data.get("explanation"), str) or not data["explanation"].strip():
+            raise ValueError("'explanation' must be a non-empty string.")
+        data.setdefault("tiebreaker", None)
+        data.setdefault("factcheck_flags", [])
+        return data

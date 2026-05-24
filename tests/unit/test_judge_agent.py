@@ -3,9 +3,8 @@
 from __future__ import annotations
 
 import json
-from unittest.mock import ANY
 from pathlib import Path
-from unittest.mock import MagicMock
+from unittest.mock import ANY, MagicMock
 
 import pytest
 
@@ -106,6 +105,73 @@ def test_parse_verdict_invalid_json_raises(agent: JudgeAgent):
     """parse_verdict raises ValueError on invalid JSON."""
     with pytest.raises(ValueError, match="invalid JSON"):
         agent.parse_verdict("{not json}")
+
+
+def test_parse_verdict_computes_total(agent: JudgeAgent):
+    """parse_verdict recomputes total from the four criteria."""
+    verdict = json.loads(json.dumps(_VERDICT))
+    verdict["scores"]["AgentA"]["total"] = 999  # deliberately wrong
+    result = agent.parse_verdict(json.dumps(verdict))
+    assert result["scores"]["AgentA"]["total"] == 32  # 8+7+9+8
+
+
+def test_parse_verdict_accepts_capitalised_keys(agent: JudgeAgent):
+    """parse_verdict normalises 'Logic' → 'logic' etc."""
+    verdict = {
+        "winner": "AgentA",
+        "scores": {
+            "AgentA": {"Logic": 8, "Evidence": 7, "Clarity": 9, "Persuasiveness": 8},
+            "AgentB": {"Logic": 6, "Evidence": 7, "Clarity": 7, "Persuasiveness": 6},
+        },
+        "tiebreaker": None,
+        "explanation": "A was better.",
+        "factcheck_flags": [],
+    }
+    result = agent.parse_verdict(json.dumps(verdict))
+    assert result["scores"]["AgentA"]["logic"] == 8
+    assert result["scores"]["AgentA"]["total"] == 32
+
+
+def test_parse_verdict_missing_score_key_raises(agent: JudgeAgent):
+    """parse_verdict raises ValueError when a criterion is absent."""
+    verdict = json.loads(json.dumps(_VERDICT))
+    del verdict["scores"]["AgentA"]["logic"]
+    with pytest.raises(ValueError, match="logic"):
+        agent.parse_verdict(json.dumps(verdict))
+
+
+def test_parse_verdict_missing_agent_raises(agent: JudgeAgent):
+    """parse_verdict raises ValueError when an agent entry is absent."""
+    verdict = json.loads(json.dumps(_VERDICT))
+    del verdict["scores"]["AgentB"]
+    with pytest.raises(ValueError, match="AgentB"):
+        agent.parse_verdict(json.dumps(verdict))
+
+
+def test_parse_verdict_score_out_of_range_raises(agent: JudgeAgent):
+    """parse_verdict raises ValueError when a score exceeds 10."""
+    verdict = json.loads(json.dumps(_VERDICT))
+    verdict["scores"]["AgentA"]["logic"] = 11
+    with pytest.raises(ValueError, match="0–10"):
+        agent.parse_verdict(json.dumps(verdict))
+
+
+def test_parse_verdict_missing_winner_raises(agent: JudgeAgent):
+    """parse_verdict raises ValueError when winner is absent."""
+    verdict = json.loads(json.dumps(_VERDICT))
+    del verdict["winner"]
+    with pytest.raises(ValueError, match="winner"):
+        agent.parse_verdict(json.dumps(verdict))
+
+
+def test_parse_verdict_defaults_optional_fields(agent: JudgeAgent):
+    """parse_verdict fills in tiebreaker and factcheck_flags when absent."""
+    verdict = json.loads(json.dumps(_VERDICT))
+    del verdict["tiebreaker"]
+    del verdict["factcheck_flags"]
+    result = agent.parse_verdict(json.dumps(verdict))
+    assert result["tiebreaker"] is None
+    assert result["factcheck_flags"] == []
 
 
 def test_invoke_delegates_to_backend(agent: JudgeAgent, mock_backend: MagicMock):
