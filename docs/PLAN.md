@@ -39,38 +39,49 @@ user → /judgment  (standalone judge run)
 ```
 .claude/
   agents/
-    orchestrate/
-      AGENT.md            # Orchestrator — full debate lifecycle, spawns debate & judge
-    debate/
-      AGENT.md            # Debater agent — argues assigned position, uses web_search
-    judge/
-      AGENT.md            # Judge agent — scores debate, uses judgment & web_search
+    debate-agent.md       # Debater system prompt — argues assigned position
+    debate-judge.md       # Judge system prompt — scores and declares winner
+    debate-orchestrator.md# Orchestrator system prompt — lifecycle control
   skills/
-    validate_json/
-      SKILL.md            # Validates agent response is well-formed JSON (json.load)
-    validate_topic/
-      SKILL.md            # LLM call: checks topic is debatable, extracts two positions
-    validate_stance/
-      SKILL.md            # LLM call: checks argument supports assigned position
-    judgment/
-      SKILL.md            # Reads JSONL, invokes judge agent, saves verdict
-    web_search/
-      SKILL.md            # Web search for references and fact verification
+    validate_json/SKILL.md
+    validate_topic/SKILL.md
+    validate_stance/SKILL.md
+    judgment/SKILL.md
+    web_search/SKILL.md
 
 src/
   constants.py            # All defaults and magic values
-  config.py               # Config dataclass + argparse CLI + file loader/saver
-  logger.py               # Dual console+file logger factory
+  config.py               # DebateConfig dataclass + argparse CLI + file loader/saver
+  logger.py               # Dual console+file logger (attaches to root debate logger)
   state.py                # JSONL read/write, turn tracking, resume detection
-  validator.py            # Response validation rules + ValidationResult
+  validator.py            # ResponseValidator + ValidationResult (valid, reason, category)
   watchdog.py             # Threading-based per-agent timeout wrapper
   output.py               # Run folder creation, canonical file paths
   cost.py                 # Per-call token recording + docs/cost.md appender
+  exceptions.py           # InvalidTopicError
+  topic_validator.py      # validate_topic() via Claude API
+  debate_helpers.py       # run_turn() helper extracted from orchestrator
   agents/
     __init__.py
-    base.py               # BaseAgent ABC: invoke_with_retry(), abstract _invoke()
-    debate.py             # DebateAgent: prompt builder, history formatter, Agent invocation
-    judge.py              # JudgeAgent: scoring prompt builder, verdict parser
+    base.py               # BaseAgent ABC: invoke_with_retry(), format/content retry prompts
+    debate.py             # DebateAgent: build_prompt(), _format_history(), _invoke()
+    judge.py              # JudgeAgent: build_scoring_prompt(), parse_verdict(), _validate_verdict()
+    loader.py             # load_agent_def(): loads .claude/agents/*.md as system prompts
+  backends/
+    __init__.py           # Public re-exports
+    _base.py              # Backend ABC: invoke() interface
+    _api.py               # ApiBackend — Anthropic SDK
+    _cli.py               # CliBackend + OllamaCliBackend — subprocess invocation
+    _ollama.py            # OllamaBackend — Ollama HTTP API
+    _factory.py           # make_backend(type) factory
+    _ansi.py              # VT100 terminal emulator; strips ANSI codes and thinking preambles
+  sdk/
+    __init__.py
+    debate_sdk.py         # DebateSDK — high-level API facade
+  shared/
+    __init__.py
+    gatekeeper.py         # APIGatekeeper — rate-limit / concurrency guard
+    version.py            # Package version constant
 
 orchestrator.py           # DebateOrchestrator: full debate lifecycle
 main.py                   # argparse entry point → Config → Orchestrator.run()
@@ -86,18 +97,42 @@ tests/
     test_base_agent.py
     test_debate_agent.py
     test_judge_agent.py
-    test_orchestrator.py
+    test_topic_validator.py
+    test_backend_factory.py
+    test_api_backend.py
+    test_cli_backend.py
+    test_ollama_backend.py
+    test_ollama_cli_backend.py
+    test_agent_file_model.py
+    test_orchestrator_core.py
+    test_orchestrator_judge.py
+    test_debate_sdk.py
+    test_gatekeeper.py
+    test_version.py
   integration/
-    test_full_debate.py   # 4-turn smoke test (reduced turns)
-    test_resume.py        # Interrupt after turn 2, resume, complete
+    test_full_debate.py
+    test_resume.py
+    test_resume_complete.py
     test_judge_standalone.py
+    test_debate_config_file.py
+
+examples/
+  debate-config.example.json   # Canonical config template
+  iran-nuclear/output-ollama/  # Full run output — diplomacy vs. military
+  ai-jobs/output-ollama/       # Full run output — AI job displacement
+  messi-ronaldo/output-ollama/ # Full run output — GOAT debate
 
 docs/
   PRD.md
+  PRD_agents.md
+  PRD_backends.md
+  PRD_orchestrator.md
   PLAN.md
   TODO.md
   rules.md
-  cost.md                 # Token/cost log appended after every run
+  cost.md                      # Token/cost log appended after every run
+  analysis.md                  # Experimental findings across example debates
+  hw1_lessons_learned.md       # Feedback from HW1 and conclusions for HW2
 
 .env.example
 .gitignore
@@ -379,3 +414,51 @@ judgment (skill)             ← also user-invocable directly via /judgment
 | Language enforcement | Validation + orchestrator prompt | All debates in English per PRD |
 | **Dedicated judge vs orchestrator-as-judge** | Dedicated `JudgeAgent` | The orchestrator has operational context (retries, skips, validation failures) that could bias scoring. A separate judge receives only the clean accepted arguments — the same view a human reader has. It also allows re-running judgment independently with different parameters (model, factcheck on/off) without replaying orchestration logic. |
 | **Retry prompt strategy** | Split by failure category (`format` vs `content`) | Format failures (bad JSON) need a tight "fix the serialisation" prompt without history noise. Content failures (too short, off-topic) need history re-attached so the agent can produce a substantive response. A single retry prompt served neither case well. |
+
+---
+
+## How to Extend
+
+### Add a new backend
+
+1. Create `src/backends/_mybackend.py` — subclass `Backend` from `_base.py` and implement `invoke(name, model, prompt, cost_tracker, max_tokens, system_prompt, agent_def) -> str`
+2. Register it in `src/backends/_factory.py` — add a new `elif backend_type == "my-backend":` branch in `make_backend()`
+3. Export it from `src/backends/__init__.py`
+4. Add tests in `tests/unit/test_mybackend.py`
+
+### Add a new agent type
+
+1. Create `src/agents/myagent.py` — subclass `BaseAgent` from `base.py`
+2. Implement `_invoke(prompt) -> str` (use `self.backend.invoke(...)`)
+3. Implement any prompt-building methods the agent needs
+4. Add a system-prompt definition in `.claude/agents/myagent.md`
+5. Add tests in `tests/unit/test_myagent.py`
+
+### Add a new validation rule
+
+1. Open `src/validator.py` — add a new `_check_*` method on `ResponseValidator`
+2. Call it from `validate()` in the check chain (before `validate_json`)
+3. Return `ValidationResult(False, "reason", category="content")` on failure
+4. Add the new pattern/constant to `src/constants.py` if needed
+5. Add a test case in `tests/unit/test_validator.py`
+
+### Add a new example debate
+
+1. Create `examples/<topic>/` directory
+2. Run: `python main.py --config <your-config.json>`
+3. Copy the run output folder to `examples/<topic>/output-<backend>/`
+4. The config is already saved inside the output folder — no top-level config needed
+
+---
+
+## ISO/IEC 25010 Compliance Matrix
+
+| Quality Characteristic | Evidence in this Project |
+|------------------------|--------------------------|
+| **Functional Suitability** | Full debate lifecycle: topic validation, 20-turn alternating debate, judge scoring with schema enforcement; verified by 160 tests covering all acceptance criteria |
+| **Reliability** | Retry logic with `max_retries`-bounded attempts; watchdog timeouts per agent; interrupted debates resume from last persisted turn; atomic JSONL appends prevent partial-turn corruption |
+| **Performance Efficiency** | Ollama backend for zero-cost local inference; parallel debate execution supported; per-call token tracking identifies costly agents; configurable `min_response_len` / `max_tokens` bound output size |
+| **Usability** | CLI-first interface with `--config` file support; comprehensive README with install, usage, and Ollama guide; `examples/` with three complete run outputs showing real terminal behaviour and verdicts |
+| **Security** | No secrets in code; `ANTHROPIC_API_KEY` via `.env` only; `.gitignore` excludes `.env` and outputs; `CLAUDE`/`ANTHROPIC` env vars stripped in `CliBackend` to prevent recursive invocation |
+| **Maintainability** | All files ≤ 150 lines; single-responsibility classes; zero Ruff violations; 160 tests at 100% coverage; `ValidationResult.category` cleanly separates retry strategies without branching in agent code |
+| **Portability** | Backend abstraction decouples agent logic from transport (API, CLI, Ollama); runs on Windows, macOS, Linux; `uv` lockfile ensures reproducible dependency resolution across OS |

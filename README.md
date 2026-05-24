@@ -5,6 +5,7 @@ A multi-agent pipeline where two Claude agents argue opposing sides of a topic, 
 ## Table of Contents
 - [Installation](#installation)
 - [Usage](#usage)
+- [Sample Run](#sample-run)
 - [Backends](#backends)
 - [Running with Ollama (free local backend)](#running-with-ollama-free-local-backend)
 - [Configuration](#configuration)
@@ -97,6 +98,59 @@ factcheck: true
 ```bash
 python main.py --config debate.yaml --turns 6   # CLI overrides YAML
 ```
+
+---
+
+## Sample Run
+
+The following shows a real 20-turn debate run using the Ollama CLI backend (Qwen3:14b).
+No API tokens are consumed.
+
+```
+$ python main.py --config examples/ai-jobs/output-ollama/config.json
+
+[INFO]  debate.orchestrator: Debate starting: Will AI automation destroy more jobs than it creates...
+[INFO]  debate.orchestrator: Positions — A: AI automation will destroy more jobs... | B: AI will generate new industries...
+[INFO]  debate.orchestrator: Turn 1/20 — Pessimist
+[WARNING] debate.agent.Pessimist: Attempt 1/3 failed for Pessimist: Invalid JSON: Expecting ',' delimiter
+[INFO]  debate.orchestrator: Turn 1/20 accepted from Pessimist.
+[INFO]  debate.orchestrator: Turn 2/20 — Optimist
+[INFO]  debate.orchestrator: Turn 2/20 accepted from Optimist.
+...
+[INFO]  debate.orchestrator: Turn 20/20 accepted from Optimist.
+[INFO]  debate.orchestrator: Verdict written to outputs/ai-jobs/20260524_220438/result.json.
+```
+
+The `WARNING` on turn 1 shows the retry system catching a JSON formatting error from the model
+and recovering automatically. The debate completes all 20 turns in ~8 minutes.
+
+**Resulting `result.json`:**
+
+```json
+{
+  "winner": "Pessimist",
+  "scores": {
+    "Pessimist": { "logic": 9, "evidence": 9, "clarity": 8, "persuasiveness": 9, "total": 35 },
+    "Optimist":  { "logic": 8, "evidence": 8, "clarity": 7, "persuasiveness": 8, "total": 31 }
+  },
+  "tiebreaker": "Pessimist presented more compelling evidence on displacement scale (McKinsey 800M jobs lost)...",
+  "explanation": "Pessimist used more specific, recent data (ILO 2024, McKinsey 2030) to highlight displacement scale...",
+  "factcheck_flags": []
+}
+```
+
+**Output files produced:**
+
+```
+outputs/ai-jobs/20260524_220438/
+  config.json          ← resolved configuration used for this run
+  conversation.jsonl   ← one JSON line per accepted turn with token usage
+  debate.log           ← full execution log (INFO + WARNING + ERROR)
+  result.json          ← judge verdict, scores, explanation, factcheck flags
+  run_info.json        ← timestamp, backend, command used
+```
+
+Complete example outputs for three debates are available in [`examples/`](examples/).
 
 ---
 

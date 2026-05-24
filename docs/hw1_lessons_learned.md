@@ -80,28 +80,33 @@ HW1 was praised for "analytical work that clearly documents the experimental pro
 
 In priority order:
 
-### 1. Add a "Sample Run" section to README
+### 1. ✅ Add a "Sample Run" section to README
 Show the actual terminal output of a debate run — log lines, retry warnings, verdict printed to console — and the resulting `result.json`. A reader should be able to see the full lifecycle in under one page without running anything.
+→ **Done:** Added to README with real log output, result JSON, and output file listing.
 
-### 2. Add `docs/analysis.md`
+### 2. ✅ Add `docs/analysis.md`
 Write a 1–2 page synthesis of the three example debates (iran-nuclear, ai-jobs, messi-ronaldo):
 - Retry frequency per backend/model
 - What the factchecker caught (and whether flags were accurate)
 - Patterns in judge scoring across topics
 - What surprised us about the system's behaviour in practice
 This is the "research & analysis" layer that demonstrates genuine engagement with the output.
+→ **Done:** `docs/analysis.md` created covering retry analysis, factchecker observations, scoring patterns, and platform behaviour conclusions.
 
-### 3. Update PLAN.md directory structure
+### 3. ✅ Update PLAN.md directory structure
 Bring the directory tree up to date with the actual codebase — backends package, sdk, shared, loader, debate_helpers, all split test files.
+→ **Done:** Directory tree in PLAN.md fully updated.
 
-### 4. Add "How to Extend" to PLAN.md
+### 4. ✅ Add "How to Extend" to PLAN.md
 Document how a new developer would:
 - Add a new backend (what interface to implement)
 - Add a new agent type (what to subclass)
 - Add a new validation rule (where to add it)
+→ **Done:** "How to Extend" section added to PLAN.md with step-by-step instructions for all four extension paths.
 
-### 5. ISO/IEC 25010 compliance matrix (optional but strong signal)
+### 5. ✅ ISO/IEC 25010 compliance matrix (optional but strong signal)
 HW1 included a quality characteristics compliance matrix. Adding one to HW2 demonstrates professional engineering awareness and gives the evaluator a single structured view of how the project meets each quality dimension.
+→ **Done:** Added to PLAN.md covering Functional Suitability, Reliability, Performance Efficiency, Usability, Security, Maintainability, and Portability.
 
 ---
 
