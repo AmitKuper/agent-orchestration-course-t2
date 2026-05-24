@@ -1,0 +1,24 @@
+{
+  "version": "0.1.0",
+  "app_name": "AI Debate Platform",
+  "description": "Multi-agent debate pipeline with Claude agents",
+  "defaults": {
+    "turns": 20,
+    "model": "claude-sonnet-4-6",
+    "backend": "api",
+    "max_retries": 3,
+    "min_response_len": 50,
+    "log_level": "INFO",
+    "outdir": "outputs",
+    "factcheck": false
+  },
+  "token_limits": {
+    "debate_agent": 2048,
+    "judge_agent": 4096
+  },
+  "timeouts_seconds": {
+    "debater": 300,
+    "judge": 600,
+    "debate_total": 7200
+  }
+}

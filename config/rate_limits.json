@@ -1,0 +1,22 @@
+{
+  "version": "0.1.0",
+  "anthropic": {
+    "requests_per_minute": 50,
+    "tokens_per_minute": 40000,
+    "retry_delay_seconds": 5,
+    "max_retries": 3,
+    "backoff_multiplier": 2.0
+  },
+  "ollama": {
+    "requests_per_minute": 120,
+    "retry_delay_seconds": 2,
+    "max_retries": 3,
+    "backoff_multiplier": 1.5
+  },
+  "cli": {
+    "requests_per_minute": 30,
+    "retry_delay_seconds": 10,
+    "max_retries": 3,
+    "backoff_multiplier": 2.0
+  }
+}
