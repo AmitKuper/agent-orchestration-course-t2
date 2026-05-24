@@ -138,8 +138,8 @@ Each debate run produces a dedicated output folder. The folder location has a de
 - Levels: `DEBUG`, `INFO`, `WARNING`, `ERROR`
 - `DEBUG`: orchestration decisions, full prompts sent to agents
 - `INFO`: turn progress, agent responses, retry attempts, debate start/end
-- `WARNING`: invalid responses, skipped turns, max retries reached
-- `ERROR`: API failures, unrecoverable errors
+- `WARNING`: invalid responses, max retries reached on a single attempt
+- `ERROR`: turn skipped (all retries exhausted), API failures, unrecoverable errors
 
 ---
 

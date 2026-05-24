@@ -13,7 +13,7 @@
 - [x] `src/state.py` — `ConversationState`: `append_turn()`, `load_from_file()`, `is_complete()`, `needs_resume()`
 - [x] `src/output.py` — `OutputManager`: `create_run_folder()`, `result_path()`, path properties
 - [x] `src/watchdog.py` — `Watchdog`: `start()`, `cancel()`, context manager
-- [x] `src/validator.py` — `ResponseValidator`: `validate()`, `ValidationResult` dataclass
+- [x] `src/validator.py` — `ResponseValidator`: `validate()`, `ValidationResult` dataclass with `category` field
 - [x] `src/cost.py` — `CostTracker`: `record_call()`, `get_run_summary()`, `append_to_cost_md()`
 
 ## Phase 3 — Agent & Skill Definitions ✅ Complete
@@ -25,9 +25,9 @@
 - [x] `.claude/skills/validate_stance/SKILL.md` — inline LLM call; checks argument supports assigned claim
 - [x] `.claude/skills/judgment/SKILL.md` — reads JSONL, invokes judge agent, saves verdict; user-invocable via `/judgment`
 - [x] `.claude/skills/web_search/SKILL.md` — WebSearch tool wrapper; returns results with references
-- [x] `src/agents/base.py` — `BaseAgent` ABC: `invoke_with_retry()`, `_invoke()`, `_build_retry_prompt()`
+- [x] `src/agents/base.py` — `BaseAgent` ABC: `invoke_with_retry()`, `_invoke()`, `_build_format_retry_prompt()`, `_build_content_retry_prompt()`
 - [x] `src/agents/debate.py` — `DebateAgent`: `build_prompt()`, `_format_history()`, `_invoke()`
-- [x] `src/agents/judge.py` — `JudgeAgent`: `build_scoring_prompt()`, `parse_verdict()`, `_invoke()`
+- [x] `src/agents/judge.py` — `JudgeAgent`: `build_scoring_prompt()`, `parse_verdict()`, `_validate_verdict()`, `_invoke()`
 
 ## Phase 4 — Orchestrator & Debate Flow ✅ Complete
 - [x] `src/exceptions.py` — `InvalidTopicError`
@@ -42,7 +42,7 @@
 - [x] `docs/cost.md` — initialized with header row
 - [x] Log file flush/close on debate end or crash (atexit in `DebateOrchestrator`)
 
-## Phase 6 — Tests ✅ Complete (7f66ebf)
+## Phase 6 — Tests ✅ Complete (aac73ea)
 - [x] `tests/unit/test_config.py`
 - [x] `tests/unit/test_state.py`
 - [x] `tests/unit/test_validator.py`
@@ -52,16 +52,34 @@
 - [x] `tests/unit/test_base_agent.py`
 - [x] `tests/unit/test_debate_agent.py`
 - [x] `tests/unit/test_judge_agent.py`
-- [x] `tests/unit/test_orchestrator.py`
-- [x] `tests/unit/test_backends.py`
 - [x] `tests/unit/test_topic_validator.py`
 - [x] `tests/integration/test_full_debate.py`
 - [x] `tests/integration/test_resume.py`
 - [x] `tests/integration/test_judge_standalone.py`
 - [x] Coverage ≥ 85% (100% achieved, 128 tests passing)
 
-## Phase 7 — Polish & Documentation ✅ Complete (9e64ff3)
+## Phase 7 — Polish & Documentation ✅ Complete (2a6a1e5)
 - [x] Zero Ruff violations (`ruff check` + `ruff format`)
 - [x] All docstrings complete (every class, method, function)
 - [x] `README.md` — setup, `.env` config, usage examples
 - [x] Final `docs/TODO.md` update — all phases complete
+
+## Phase 8 — Post-Polish Improvements ✅ Complete (6151f77)
+- [x] `src/backends/` package — split `src/backends.py` into `_base.py`, `_api.py`, `_cli.py`, `_ollama.py`, `_factory.py`
+- [x] `src/backends/_ansi.py` — VT100 terminal emulator; strips ANSI escape codes and Qwen3 thinking preambles from CLI output
+- [x] `src/agents/loader.py` — extracted `load_agent_def` from `base.py` to dedicated module
+- [x] `src/debate_helpers.py` — extracted turn-execution helpers from orchestrator
+- [x] `src/sdk/debate_sdk.py` — `DebateSDK` high-level API wrapper
+- [x] `src/shared/gatekeeper.py` — `APIGatekeeper` rate-limit / concurrency guard
+- [x] `src/shared/version.py` — package version constant
+- [x] Logger hierarchy fix — handlers attached to root `debate` logger so all child loggers write to file
+- [x] Retry categorisation — `ValidationResult.category` (`"format"` vs `"content"`) controls retry prompt strategy
+- [x] Judge verdict schema enforcement — `parse_verdict` validates all four criteria, normalises key case, recomputes totals
+- [x] Turn-skip log level raised from `WARNING` to `ERROR` (unrecoverable debate content loss)
+- [x] Test files split to comply with 150-line limit (13 unit + 5 integration files, 160 tests passing)
+- [x] `tests/unit/test_backend_factory.py`, `test_api_backend.py`, `test_cli_backend.py`, `test_ollama_backend.py`, `test_ollama_cli_backend.py`
+- [x] `tests/unit/test_agent_file_model.py`, `test_orchestrator_core.py`, `test_orchestrator_judge.py`
+- [x] `tests/unit/test_debate_sdk.py`, `test_gatekeeper.py`, `test_version.py`
+- [x] `tests/integration/test_debate_config_file.py`, `test_resume_complete.py`
+- [x] `examples/` restructured to topic-first layout (`examples/<topic>/output-<backend>/`)
+- [x] Example debates: `iran-nuclear`, `ai-jobs`, `messi-ronaldo` (all via ollama-cli / Qwen3:14b)

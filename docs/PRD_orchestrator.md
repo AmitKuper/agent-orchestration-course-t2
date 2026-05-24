@@ -9,13 +9,14 @@ The orchestrator manages the full debate lifecycle without ever participating in
 - Configurable watchdog timeouts per agent
 
 ## Acceptance Criteria
-- [ ] `DebateOrchestrator.run_debate()` completes full lifecycle end-to-end
-- [ ] `resume_debate()` continues correctly from the last persisted turn
-- [ ] Watchdog fires and is logged if agent exceeds `DEBATER_TIMEOUT`
-- [ ] Each agent response validated before being appended to state
-- [ ] Topic validation raises `InvalidTopicError` for non-debatable topics
-- [ ] Cost tracker updated after every agent call
-- [ ] Config written to `config.json` at debate start
+- [x] `DebateOrchestrator.run_debate()` completes full lifecycle end-to-end
+- [x] `resume_debate()` continues correctly from the last persisted turn
+- [x] Watchdog fires and is logged if agent exceeds `DEBATER_TIMEOUT`
+- [x] Each agent response validated before being appended to state
+- [x] Topic validation raises `InvalidTopicError` for non-debatable topics
+- [x] Cost tracker updated after every agent call
+- [x] Config written to `config.json` at debate start
+- [x] Turn skips logged at ERROR level; retries logged at WARNING level
 
 ## Lifecycle Sequence
 ```
