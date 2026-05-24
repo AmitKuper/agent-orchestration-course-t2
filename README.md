@@ -6,6 +6,7 @@ A multi-agent pipeline where two Claude agents argue opposing sides of a topic, 
 - [Installation](#installation)
 - [Usage](#usage)
 - [Backends](#backends)
+- [Running with Ollama (free local backend)](#running-with-ollama-free-local-backend)
 - [Configuration](#configuration)
 - [Output](#output)
 - [Running Tests](#running-tests)
@@ -146,6 +147,82 @@ Override the Ollama server URL:
 ```bash
 OLLAMA_BASE_URL=http://192.168.1.10:11434 python main.py --topic "..." --backend ollama --model-a llama3.2
 ```
+
+---
+
+## Running with Ollama (free local backend)
+
+During development and testing, running every debate turn against the Anthropic API burns real tokens quickly — a 20-turn debate with a judge call can cost $0.05–$0.20 per run. [Ollama](https://ollama.com) lets you run open-source models locally at zero cost, making it practical to iterate freely without watching your API bill.
+
+### 1. Install Ollama
+
+**Windows / macOS:** download the installer from [ollama.com/download](https://ollama.com/download) and run it.
+
+**Linux:**
+```bash
+curl -fsSL https://ollama.com/install.sh | sh
+```
+
+### 2. Pull a model
+
+```bash
+ollama pull qwen3:14b       # good balance of quality and speed on a modern GPU
+ollama pull llama3.2        # lighter option for slower machines
+ollama pull mistral         # alternative if you prefer Mistral
+```
+
+Check what you have installed:
+```bash
+ollama list
+```
+
+### 3. Run a debate with Ollama
+
+Use a JSON config file (recommended for multi-model setups):
+
+```json
+{
+  "topic": "Will AI automation destroy more jobs than it creates?",
+  "turns": 20,
+  "backend": "ollama-cli",
+  "debater_a": { "name": "Pessimist", "model": "qwen3:14b" },
+  "debater_b": { "name": "Optimist",  "model": "qwen3:14b" },
+  "judge":     { "model": "qwen3:14b", "factcheck": true },
+  "outdir": "outputs/ai-jobs"
+}
+```
+
+```bash
+python main.py --config my-debate.json
+```
+
+Or inline via CLI flags:
+
+```bash
+python main.py \
+  --topic "Will AI automation destroy more jobs than it creates?" \
+  --backend ollama-cli \
+  --model-a qwen3:14b --model-b qwen3:14b --model-judge qwen3:14b \
+  --turns 20
+```
+
+### 4. Which backend to choose
+
+| Situation | Recommended backend |
+|-----------|-------------------|
+| Production / best quality | `api` (Anthropic Claude) |
+| Development, cost-free iteration | `ollama-cli` |
+| Ollama on a remote server | `ollama` (HTTP API) |
+| You have Claude Code + Pro subscription | `cli` |
+
+> **Note:** Ollama models follow instructions less reliably than Claude and may occasionally produce malformed JSON. The platform's retry logic handles this automatically — you may see more `WARNING` retry log lines than with the API backend.
+
+### 5. Example debates run with Ollama
+
+See [`examples/`](examples/) for complete run outputs using `qwen3:14b` via `ollama-cli`:
+- `examples/iran-nuclear/output-ollama/` — diplomatic vs military approach
+- `examples/ai-jobs/output-ollama/` — AI job displacement debate
+- `examples/messi-ronaldo/output-ollama/` — GOAT debate
 
 ---
 
