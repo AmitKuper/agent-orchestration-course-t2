@@ -377,3 +377,5 @@ judgment (skill)             ← also user-invocable directly via /judgment
 | Watchdog impl | `threading.Timer` | Simple; works with synchronous Agent calls; no asyncio required |
 | Result files | Timestamped filenames | Append-safe; multiple judge runs preserved |
 | Language enforcement | Validation + orchestrator prompt | All debates in English per PRD |
+| **Dedicated judge vs orchestrator-as-judge** | Dedicated `JudgeAgent` | The orchestrator has operational context (retries, skips, validation failures) that could bias scoring. A separate judge receives only the clean accepted arguments — the same view a human reader has. It also allows re-running judgment independently with different parameters (model, factcheck on/off) without replaying orchestration logic. |
+| **Retry prompt strategy** | Split by failure category (`format` vs `content`) | Format failures (bad JSON) need a tight "fix the serialisation" prompt without history noise. Content failures (too short, off-topic) need history re-attached so the agent can produce a substantive response. A single retry prompt served neither case well. |
