@@ -34,3 +34,70 @@ The backend layer decouples agent invocation from the transport mechanism, allow
 ## Configuration
 - Backend selected via `--backend {api,cli,ollama-cli,ollama}`
 - Ollama base URL from `OLLAMA_BASE_URL` env var
+
+---
+
+## How API and CLI Backends Differ
+
+The two Claude backends look similar from the outside — both take a prompt and return a
+response — but they use `.claude/agents/*.md` in fundamentally different ways.
+
+### API backend (`ApiBackend`)
+
+```
+Python code
+  │
+  ├── load_agent_def(".claude/agents/debate-agent.md")  → reads file → system_prompt string
+  │
+  └── anthropic.Anthropic().messages.create(
+          model     = "claude-sonnet-4-6",
+          system    = system_prompt,          ← agent def injected explicitly
+          messages  = [{"role": "user",
+                        "content": prompt}],  ← full prompt built by our code
+          max_tokens = 2048,
+      )
+```
+
+- Our Python code reads the `.claude/agents/*.md` file and forwards its content as the
+  `system` parameter to the Anthropic API.
+- The API has no knowledge of the file — it only sees the string.
+- Full control over model, system prompt, max_tokens, and temperature.
+- Actual input/output token counts are returned and recorded in `docs/cost.md`.
+
+### CLI backend (`CliBackend`)
+
+```
+Python code
+  │
+  ├── update_agent_file_model(".claude/agents/debate-agent.md", model)
+  │     └── rewrites the model: field in YAML frontmatter
+  │
+  └── subprocess.run(
+          ["claude", "--model", model, "--print", "--dangerously-skip-permissions"],
+          input = prompt,    ← piped to stdin
+      )
+          │
+          └── claude process starts
+                └── reads .claude/ on its own:
+                      - .claude/agents/debate-agent.md  (system prompt + model)
+                      - .claude/CLAUDE.md               (project-level instructions)
+                      - .claude/settings.json           (permissions)
+```
+
+- Our Python code does **not** pass the system prompt — `system=` is ignored by `CliBackend`.
+- Instead, Python writes the correct model into the `.md` frontmatter before invoking, so
+  the `claude` subprocess picks it up from its own `.claude/` context.
+- The agent definition, permissions, and project instructions are all handled by the claude
+  process itself — our code only controls what goes into stdin (the prompt).
+- Token counts are unavailable; the CLI does not expose them.
+
+### Summary
+
+| Dimension | `ApiBackend` | `CliBackend` |
+|-----------|-------------|-------------|
+| Who reads `.claude/agents/*.md` | Our Python code (then passes as `system=`) | The `claude` subprocess itself |
+| System prompt | Passed explicitly as API parameter | Delegated to claude's own context |
+| Model selection | Passed as API parameter | Written into `.md` frontmatter before invoke |
+| Token counts | Available (recorded in cost.md) | Not available (recorded as 0) |
+| Auth | `ANTHROPIC_API_KEY` env var | Claude Code Pro subscription (OAuth) |
+| Use case | Production, cost tracking | Development with existing Pro subscription |
