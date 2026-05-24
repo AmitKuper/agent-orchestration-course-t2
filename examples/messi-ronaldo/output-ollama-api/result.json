@@ -1,0 +1,28 @@
+{
+  "winner": "TeamMessi",
+  "scores": {
+    "TeamMessi": {
+      "logic": 9,
+      "evidence": 8,
+      "clarity": 8,
+      "persuasiveness": 9,
+      "total": 34
+    },
+    "TeamRonaldo": {
+      "logic": 9,
+      "evidence": 7,
+      "clarity": 8,
+      "persuasiveness": 9,
+      "total": 33
+    }
+  },
+  "tiebreaker": "evidence",
+  "explanation": "TeamMessi presented stronger arguments in evidence due to consistent data citing (FIFA, UEFA, Sports Science Journal) and clear focus on sustained excellence and team impact. TeamRonaldo's claims about Ronaldo's 2023 Serie A title with Juventus were flagged as unverifiable, slightly lowering their evidence score. Both teams demonstrated similar logic and persuasiveness, but TeamMessi's more accurate evidence secured their win.",
+  "factcheck_flags": [
+    {
+      "agent": "TeamRonaldo",
+      "claim": "Ronaldo's 2023 Serie A title (Juventus)",
+      "issue": "Unverifiable: Ronaldo moved to Al Nassr in 2023; Juventus did not win Serie A in 2023."
+    }
+  ]
+}

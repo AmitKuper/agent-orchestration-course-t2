@@ -1,0 +1,43 @@
+2026-05-24 23:51:56,418 [INFO] debate.orchestrator: Debate starting: Will attacking Iran prevent them from achieving a nuclear weapon, or is diplomacy the way to go?
+2026-05-24 23:52:06,381 [INFO] debate.orchestrator: Positions — A: Attacking Iran will prevent them from achieving a nuclear weapon. | B: Diplomacy is the way to go to prevent Iran from achieving a nuclear weapon.
+2026-05-24 23:52:06,383 [INFO] debate.orchestrator: Turn 1/20 — Hawk
+2026-05-24 23:52:32,054 [INFO] debate.orchestrator: Turn 1/20 accepted from Hawk.
+2026-05-24 23:52:32,055 [INFO] debate.orchestrator: Turn 2/20 — Dove
+2026-05-24 23:52:57,111 [INFO] debate.orchestrator: Turn 2/20 accepted from Dove.
+2026-05-24 23:52:57,115 [INFO] debate.orchestrator: Turn 3/20 — Hawk
+2026-05-24 23:53:29,355 [INFO] debate.orchestrator: Turn 3/20 accepted from Hawk.
+2026-05-24 23:53:29,356 [INFO] debate.orchestrator: Turn 4/20 — Dove
+2026-05-24 23:54:02,376 [INFO] debate.orchestrator: Turn 4/20 accepted from Dove.
+2026-05-24 23:54:02,377 [INFO] debate.orchestrator: Turn 5/20 — Hawk
+2026-05-24 23:54:34,372 [INFO] debate.orchestrator: Turn 5/20 accepted from Hawk.
+2026-05-24 23:54:34,373 [INFO] debate.orchestrator: Turn 6/20 — Dove
+2026-05-24 23:55:07,269 [INFO] debate.orchestrator: Turn 6/20 accepted from Dove.
+2026-05-24 23:55:07,269 [INFO] debate.orchestrator: Turn 7/20 — Hawk
+2026-05-24 23:55:41,978 [INFO] debate.orchestrator: Turn 7/20 accepted from Hawk.
+2026-05-24 23:55:41,978 [INFO] debate.orchestrator: Turn 8/20 — Dove
+2026-05-24 23:56:13,251 [INFO] debate.orchestrator: Turn 8/20 accepted from Dove.
+2026-05-24 23:56:13,251 [INFO] debate.orchestrator: Turn 9/20 — Hawk
+2026-05-24 23:56:51,351 [INFO] debate.orchestrator: Turn 9/20 accepted from Hawk.
+2026-05-24 23:56:51,352 [INFO] debate.orchestrator: Turn 10/20 — Dove
+2026-05-24 23:57:25,574 [INFO] debate.orchestrator: Turn 10/20 accepted from Dove.
+2026-05-24 23:57:25,575 [INFO] debate.orchestrator: Turn 11/20 — Hawk
+2026-05-24 23:58:07,722 [INFO] debate.orchestrator: Turn 11/20 accepted from Hawk.
+2026-05-24 23:58:07,723 [INFO] debate.orchestrator: Turn 12/20 — Dove
+2026-05-24 23:58:47,551 [INFO] debate.orchestrator: Turn 12/20 accepted from Dove.
+2026-05-24 23:58:47,552 [INFO] debate.orchestrator: Turn 13/20 — Hawk
+2026-05-24 23:59:22,923 [INFO] debate.orchestrator: Turn 13/20 accepted from Hawk.
+2026-05-24 23:59:22,923 [INFO] debate.orchestrator: Turn 14/20 — Dove
+2026-05-25 00:00:03,771 [INFO] debate.orchestrator: Turn 14/20 accepted from Dove.
+2026-05-25 00:00:03,771 [INFO] debate.orchestrator: Turn 15/20 — Hawk
+2026-05-25 00:00:44,680 [INFO] debate.orchestrator: Turn 15/20 accepted from Hawk.
+2026-05-25 00:00:44,681 [INFO] debate.orchestrator: Turn 16/20 — Dove
+2026-05-25 00:01:21,393 [INFO] debate.orchestrator: Turn 16/20 accepted from Dove.
+2026-05-25 00:01:21,393 [INFO] debate.orchestrator: Turn 17/20 — Hawk
+2026-05-25 00:02:02,839 [INFO] debate.orchestrator: Turn 17/20 accepted from Hawk.
+2026-05-25 00:02:02,839 [INFO] debate.orchestrator: Turn 18/20 — Dove
+2026-05-25 00:02:45,938 [INFO] debate.orchestrator: Turn 18/20 accepted from Dove.
+2026-05-25 00:02:45,939 [INFO] debate.orchestrator: Turn 19/20 — Hawk
+2026-05-25 00:03:24,635 [INFO] debate.orchestrator: Turn 19/20 accepted from Hawk.
+2026-05-25 00:03:24,636 [INFO] debate.orchestrator: Turn 20/20 — Dove
+2026-05-25 00:04:05,682 [INFO] debate.orchestrator: Turn 20/20 accepted from Dove.
+2026-05-25 00:04:50,351 [INFO] debate.orchestrator: Verdict written to outputs\iran-nuclear-api\20260524_235156\result.json.

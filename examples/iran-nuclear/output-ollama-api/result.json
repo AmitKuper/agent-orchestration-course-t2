@@ -1,0 +1,38 @@
+{
+  "winner": "Dove",
+  "scores": {
+    "Hawk": {
+      "logic": 7,
+      "evidence": 6,
+      "clarity": 5,
+      "persuasiveness": 6,
+      "total": 24
+    },
+    "Dove": {
+      "logic": 8,
+      "evidence": 8,
+      "clarity": 8,
+      "persuasiveness": 8,
+      "total": 32
+    }
+  },
+  "tiebreaker": null,
+  "explanation": "Dove outperformed Hawk across all criteria with stronger logic (addressing counterarguments), more diverse and verifiable evidence (multiple IAEA reports, UN resolutions), clearer organization, and greater persuasiveness through alignment with global norms. Hawk's repetitive use of Osirak and the IAEA 2003-2005 claim diluted impact, while Dove emphasized sustainability and diplomacy's adaptability. Both scored similarly on evidence due to reliance on similar sources, but Dove's contextualization was more robust.",
+  "factcheck_flags": [
+    {
+      "agent": "Hawk",
+      "claim": "IAEA admits Iranian pauses in 2003\u20132005 followed UN sanctions and credible threat of force, not dialogue",
+      "issue": "Unverifiable assertion; IAEA reports do not explicitly confirm this causal link to sanctions/threats"
+    },
+    {
+      "agent": "Hawk",
+      "claim": "Israel\u2019s 1981 Osirak strike permanently crippled Iraq\u2019s program",
+      "issue": "IISS 2022 does not confirm this as an unequivocal outcome; Iraq's program evolved post-1991"
+    },
+    {
+      "agent": "Dove",
+      "claim": "BBC 2021 on U.S.-UK 2021 negotiations with Iran",
+      "issue": "No verifiable BBC report from 2021 details specific U.S.-UK offers to Iran"
+    }
+  ]
+}
