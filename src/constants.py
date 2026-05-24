@@ -29,6 +29,9 @@ FILE_CONVERSATION = "conversation.jsonl"
 FILE_LOG = "debate.log"
 FILE_RESULT_PREFIX = "result"
 
+# Docs paths
+COST_MD_PATH = "docs/cost.md"
+
 # Words that trigger the disrespectful language check
 DISRESPECTFUL_PATTERNS = [
     "fuck",

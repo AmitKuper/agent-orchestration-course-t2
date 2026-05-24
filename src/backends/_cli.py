@@ -1,0 +1,112 @@
+"""CLI backends: Claude Code CLI and Ollama CLI."""
+
+from __future__ import annotations
+
+import os
+import subprocess
+from typing import TYPE_CHECKING
+
+from src.backends._ansi import extract_response
+from src.backends._base import Backend
+
+if TYPE_CHECKING:
+    from src.cost import CostTracker
+
+
+class CliBackend(Backend):
+    """Shells out to ``claude --model <m> --print`` via Pro OAuth.
+
+    Token counts are unavailable; records zeros to the cost tracker.
+    Also strips CLAUDE*/ANTHROPIC* env vars to prevent recursive invocation.
+    """
+
+    def invoke(
+        self,
+        name: str,
+        model: str,
+        prompt: str,
+        cost_tracker: CostTracker,
+        max_tokens: int,
+        temperature: float | None = None,
+        system: str | None = None,
+    ) -> str:
+        """Run ``claude --model <model> --print`` with prompt on stdin.
+
+        Args:
+            name: Agent display name for cost tracking.
+            model: Claude model ID passed as ``--model`` flag.
+            prompt: Input piped to claude's stdin.
+            cost_tracker: Receives zero token counts (CLI gives none).
+            max_tokens: Unused by CLI; present for interface compatibility.
+            temperature: Unused by CLI.
+            system: Unused by CLI.
+
+        Returns:
+            Stripped stdout from the claude subprocess.
+
+        Raises:
+            RuntimeError: If the claude CLI exits with a non-zero code.
+        """
+        env = {
+            k: v for k, v in os.environ.items()
+            if not k.startswith("CLAUDE") and not k.startswith("ANTHROPIC")
+        }
+        result = subprocess.run(
+            ["claude", "--model", model, "--print", "--dangerously-skip-permissions"],
+            input=prompt,
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+            env=env,
+        )
+        if result.returncode != 0:
+            raise RuntimeError(f"claude CLI failed (rc={result.returncode}): {result.stderr[:200]}")
+        cost_tracker.record_call(name, 0, 0)
+        return extract_response(result.stdout)
+
+
+class OllamaCliBackend(Backend):
+    """Shells out to ``ollama run <model>`` — routes through local Ollama CLI.
+
+    Requires the target model to be installed locally (``ollama pull <model>``).
+    Temperature, system prompts, and token counts are unavailable.
+    """
+
+    def invoke(
+        self,
+        name: str,
+        model: str,
+        prompt: str,
+        cost_tracker: CostTracker,
+        max_tokens: int,
+        temperature: float | None = None,
+        system: str | None = None,
+    ) -> str:
+        """Run ``ollama run <model>`` with prompt on stdin.
+
+        Args:
+            name: Agent display name for cost tracking.
+            model: Ollama model name (e.g. 'llama3.2').
+            prompt: Input piped to ollama's stdin.
+            cost_tracker: Receives zero token counts.
+            max_tokens: Unused.
+            temperature: Unused.
+            system: Unused.
+
+        Returns:
+            Stripped stdout from the ollama subprocess.
+
+        Raises:
+            RuntimeError: If the ollama CLI exits with a non-zero code.
+        """
+        result = subprocess.run(
+            ["ollama", "run", model],
+            input=prompt,
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+        )
+        if result.returncode != 0:
+            raise RuntimeError(f"ollama CLI failed (rc={result.returncode}): {result.stderr[:200]}")
+        cost_tracker.record_call(name, 0, 0)
+        return extract_response(result.stdout)

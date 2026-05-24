@@ -6,7 +6,6 @@ import argparse
 import json
 from dataclasses import asdict, dataclass
 from pathlib import Path
-from typing import Optional
 
 import yaml
 
@@ -41,9 +40,9 @@ class DebateConfig:
     factcheck: bool = False
     log_level: str = DEFAULT_LOG_LEVEL
     resume: bool = False
-    config_file: Optional[str] = None
+    config_file: str | None = None
     backend: str = DEFAULT_BACKEND
-    temperature: Optional[float] = DEFAULT_TEMPERATURE
+    temperature: float | None = DEFAULT_TEMPERATURE
 
 
 def build_cli_parser() -> argparse.ArgumentParser:
@@ -79,9 +78,12 @@ def build_cli_parser() -> argparse.ArgumentParser:
     )
     p.add_argument(
         "--backend",
-        choices=["api", "cli", "ollama"],
+        choices=["api", "cli", "ollama-cli", "ollama"],
         default=None,
-        help="Invocation backend: 'api' (Anthropic SDK), 'cli' (claude --print), or 'ollama'",
+        help=(
+            "Invocation backend: 'api' (Anthropic SDK), 'cli' (claude --model … --print), "
+            "'ollama-cli' (ollama run <model>), or 'ollama' (Ollama HTTP API)"
+        ),
     )
     p.add_argument(
         "--temperature",

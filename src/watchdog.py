@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import threading
-from typing import Callable, Optional
+from collections.abc import Callable
 
 
 class Watchdog:
@@ -24,7 +24,7 @@ class Watchdog:
         """
         self._timeout = timeout_seconds
         self._on_timeout = on_timeout
-        self._timer: Optional[threading.Timer] = None
+        self._timer: threading.Timer | None = None
 
     def start(self) -> None:
         """Start the watchdog timer, cancelling any previously running timer."""

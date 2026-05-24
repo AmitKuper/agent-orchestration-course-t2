@@ -3,12 +3,16 @@
 from __future__ import annotations
 
 import json
+from typing import TYPE_CHECKING
 
 from src.exceptions import InvalidTopicError
 
+if TYPE_CHECKING:
+    from src.backends import Backend
+
 
 def validate_topic(
-    topic: str, model: str, backend: "Backend | None" = None
+    topic: str, model: str, backend: Backend | None = None
 ) -> tuple[str, str]:
     """Ask a model whether a topic can be split into two opposing debatable sides.
 
