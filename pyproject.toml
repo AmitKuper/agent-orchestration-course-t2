@@ -27,7 +27,7 @@ line-length = 88
 target-version = "py311"
 
 [tool.ruff.lint]
-select = ["E", "F", "W", "I"]
+select = ["E", "F", "W", "I", "N", "UP", "B", "C4", "SIM"]
 ignore = ["E501"]
 
 [tool.pytest.ini_options]
@@ -36,3 +36,6 @@ testpaths = ["tests"]
 [tool.coverage.run]
 source = ["src", "orchestrator"]
 omit = ["tests/*"]
+
+[tool.coverage.report]
+fail_under = 85
