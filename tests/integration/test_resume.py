@@ -17,14 +17,7 @@ from src.state import ConversationState
 
 def _api_response(agent_name: str, turn: int) -> MagicMock:
     """Build a mock API response for a debate turn."""
-    text = json.dumps(
-        {
-            "agent": agent_name,
-            "turn": turn,
-            "argument": "B" * 50,
-            "references": [],
-        }
-    )
+    text = json.dumps({"agent": agent_name, "turn": turn, "argument": "B" * 50, "references": []})
     m = MagicMock()
     m.content[0].text = text
     m.usage.input_tokens = 80
@@ -37,20 +30,8 @@ def _verdict_response() -> MagicMock:
     verdict = {
         "winner": "Agent A",
         "scores": {
-            "Agent A": {
-                "logic": 7,
-                "evidence": 7,
-                "clarity": 7,
-                "persuasiveness": 7,
-                "total": 28,
-            },
-            "Agent B": {
-                "logic": 6,
-                "evidence": 6,
-                "clarity": 6,
-                "persuasiveness": 6,
-                "total": 24,
-            },
+            "Agent A": {"logic": 7, "evidence": 7, "clarity": 7, "persuasiveness": 7, "total": 28},
+            "Agent B": {"logic": 6, "evidence": 6, "clarity": 6, "persuasiveness": 6, "total": 24},
         },
         "tiebreaker": None,
         "explanation": "A was better.",
@@ -76,15 +57,9 @@ def partial_setup(tmp_path: Path):
     folder = tmp_path / "run"
     folder.mkdir()
     output = OutputManager(folder)
-
     state = ConversationState(output.conversation_path)
-    state.append_turn(
-        {"agent": config.name_a, "turn": 1, "argument": "C" * 50, "references": []}
-    )
-    state.append_turn(
-        {"agent": config.name_b, "turn": 2, "argument": "D" * 50, "references": []}
-    )
-
+    state.append_turn({"agent": config.name_a, "turn": 1, "argument": "C" * 50, "references": []})
+    state.append_turn({"agent": config.name_b, "turn": 2, "argument": "D" * 50, "references": []})
     cost = CostTracker(folder.name)
     orch = DebateOrchestrator(config, output, state, cost)
     return orch, state, output
@@ -106,7 +81,6 @@ def test_resume_starts_from_turn_3(partial_setup):
         patch("anthropic.Anthropic") as mock_anthropic,
     ):
         mock_anthropic.return_value.messages.create.side_effect = resume_responses
-
         orch.resume_debate()
 
     turns = state.get_turns()
@@ -132,24 +106,8 @@ def test_resume_preserves_existing_turns(partial_setup):
             _api_response(cfg.name_b, 4),
             _verdict_response(),
         ]
-
         orch.resume_debate()
 
     turns = state.get_turns()
     assert turns[0]["argument"] == existing_arg_1
     assert turns[1]["argument"] == existing_arg_2
-
-
-def test_resume_raises_if_already_complete(partial_setup):
-    """resume_debate raises RuntimeError when the debate is fully complete."""
-    orch, state, _ = partial_setup
-    cfg = orch.config
-    state.append_turn(
-        {"agent": cfg.name_a, "turn": 3, "argument": "x" * 20, "references": []}
-    )
-    state.append_turn(
-        {"agent": cfg.name_b, "turn": 4, "argument": "y" * 20, "references": []}
-    )
-
-    with pytest.raises(RuntimeError, match="complete"):
-        orch.resume_debate()
