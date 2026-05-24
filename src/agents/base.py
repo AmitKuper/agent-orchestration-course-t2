@@ -3,10 +3,10 @@
 from __future__ import annotations
 
 import logging
-from abc import ABC
-from pathlib import Path
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 
+from src.agents.loader import load_agent_def  # noqa: F401 — re-exported
+from src.constants import MAX_TOKENS_DEBATE
 from src.validator import ResponseValidator
 
 if TYPE_CHECKING:
@@ -15,40 +15,17 @@ if TYPE_CHECKING:
     from src.cost import CostTracker
     from src.state import ConversationState
 
-from src.constants import MAX_TOKENS_DEBATE
+__all__ = ["BaseAgent", "load_agent_def"]
 
 
-def load_agent_def(path: str | Path, subs: dict[str, str]) -> str:
-    """Load an agent definition file, strip YAML frontmatter, substitute variables.
-
-    Args:
-        path: Path to the .md agent definition file.
-        subs: Mapping of VARIABLE_NAME → value to replace $VARIABLE_NAME.
-
-    Returns:
-        Rendered system prompt string, or empty string if file not found.
-    """
-    p = Path(path)
-    if not p.exists():
-        return ""
-    text = p.read_text(encoding="utf-8")
-    if text.startswith("---"):
-        end = text.index("---", 3)
-        text = text[end + 3:].lstrip()
-    for key, value in subs.items():
-        text = text.replace(f"${key}", str(value))
-    return text
-
-
-class BaseAgent(ABC):
+class BaseAgent:
     """Abstract base for DebateAgent and JudgeAgent.
 
     Provides invoke_with_retry() which calls _invoke(), validates the result,
     and retries up to max_retries times — feeding the violation reason back
     into each retry prompt so the agent can self-correct.
 
-    Subclasses that override _invoke() do not require a backend. Subclasses
-    that rely on the default _invoke() must pass a Backend instance.
+    Subclasses that rely on the default _invoke() must pass a Backend instance.
     """
 
     def __init__(
@@ -58,8 +35,8 @@ class BaseAgent(ABC):
         config: DebateConfig,
         state: ConversationState,
         cost_tracker: CostTracker,
-        backend: Optional[Backend] = None,
-        system_prompt: Optional[str] = None,
+        backend: Backend | None = None,
+        system_prompt: str | None = None,
     ) -> None:
         """Initialise with shared infrastructure references.
 
@@ -69,10 +46,8 @@ class BaseAgent(ABC):
             config: Fully resolved debate configuration.
             state: Shared conversation state for history access.
             cost_tracker: Token usage recorder for cost accounting.
-            backend: Invocation backend (ApiBackend or CliBackend). Required
-                unless the subclass overrides _invoke() directly.
+            backend: Invocation backend. Required unless subclass overrides _invoke().
             system_prompt: Optional system prompt injected on every call.
-                Loaded from .claude/agents/ definitions by subclasses.
         """
         self.name = name
         self.model = model
@@ -88,10 +63,6 @@ class BaseAgent(ABC):
     def invoke_with_retry(self, prompt: str, context: str = "") -> str:
         """Invoke the agent and retry on validation failure.
 
-        Calls _invoke(), validates the response, and on failure builds a
-        retry prompt that explains the violation. Returns empty string if
-        all attempts are exhausted (caller should log and skip the turn).
-
         Args:
             prompt: The main prompt to send.
             context: Optional context prepended to the prompt on first attempt.
@@ -99,7 +70,8 @@ class BaseAgent(ABC):
         Returns:
             Accepted response string, or empty string after max retries.
         """
-        current_prompt = f"{context}\n\n{prompt}".strip() if context else prompt
+        full_prompt = f"{context}\n\n{prompt}".strip() if context else prompt
+        current_prompt = full_prompt
         for attempt in range(self.config.max_retries + 1):
             response = self._invoke(current_prompt)
             result = self._validator.validate(response, self.config.min_response_len)
@@ -107,13 +79,13 @@ class BaseAgent(ABC):
                 return response
             self._logger.warning(
                 "Attempt %d/%d failed for %s: %s",
-                attempt + 1,
-                self.config.max_retries + 1,
-                self.name,
-                result.reason,
+                attempt + 1, self.config.max_retries + 1, self.name, result.reason,
             )
             if attempt < self.config.max_retries:
-                current_prompt = self._build_retry_prompt(prompt, result.reason)
+                if result.category == "format":
+                    current_prompt = self._build_format_retry_prompt(prompt, result.reason)
+                else:
+                    current_prompt = self._build_content_retry_prompt(full_prompt, result.reason)
         self._logger.warning("All retries exhausted for %s — skipping turn.", self.name)
         return ""
 
@@ -138,18 +110,41 @@ class BaseAgent(ABC):
             self.config.temperature, self._system_prompt,
         )
 
-    def _build_retry_prompt(self, original_prompt: str, violation_reason: str) -> str:
-        """Construct a retry prompt that explains the previous violation.
+    def _build_format_retry_prompt(self, prompt: str, reason: str) -> str:
+        """Retry prompt for format/JSON errors — no history re-attached.
+
+        The agent produced the right content but the wrong structure. Re-sending
+        history would add noise; just explain the structural error and repeat the
+        bare task so the agent can focus on fixing the format.
 
         Args:
-            original_prompt: The original task prompt (not the failed attempt).
-            violation_reason: Human-readable explanation of what was invalid.
+            prompt: The original task prompt (without history context).
+            reason: JSONDecodeError or other structural failure description.
 
         Returns:
-            New prompt string with the violation explanation prepended.
+            Compact prompt focused on format correction.
         """
         return (
-            f"Your previous response was rejected: {violation_reason}\n"
+            f"Your previous response was rejected: {reason}\n"
             f"Output ONLY the raw JSON line — no markdown, no explanation, no code fences.\n\n"
-            f"{original_prompt}"
+            f"{prompt}"
+        )
+
+    def _build_content_retry_prompt(self, prompt_with_context: str, reason: str) -> str:
+        """Retry prompt for content errors — full history context re-attached.
+
+        Re-attaches history so the agent can produce a substantive response
+        grounded in the debate so far (too short, empty, disrespectful, etc.).
+
+        Args:
+            prompt_with_context: The full prompt including history context.
+            reason: Human-readable description of the content violation.
+
+        Returns:
+            Prompt with history context and a clear correction instruction.
+        """
+        return (
+            f"Your previous response was rejected: {reason}\n"
+            f"Please provide a substantive response that meets the requirements.\n\n"
+            f"{prompt_with_context}"
         )

@@ -11,10 +11,18 @@ from src.constants import API_ERROR_MARKERS, DISRESPECTFUL_PATTERNS
 
 @dataclass
 class ValidationResult:
-    """Outcome of a single response validation check."""
+    """Outcome of a single response validation check.
+
+    Attributes:
+        valid: True if the response passed all checks.
+        reason: Human-readable explanation of why the check failed.
+        category: 'format' for structural/JSON errors; 'content' for all others.
+            Retry logic uses this to decide whether to re-attach history context.
+    """
 
     valid: bool
     reason: str = ""
+    category: str = "content"
 
 
 class ResponseValidator:
@@ -60,7 +68,7 @@ class ResponseValidator:
             json.loads(response)
             return ValidationResult(True)
         except json.JSONDecodeError as exc:
-            return ValidationResult(False, f"Invalid JSON: {exc}")
+            return ValidationResult(False, f"Invalid JSON: {exc}", category="format")
 
     def _contains_api_error(self, response: str) -> bool:
         """Return True if the response resembles an API error string."""

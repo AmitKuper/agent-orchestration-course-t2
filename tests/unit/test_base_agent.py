@@ -82,12 +82,21 @@ def test_returns_empty_after_max_retries(config, state, cost):
     assert result == ""
 
 
-def test_retry_prompt_contains_violation(config, state, cost):
-    """_build_retry_prompt includes the violation reason."""
+def test_format_retry_prompt_contains_violation(config, state, cost):
+    """_build_format_retry_prompt includes the JSON error and task prompt."""
     agent = _make_agent([], config, state, cost)
-    retry = agent._build_retry_prompt("do something", "Response is empty.")
-    assert "Response is empty." in retry
+    retry = agent._build_format_retry_prompt("do something", "Invalid JSON: ...")
+    assert "Invalid JSON" in retry
     assert "do something" in retry
+
+
+def test_content_retry_prompt_contains_context(config, state, cost):
+    """_build_content_retry_prompt re-attaches history context."""
+    agent = _make_agent([], config, state, cost)
+    retry = agent._build_content_retry_prompt("history\n\ntask", "Response is too short.")
+    assert "Response is too short." in retry
+    assert "history" in retry
+    assert "task" in retry
 
 
 def test_succeeds_on_last_allowed_attempt(config, state, cost):
