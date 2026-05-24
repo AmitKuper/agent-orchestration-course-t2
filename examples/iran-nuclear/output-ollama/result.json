@@ -1,0 +1,25 @@
+{
+  "winner": "Dove",
+  "scores": {
+    "Hawk": {
+      "logic": 9,
+      "evidence": 8,
+      "clarity": 9,
+      "persuasiveness": 9,
+      "total": 35
+    },
+    "Dove": {
+      "logic": 9,
+      "evidence": 9,
+      "clarity": 9,
+      "persuasiveness": 10,
+      "total": 37
+    }
+  },
+  "tiebreaker": "Dove's arguments demonstrated stronger alignment with verifiable historical successes (e.g., 1994 Agreed Framework) and consistent use of the 2023 IAEA report to counter Hawk's claims, while also addressing the root causes of Iran's nuclear ambitions (security concerns).",
+  "explanation": "Both sides presented logically coherent arguments with similar evidence quality. However, Dove's case was more persuasive due to: (1) consistent emphasis on verifiable diplomatic successes (e.g., JCPOA's initial success, 1994 Agreed Framework), (2) direct refutation of Hawk's claims using the same 2023 IAEA report, and (3) addressing the root cause of Iran's behavior (security concerns). Hawk's arguments relied more on historical precedents with ambiguous outcomes (e.g., Osirak raid's long-term effectiveness) and less on addressing Iran's motivations.",
+  "factcheck_flags": [
+    "2024 MIT Security Analysis",
+    "2024 Stanford Nonproliferation Study"
+  ]
+}
