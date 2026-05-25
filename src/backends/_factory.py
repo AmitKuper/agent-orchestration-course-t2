@@ -14,7 +14,7 @@ from src.backends._persistent_cli import PersistentCliBackend
 
 _CHOICES = (
     "claude-api", "claude-cli-agents", "claude-cli-session",
-    "ollama-api", "ollama-cli-agents", "ollama-cli",
+    "ollama-api", "ollama-cli-agents", "ollama-cli", "ollama-orchestrator",
 )
 
 
@@ -23,10 +23,23 @@ def make_backend(
 ) -> Backend | OrchestratorBackend:
     """Instantiate the correct backend from a type string.
 
+    Canonical names:
+        claude-api             Anthropic SDK (requires ANTHROPIC_API_KEY)
+        claude-cli-agents      claude --print subprocess per agent turn
+        claude-cli-session     Persistent claude subprocess per agent
+        ollama-api             Ollama HTTP API
+        ollama-cli-agents      ollama run subprocess per agent turn
+        ollama-cli             ollama run subprocess per agent turn (alias)
+        ollama-orchestrator    Single-shot Ollama self-orchestrating backend
+
+    Legacy aliases:
+        api          → claude-api
+        cli          → claude-cli-agents
+        cli-session  → claude-cli-session
+        ollama       → ollama-api
+
     Args:
         backend_type: One of the recognised backend identifiers (see _CHOICES).
-            Legacy aliases ``api``, ``cli``, ``cli-session``, ``ollama``,
-            ``ollama-cli`` are still accepted for backwards compatibility.
         output_path: Required for ``"claude-cli-session"``; the run output
             folder used as the subprocess working directory.
 
@@ -48,9 +61,11 @@ def make_backend(
         return PersistentCliBackend(output_path)
     if backend_type == "ollama-api":
         return OllamaBackend()
-    if backend_type == "ollama-cli-agents":
+    if backend_type in ("ollama-cli-agents", "ollama-cli"):
+        # Both names mean per-agent CLI invocation (ollama run per turn)
         return OllamaCliBackend()
-    if backend_type == "ollama-cli":
+    if backend_type == "ollama-orchestrator":
+        # Single model call that self-orchestrates the entire debate
         return OllamaOrchestratorBackend()
 
     # Legacy aliases

@@ -1,15 +1,33 @@
-"""Anthropic SDK backend."""
+"""Anthropic SDK backend.
+
+Note: ``anthropic`` is imported lazily inside ``__init__`` to avoid Windows
+MAX_PATH failures when the project lives in a deeply nested path.  The module
+reference is stored as ``self._anthropic`` so unit tests can still patch it via
+``patch.object(backend, '_client', ...)``.
+"""
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
-
-import anthropic
+from typing import TYPE_CHECKING, Any
 
 from src.backends._base import Backend
 
 if TYPE_CHECKING:
     from src.cost import CostTracker
+
+# Lazy module-level reference populated on first instantiation.
+# Tests that patch ``src.backends._api.anthropic`` must use
+# ``patch("src.backends._api._get_anthropic")`` instead.
+anthropic: Any = None  # noqa: N816 — intentional shadowing for patch compat
+
+
+def _get_anthropic() -> Any:
+    """Return the ``anthropic`` module, importing it on first call."""
+    global anthropic  # noqa: PLW0603
+    if anthropic is None:
+        import anthropic as _ant  # noqa: PLC0415
+        anthropic = _ant
+    return anthropic
 
 
 class ApiBackend(Backend):
@@ -21,7 +39,7 @@ class ApiBackend(Backend):
 
     def __init__(self) -> None:
         """Initialise the Anthropic SDK client."""
-        self._client = anthropic.Anthropic()
+        self._client: Any = _get_anthropic().Anthropic()
 
     def invoke(
         self,

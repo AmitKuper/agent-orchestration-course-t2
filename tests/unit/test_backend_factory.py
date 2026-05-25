@@ -11,14 +11,22 @@ from src.backends import (
     CliBackend,
     OllamaBackend,
     OllamaCliBackend,
+    OllamaOrchestratorBackend,
     make_backend,
 )
 
 
 def test_make_backend_api_returns_api_backend():
     """make_backend('api') returns an ApiBackend instance."""
-    with patch("src.backends._api.anthropic.Anthropic"):
+    with patch("src.backends._api._get_anthropic", return_value=MagicMock()):
         backend = make_backend("api")
+    assert isinstance(backend, ApiBackend)
+
+
+def test_make_backend_claude_api_returns_api_backend():
+    """make_backend('claude-api') returns an ApiBackend instance."""
+    with patch("src.backends._api._get_anthropic", return_value=MagicMock()):
+        backend = make_backend("claude-api")
     assert isinstance(backend, ApiBackend)
 
 
@@ -35,8 +43,13 @@ def test_make_backend_ollama_returns_ollama_backend():
 
 
 def test_make_backend_ollama_cli_returns_ollama_cli_backend():
-    """make_backend('ollama-cli') returns an OllamaCliBackend instance."""
+    """make_backend('ollama-cli') returns a per-agent OllamaCliBackend instance."""
     assert isinstance(make_backend("ollama-cli"), OllamaCliBackend)
+
+
+def test_make_backend_ollama_orchestrator_returns_orchestrator_backend():
+    """make_backend('ollama-orchestrator') returns an OllamaOrchestratorBackend."""
+    assert isinstance(make_backend("ollama-orchestrator"), OllamaOrchestratorBackend)
 
 
 def test_make_backend_unknown_raises():

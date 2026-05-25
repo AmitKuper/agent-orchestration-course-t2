@@ -81,6 +81,7 @@ def build_cli_parser() -> argparse.ArgumentParser:
         choices=[
             "claude-api", "claude-cli-agents", "claude-cli-session",
             "ollama-api", "ollama-cli-agents", "ollama-cli",
+            "ollama-orchestrator",
             # legacy aliases
             "api", "cli", "cli-session", "ollama",
         ],
@@ -88,8 +89,8 @@ def build_cli_parser() -> argparse.ArgumentParser:
         help=(
             "claude-api: Anthropic SDK | claude-cli-agents: claude --print per turn | "
             "claude-cli-session: persistent claude subprocess | "
-            "ollama-api: Ollama HTTP API | ollama-cli-agents: ollama run per turn | "
-            "ollama-cli: Ollama self-orchestrates the full debate"
+            "ollama-api: Ollama HTTP API | ollama-cli-agents/ollama-cli: ollama run per turn | "
+            "ollama-orchestrator: Ollama single-shot self-orchestrating mode"
         ),
     )
     p.add_argument(

@@ -68,7 +68,7 @@ class DebateOrchestrator:
         c = self.config
         if self._backend is None:
             self._backend = make_backend(c.backend, output_path=self.output.folder)
-        if c.backend in ("cli", "claude-cli-agents", "ollama-cli-agents"):
+        if c.backend in ("cli", "claude-cli-agents", "ollama-cli-agents", "ollama-cli"):
             update_agent_file_model(Path(".claude/agents/debate-agent.md"), c.model_a)
             update_agent_file_model(Path(".claude/agents/debate-judge.md"), c.model_judge)
         self._agent_a = DebateAgent(c.name_a, c.model_a, c, self.state, self.cost_tracker, position_a, c.name_b, self._backend)
