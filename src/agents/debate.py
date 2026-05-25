@@ -66,13 +66,17 @@ class DebateAgent(BaseAgent):
         Returns:
             Formatted prompt string ready to send to the backend.
         """
+        history_section = (
+            "" if self.backend.uses_memory
+            else f"Debate so far:\n{self._format_history(history)}\n\n"
+        )
         return (
-            f"You are {self.name}, debating the position: {self.position}\n"
-            f"Opponent: {self.opponent_name} | "
-            f"Turn: {turn_number} | Turns remaining after this: {turns_remaining}\n"
+            f"You are {self.name}. Your position: {self.position}\n"
+            f"You are debating directly against {self.opponent_name}. "
+            f"Turn: {turn_number} | Your turns remaining after this: {turns_remaining}\n"
             f"Minimum response length: {self.config.min_response_len} characters\n\n"
-            f"Conversation history:\n{self._format_history(history)}\n\n"
-            f"Always defend your position — never concede. Use web search for evidence.\n"
+            f"{history_section}"
+            f"Address {self.opponent_name} directly. Never concede. Use web search for evidence.\n"
             f"Respond with exactly one JSONL line:\n"
             f'{{"agent": "{self.name}", "turn": {turn_number}, '
             f'"argument": "...", "references": ["..."]}}'

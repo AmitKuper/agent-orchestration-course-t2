@@ -28,6 +28,9 @@ def update_agent_file_model(path: Path, model: str) -> None:
 class Backend(ABC):
     """Abstract invocation backend — decouples agents from the transport layer."""
 
+    uses_memory: bool = False
+    """True for CLI backends that rely on project memory for conversation history."""
+
     @abstractmethod
     def invoke(
         self,

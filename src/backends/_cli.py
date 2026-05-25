@@ -20,6 +20,8 @@ class CliBackend(Backend):
     Also strips CLAUDE*/ANTHROPIC* env vars to prevent recursive invocation.
     """
 
+    uses_memory: bool = True
+
     def invoke(
         self,
         name: str,
