@@ -7,6 +7,7 @@ from typing import TYPE_CHECKING
 
 from src.agents.loader import load_agent_def  # noqa: F401 — re-exported
 from src.constants import MAX_TOKENS_DEBATE
+from src.stance_validator import StanceValidator
 from src.validator import ResponseValidator
 
 if TYPE_CHECKING:
@@ -58,6 +59,8 @@ class BaseAgent:
         self._system_prompt = system_prompt or None
         self._max_tokens: int = MAX_TOKENS_DEBATE
         self._validator = ResponseValidator()
+        self._stance_validator = StanceValidator()
+        self._assigned_position: str | None = None
         self._logger = logging.getLogger(f"debate.agent.{name}")
 
     def invoke_with_retry(self, prompt: str, context: str = "") -> str:
@@ -74,7 +77,17 @@ class BaseAgent:
         current_prompt = full_prompt
         for attempt in range(self.config.max_retries + 1):
             response = self._invoke(current_prompt)
-            result = self._validator.validate(response, self.config.min_response_len)
+            result = self._validator.validate(
+                response,
+                self.config.min_response_len,
+                require_references=getattr(self.config, "require_references", False),
+            )
+            if result.valid and self._assigned_position is not None:
+                stance = self._stance_validator.validate(
+                    response, self._assigned_position, self.name
+                )
+                if not stance.valid:
+                    result = type(result)(False, stance.reason, "content")
             if result.valid:
                 return response
             self._logger.warning(

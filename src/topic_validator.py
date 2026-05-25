@@ -34,11 +34,11 @@ def validate_topic(
     )
 
     if backend is not None:
-        from src.cost import CostTracker
+        from src.cost import CostTracker  # noqa: PLC0415
         raw = backend.invoke("validator", model, prompt, CostTracker("validator"), 256)
     else:
-        import anthropic
-        msg = anthropic.Anthropic().messages.create(
+        from src.backends._api import _get_anthropic  # noqa: PLC0415
+        msg = _get_anthropic().Anthropic().messages.create(
             model=model,
             max_tokens=256,
             messages=[{"role": "user", "content": prompt}],

@@ -70,15 +70,14 @@ def test_strips_plain_code_fence():
 
 
 def test_fallback_to_anthropic_sdk():
-    """Without a backend, validate_topic uses the Anthropic SDK directly."""
+    """Without a backend, validate_topic uses the Anthropic SDK via _get_anthropic."""
     payload = json.dumps({"valid": True, "position_a": "SDK_A", "position_b": "SDK_B"})
     mock_msg = MagicMock()
     mock_msg.content[0].text = payload
+    mock_anthropic = MagicMock()
+    mock_anthropic.Anthropic.return_value.messages.create.return_value = mock_msg
 
-    # anthropic is imported locally inside validate_topic, so patch the class
-    # on the anthropic module itself (not via a module-level reference).
-    with patch("anthropic.Anthropic") as mock_anthropic:
-        mock_anthropic.return_value.messages.create.return_value = mock_msg
+    with patch("src.backends._api._get_anthropic", return_value=mock_anthropic):
         pos_a, pos_b = validate_topic("topic", "claude-test")
 
     assert pos_a == "SDK_A"

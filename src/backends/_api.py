@@ -37,9 +37,14 @@ class ApiBackend(Backend):
     """
 
     def __init__(self) -> None:
-        """Initialise the Anthropic SDK client and gatekeeper."""
-        self._client: Any = _get_anthropic().Anthropic()
+        """Initialise gatekeeper; defer Anthropic client creation to first invoke."""
+        self._client: Any = None
         self._gatekeeper = APIGatekeeper("anthropic")
+
+    def _ensure_client(self) -> None:
+        """Create the Anthropic SDK client on first call (lazy import)."""
+        if self._client is None:
+            self._client = _get_anthropic().Anthropic()
 
     def invoke(
         self,
@@ -75,6 +80,7 @@ class ApiBackend(Backend):
         if system is not None:
             kwargs["system"] = system
 
+        self._ensure_client()
         message = self._gatekeeper.execute(self._client.messages.create, **kwargs)
         cost_tracker.record_call(name, message.usage.input_tokens, message.usage.output_tokens)
         return message.content[0].text

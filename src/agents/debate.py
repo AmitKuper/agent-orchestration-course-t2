@@ -52,6 +52,7 @@ class DebateAgent(BaseAgent):
         super().__init__(name, model, config, state, cost_tracker, backend, system or None)
         self.position = position
         self.opponent_name = opponent_name
+        self._assigned_position = position
 
     def build_prompt(
         self, history: list[dict], turn_number: int, turns_remaining: int

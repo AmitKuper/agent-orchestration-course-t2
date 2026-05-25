@@ -10,12 +10,12 @@ from src.backends import ApiBackend
 from src.cost import CostTracker
 
 
-def _make_backend() -> ApiBackend:
-    """Return an ApiBackend with a mocked Anthropic client."""
-    mock_anthropic = MagicMock()
-    with patch("src.backends._api._get_anthropic", return_value=mock_anthropic):
-        backend = ApiBackend()
-    return backend
+def _make_backend_with_mock_client() -> tuple[ApiBackend, MagicMock]:
+    """Return an ApiBackend with a pre-injected mock client."""
+    backend = ApiBackend()
+    mock_client = MagicMock()
+    backend._client = mock_client
+    return backend, mock_client
 
 
 @pytest.fixture
@@ -26,12 +26,12 @@ def cost() -> CostTracker:
 
 def test_api_backend_records_tokens(cost: CostTracker):
     """ApiBackend.invoke records input/output tokens to the cost tracker."""
-    backend = _make_backend()
+    backend, client = _make_backend_with_mock_client()
     mock_message = MagicMock()
     mock_message.content[0].text = "response text"
     mock_message.usage.input_tokens = 100
     mock_message.usage.output_tokens = 50
-    backend._client.messages.create.return_value = mock_message
+    client.messages.create.return_value = mock_message
 
     result = backend.invoke("Agent", "claude-test", "prompt", cost, 2048)
 
@@ -43,45 +43,45 @@ def test_api_backend_records_tokens(cost: CostTracker):
 
 def test_api_backend_passes_max_tokens(cost: CostTracker):
     """ApiBackend.invoke forwards max_tokens to the API call."""
-    backend = _make_backend()
+    backend, client = _make_backend_with_mock_client()
     mock_message = MagicMock()
     mock_message.content[0].text = "ok"
     mock_message.usage.input_tokens = 10
     mock_message.usage.output_tokens = 5
-    backend._client.messages.create.return_value = mock_message
+    client.messages.create.return_value = mock_message
 
     backend.invoke("Agent", "claude-test", "prompt", cost, 4096)
 
-    backend._client.messages.create.assert_called_once()
-    call_kwargs = backend._client.messages.create.call_args
+    client.messages.create.assert_called_once()
+    call_kwargs = client.messages.create.call_args
     assert call_kwargs.kwargs.get("max_tokens") == 4096
 
 
 def test_api_backend_passes_temperature(cost: CostTracker):
     """ApiBackend.invoke includes temperature in the API call when provided."""
-    backend = _make_backend()
+    backend, client = _make_backend_with_mock_client()
     mock_message = MagicMock()
     mock_message.content[0].text = "ok"
     mock_message.usage.input_tokens = 5
     mock_message.usage.output_tokens = 5
-    backend._client.messages.create.return_value = mock_message
+    client.messages.create.return_value = mock_message
 
     backend.invoke("A", "model", "prompt", cost, 256, temperature=0.7)
 
-    call_kwargs = backend._client.messages.create.call_args.kwargs
+    call_kwargs = client.messages.create.call_args.kwargs
     assert call_kwargs.get("temperature") == 0.7
 
 
 def test_api_backend_passes_system(cost: CostTracker):
     """ApiBackend.invoke includes system prompt in the API call when provided."""
-    backend = _make_backend()
+    backend, client = _make_backend_with_mock_client()
     mock_message = MagicMock()
     mock_message.content[0].text = "ok"
     mock_message.usage.input_tokens = 5
     mock_message.usage.output_tokens = 5
-    backend._client.messages.create.return_value = mock_message
+    client.messages.create.return_value = mock_message
 
     backend.invoke("A", "model", "prompt", cost, 256, system="You are helpful.")
 
-    call_kwargs = backend._client.messages.create.call_args.kwargs
+    call_kwargs = client.messages.create.call_args.kwargs
     assert call_kwargs.get("system") == "You are helpful."

@@ -14,6 +14,7 @@ class OutputManager:
 
     Each debate run gets a dedicated timestamped folder. Result files use
     unique timestamps so multiple judge runs never overwrite each other.
+    A convenience ``result.json`` is also written as the latest result.
     """
 
     def __init__(self, run_folder: Path) -> None:
@@ -27,9 +28,6 @@ class OutputManager:
     @classmethod
     def create_run_folder(cls, outdir: str) -> OutputManager:
         """Create a timestamped output folder for a new debate run.
-
-        The caller is responsible for encoding the topic in outdir
-        (e.g. "outputs/messi-ronaldo"). The run subfolder is date only.
 
         Args:
             outdir: Base output directory (already includes topic path).
@@ -63,7 +61,7 @@ class OutputManager:
         return self._folder / FILE_LOG
 
     def result_path(self) -> Path:
-        """Return the result file path (fixed name — folder already has the timestamp)."""
+        """Return the convenience latest-result path (result.json)."""
         return self._folder / f"{FILE_RESULT_PREFIX}.json"
 
     def write_config(self, config_dict: dict) -> None:
@@ -85,6 +83,7 @@ class OutputManager:
             },
             "max_retries": config_dict.get("max_retries"),
             "min_response_len": config_dict.get("min_response_len"),
+            "require_references": config_dict.get("require_references"),
             "outdir": config_dict.get("outdir"),
             "backend": config_dict.get("backend"),
             "temperature": config_dict.get("temperature"),
@@ -109,14 +108,21 @@ class OutputManager:
         path.write_text(json.dumps(info, indent=2), encoding="utf-8")
 
     def write_result(self, verdict: dict) -> Path:
-        """Write a judge verdict to a unique timestamped result file.
+        """Write a judge verdict to a unique timestamped file and update result.json.
+
+        Always writes a timestamped file so previous verdicts are preserved.
+        Also writes ``result.json`` as a convenience pointer to the latest verdict.
 
         Args:
             verdict: Structured judge output dict.
 
         Returns:
-            Path to the written result file.
+            Path to the timestamped result file that was written.
         """
-        path = self.result_path()
-        path.write_text(json.dumps(verdict, indent=2), encoding="utf-8")
-        return path
+        ts = datetime.now().strftime("%Y%m%d_%H%M%S")
+        timestamped_path = self._folder / f"{FILE_RESULT_PREFIX}_{ts}.json"
+        payload = json.dumps(verdict, indent=2)
+        timestamped_path.write_text(payload, encoding="utf-8")
+        # Also keep result.json as the latest for convenience
+        self.result_path().write_text(payload, encoding="utf-8")
+        return timestamped_path

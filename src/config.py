@@ -38,6 +38,7 @@ class DebateConfig:
     min_response_len: int = MIN_RESPONSE_LEN
     outdir: str = DEFAULT_OUTDIR
     factcheck: bool = False
+    require_references: bool = False
     log_level: str = DEFAULT_LOG_LEVEL
     resume: bool = False
     config_file: str | None = None
@@ -66,6 +67,15 @@ def build_cli_parser() -> argparse.ArgumentParser:
     p.add_argument("--outdir", type=str, help="Output directory")
     p.add_argument(
         "--factcheck", action="store_true", default=None, help="Enable factcheck"
+    )
+    p.add_argument(
+        "--require-references", dest="require_references",
+        action="store_true", default=None,
+        help=(
+            "Require each debater turn to include at least one reference. "
+            "Only effective for backends that support web search (e.g. claude-cli-agents). "
+            "Documented limitation: API/Ollama backends cannot perform real web search."
+        ),
     )
     p.add_argument(
         "--log-level", dest="log_level", choices=["DEBUG", "INFO", "WARNING", "ERROR"]
