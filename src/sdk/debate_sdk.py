@@ -43,18 +43,21 @@ class DebateSDK:
     Hides orchestration internals from callers; provides run() and resume().
     """
 
-    def run(self, config: DebateConfig) -> DebateResult:
+    def run(self, config: DebateConfig, argv: list[str] | None = None) -> DebateResult:
         """Run a full debate from scratch and return structured results.
 
         Args:
             config: Fully resolved debate configuration.
+            argv: sys.argv to record in run_info.json; defaults to empty list.
 
         Returns:
             DebateResult with output path, verdict, and cost summary.
         """
-        from orchestrator import DebateOrchestrator
+        import sys  # noqa: PLC0415
+        from orchestrator import DebateOrchestrator  # noqa: PLC0415
 
         output = OutputManager.create_run_folder(config.outdir)
+        output.write_run_info(config.backend, argv or sys.argv)
         state = ConversationState(output.conversation_path)
         tracker = CostTracker(output.folder.name)
         orch = DebateOrchestrator(config, output, state, tracker)
