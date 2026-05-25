@@ -10,7 +10,7 @@ from pathlib import Path
 
 from src.agents.debate import DebateAgent
 from src.agents.judge import JudgeAgent
-from src.backends import make_backend, update_agent_file_model
+from src.backends import OrchestratorBackend, make_backend, update_agent_file_model
 from src.config import DebateConfig
 from src.constants import COST_MD_PATH
 from src.cost import CostTracker
@@ -58,13 +58,17 @@ class DebateOrchestrator:
         Raises:
             InvalidTopicError: If the topic cannot be split into two clear sides.
         """
-        return validate_topic(topic, self.config.model_judge, make_backend(self.config.backend))
+        backend = self._backend or make_backend(self.config.backend, output_path=self.output.folder)
+        if isinstance(backend, OrchestratorBackend):
+            backend = make_backend("ollama-api")
+        return validate_topic(topic, self.config.model_judge, backend)
 
     def initialize_agents(self, position_a: str, position_b: str) -> None:
         """Construct DebateAgent A, B and JudgeAgent with assigned positions."""
         c = self.config
-        self._backend = make_backend(c.backend, output_path=self.output.folder)
-        if c.backend in ("cli", "ollama-cli"):
+        if self._backend is None:
+            self._backend = make_backend(c.backend, output_path=self.output.folder)
+        if c.backend in ("cli", "claude-cli-agents", "ollama-cli-agents"):
             update_agent_file_model(Path(".claude/agents/debate-agent.md"), c.model_a)
             update_agent_file_model(Path(".claude/agents/debate-judge.md"), c.model_judge)
         self._agent_a = DebateAgent(c.name_a, c.model_a, c, self.state, self.cost_tracker, position_a, c.name_b, self._backend)
@@ -88,12 +92,16 @@ class DebateOrchestrator:
     def run_debate(self) -> None:
         """Full lifecycle: validate topic → init agents → all turns → judge → cost."""
         self._logger.info("Debate starting: %s", self.config.topic)
+        self._backend = make_backend(self.config.backend, output_path=self.output.folder)
         pos_a, pos_b = self.validate_topic(self.config.topic)
         self._logger.info("Positions — A: %s | B: %s", pos_a, pos_b)
-        self.initialize_agents(pos_a, pos_b)
         self.output.write_config(asdict(self.config))
-        self._run_turns(1)
-        self._run_judge()
+        if isinstance(self._backend, OrchestratorBackend):
+            self._run_orchestrated(pos_a, pos_b)
+        else:
+            self.initialize_agents(pos_a, pos_b)
+            self._run_turns(1)
+            self._run_judge()
         self.cost_tracker.append_to_cost_md(Path(COST_MD_PATH))
 
     def resume_debate(self) -> None:
@@ -111,6 +119,18 @@ class DebateOrchestrator:
         self._run_turns(start)
         self._run_judge()
         self.cost_tracker.append_to_cost_md(Path(COST_MD_PATH))
+
+    def _run_orchestrated(self, pos_a: str, pos_b: str) -> None:
+        """Delegate the full debate to an OrchestratorBackend and write outputs."""
+        turns, verdict = self._backend.run_debate(self.config, pos_a, pos_b)
+        for turn in turns:
+            self.state.append_turn(turn)
+        self._logger.info("Orchestrator produced %d turns.", len(turns))
+        if verdict:
+            path = self.output.write_result(verdict)
+            self._logger.info("Verdict written to %s.", path)
+        else:
+            self._logger.error("Orchestrator backend produced no verdict.")
 
     def _run_judge(self) -> None:
         """Invoke the judge with timeout; write verdict to output or log failure."""

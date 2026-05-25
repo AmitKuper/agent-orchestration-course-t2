@@ -67,7 +67,7 @@ class DebateAgent(BaseAgent):
             Formatted prompt string ready to send to the backend.
         """
         history_section = (
-            "" if self.backend.uses_memory
+            "" if self._backend.uses_memory
             else f"Debate so far:\n{self._format_history(history)}\n\n"
         )
         return (

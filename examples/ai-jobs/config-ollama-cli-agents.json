@@ -1,7 +1,7 @@
 {
   "topic": "Will AI automation destroy more jobs than it creates, causing long-term unemployment, or will it generate new industries and opportunities that outweigh the losses?",
   "turns": 20,
-  "backend": "ollama-api",
+  "backend": "ollama-cli-agents",
   "debater_a": {
     "name": "Pessimist",
     "model": "Qwen3:14b"
@@ -16,5 +16,5 @@
   },
   "max_retries": 2,
   "min_response_len": 200,
-  "outdir": "outputs/ai-jobs-api"
+  "outdir": "outputs/ai-jobs-ollama-cli-agents"
 }

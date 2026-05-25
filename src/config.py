@@ -78,12 +78,18 @@ def build_cli_parser() -> argparse.ArgumentParser:
     )
     p.add_argument(
         "--backend",
-        choices=["api", "cli", "cli-session", "ollama-cli", "ollama"],
+        choices=[
+            "claude-api", "claude-cli-agents", "claude-cli-session",
+            "ollama-api", "ollama-cli-agents", "ollama-cli",
+            # legacy aliases
+            "api", "cli", "cli-session", "ollama",
+        ],
         default=None,
         help=(
-            "Invocation backend: 'api' (Anthropic SDK), 'cli' (claude --print per turn), "
-            "'cli-session' (persistent claude subprocess), "
-            "'ollama-cli' (ollama run <model>), or 'ollama' (Ollama HTTP API)"
+            "claude-api: Anthropic SDK | claude-cli-agents: claude --print per turn | "
+            "claude-cli-session: persistent claude subprocess | "
+            "ollama-api: Ollama HTTP API | ollama-cli-agents: ollama run per turn | "
+            "ollama-cli: Ollama self-orchestrates the full debate"
         ),
     )
     p.add_argument(
