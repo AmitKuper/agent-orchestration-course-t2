@@ -78,10 +78,11 @@ def build_cli_parser() -> argparse.ArgumentParser:
     )
     p.add_argument(
         "--backend",
-        choices=["api", "cli", "ollama-cli", "ollama"],
+        choices=["api", "cli", "cli-session", "ollama-cli", "ollama"],
         default=None,
         help=(
-            "Invocation backend: 'api' (Anthropic SDK), 'cli' (claude --model … --print), "
+            "Invocation backend: 'api' (Anthropic SDK), 'cli' (claude --print per turn), "
+            "'cli-session' (persistent claude subprocess), "
             "'ollama-cli' (ollama run <model>), or 'ollama' (Ollama HTTP API)"
         ),
     )

@@ -10,6 +10,7 @@ from src.backends._base import Backend, update_agent_file_model
 from src.backends._cli import CliBackend, OllamaCliBackend
 from src.backends._factory import make_backend
 from src.backends._ollama import OllamaBackend
+from src.backends._persistent_cli import PersistentCliBackend
 
 __all__ = [
     "Backend",
@@ -17,6 +18,7 @@ __all__ = [
     "CliBackend",
     "OllamaCliBackend",
     "OllamaBackend",
+    "PersistentCliBackend",
     "make_backend",
     "update_agent_file_model",
 ]

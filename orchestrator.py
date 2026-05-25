@@ -48,7 +48,9 @@ class DebateOrchestrator:
         self._agent_a: DebateAgent | None = None
         self._agent_b: DebateAgent | None = None
         self._judge: JudgeAgent | None = None
+        self._backend = None
         atexit.register(self._flush_logs)
+        atexit.register(self._close_backend)
 
     def validate_topic(self, topic: str) -> tuple[str, str]:
         """Check if topic is debatable; return (position_a, position_b).
@@ -61,13 +63,13 @@ class DebateOrchestrator:
     def initialize_agents(self, position_a: str, position_b: str) -> None:
         """Construct DebateAgent A, B and JudgeAgent with assigned positions."""
         c = self.config
-        backend = make_backend(c.backend)
+        self._backend = make_backend(c.backend, output_path=self.output.folder)
         if c.backend in ("cli", "ollama-cli"):
             update_agent_file_model(Path(".claude/agents/debate-agent.md"), c.model_a)
             update_agent_file_model(Path(".claude/agents/debate-judge.md"), c.model_judge)
-        self._agent_a = DebateAgent(c.name_a, c.model_a, c, self.state, self.cost_tracker, position_a, c.name_b, backend)
-        self._agent_b = DebateAgent(c.name_b, c.model_b, c, self.state, self.cost_tracker, position_b, c.name_a, backend)
-        self._judge = JudgeAgent("Judge", c.model_judge, c, self.state, self.cost_tracker, c.name_a, c.name_b, backend)
+        self._agent_a = DebateAgent(c.name_a, c.model_a, c, self.state, self.cost_tracker, position_a, c.name_b, self._backend)
+        self._agent_b = DebateAgent(c.name_b, c.model_b, c, self.state, self.cost_tracker, position_b, c.name_a, self._backend)
+        self._judge = JudgeAgent("Judge", c.model_judge, c, self.state, self.cost_tracker, c.name_a, c.name_b, self._backend)
 
     def run_turn(self, agent: DebateAgent, turn_number: int) -> str:
         """Run one turn: watchdog → retry → return response or empty string."""
@@ -113,6 +115,11 @@ class DebateOrchestrator:
     def _run_judge(self) -> None:
         """Invoke the judge with timeout; write verdict to output or log failure."""
         execute_judge(self._judge, self.state, self.config.factcheck, self.output, self._logger)
+
+    def _close_backend(self) -> None:
+        """Close the backend (terminates persistent subprocesses if any)."""
+        if self._backend is not None:
+            self._backend.close()
 
     def _flush_logs(self) -> None:
         """Flush and close all handlers on the orchestrator logger."""
