@@ -10,6 +10,12 @@ from src.backends import OllamaBackend
 from src.cost import CostTracker
 
 
+@pytest.fixture(autouse=True)
+def no_sleep(monkeypatch):
+    """Patch time.sleep in gatekeeper so retry tests don't actually wait."""
+    monkeypatch.setattr("src.shared.gatekeeper.time.sleep", lambda _: None)
+
+
 @pytest.fixture
 def cost() -> CostTracker:
     """Return a fresh CostTracker."""

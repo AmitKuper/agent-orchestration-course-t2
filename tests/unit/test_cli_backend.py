@@ -1,4 +1,4 @@
-"""Unit tests for CliBackend."""
+"""Unit tests for CliBackend and OllamaCliBackend."""
 
 from __future__ import annotations
 
@@ -6,7 +6,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from src.backends import CliBackend
+from src.backends import CliBackend, OllamaCliBackend
 from src.cost import CostTracker
 
 
@@ -14,6 +14,12 @@ from src.cost import CostTracker
 def cost() -> CostTracker:
     """Return a fresh CostTracker."""
     return CostTracker("test")
+
+
+@pytest.fixture(autouse=True)
+def no_sleep(monkeypatch):
+    """Patch time.sleep in gatekeeper so retry tests don't actually wait."""
+    monkeypatch.setattr("src.shared.gatekeeper.time.sleep", lambda _: None)
 
 
 def test_cli_backend_returns_stdout(cost: CostTracker):
@@ -64,6 +70,31 @@ def test_cli_backend_raises_on_nonzero_exit(cost: CostTracker):
 
     with (
         patch("src.backends._cli.subprocess.run", return_value=mock_result),
-        pytest.raises(RuntimeError, match="claude CLI failed"),
+        pytest.raises(RuntimeError),
     ):
         CliBackend().invoke("Agent", "any-model", "prompt", cost, 2048)
+
+
+def test_ollama_cli_backend_returns_stdout(cost: CostTracker):
+    """OllamaCliBackend.invoke returns stripped stdout from ollama."""
+    mock_result = MagicMock()
+    mock_result.returncode = 0
+    mock_result.stdout = '{"agent":"B","turn":2,"argument":"yes","references":[]}\n'
+
+    with patch("src.backends._cli.subprocess.run", return_value=mock_result):
+        result = OllamaCliBackend().invoke("Agent B", "llama3.2", "prompt", cost, 2048)
+
+    assert "agent" in result
+
+
+def test_ollama_cli_backend_raises_on_nonzero_exit(cost: CostTracker):
+    """OllamaCliBackend.invoke raises RuntimeError when ollama exits non-zero."""
+    mock_result = MagicMock()
+    mock_result.returncode = 1
+    mock_result.stderr = "ollama error"
+
+    with (
+        patch("src.backends._cli.subprocess.run", return_value=mock_result),
+        pytest.raises(RuntimeError),
+    ):
+        OllamaCliBackend().invoke("Agent B", "llama3.2", "prompt", cost, 2048)

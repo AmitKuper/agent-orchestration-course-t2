@@ -1,9 +1,7 @@
 """Anthropic SDK backend.
 
 Note: ``anthropic`` is imported lazily inside ``__init__`` to avoid Windows
-MAX_PATH failures when the project lives in a deeply nested path.  The module
-reference is stored as ``self._anthropic`` so unit tests can still patch it via
-``patch.object(backend, '_client', ...)``.
+MAX_PATH failures when the project lives in a deeply nested path.
 """
 
 from __future__ import annotations
@@ -11,14 +9,13 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Any
 
 from src.backends._base import Backend
+from src.shared.gatekeeper import APIGatekeeper
 
 if TYPE_CHECKING:
     from src.cost import CostTracker
 
-# Lazy module-level reference populated on first instantiation.
-# Tests that patch ``src.backends._api.anthropic`` must use
-# ``patch("src.backends._api._get_anthropic")`` instead.
-anthropic: Any = None  # noqa: N816 — intentional shadowing for patch compat
+# Lazy module-level reference; tests patch ``_get_anthropic`` directly.
+anthropic: Any = None  # noqa: N816
 
 
 def _get_anthropic() -> Any:
@@ -31,15 +28,18 @@ def _get_anthropic() -> Any:
 
 
 class ApiBackend(Backend):
-    """Calls the Anthropic Messages API directly.
+    """Calls the Anthropic Messages API via APIGatekeeper.
 
+    All requests route through the gatekeeper, which reads rate limits from
+    ``config/rate_limits.json`` and retries transient failures automatically.
     Requires ``ANTHROPIC_API_KEY`` environment variable.
     Records actual input/output token counts to the cost tracker.
     """
 
     def __init__(self) -> None:
-        """Initialise the Anthropic SDK client."""
+        """Initialise the Anthropic SDK client and gatekeeper."""
         self._client: Any = _get_anthropic().Anthropic()
+        self._gatekeeper = APIGatekeeper("anthropic")
 
     def invoke(
         self,
@@ -51,7 +51,7 @@ class ApiBackend(Backend):
         temperature: float | None = None,
         system: str | None = None,
     ) -> str:
-        """Call the Anthropic API and record token usage.
+        """Call the Anthropic API through the gatekeeper and record token usage.
 
         Args:
             name: Agent display name for cost tracking.
@@ -74,6 +74,7 @@ class ApiBackend(Backend):
             kwargs["temperature"] = temperature
         if system is not None:
             kwargs["system"] = system
-        message = self._client.messages.create(**kwargs)
+
+        message = self._gatekeeper.execute(self._client.messages.create, **kwargs)
         cost_tracker.record_call(name, message.usage.input_tokens, message.usage.output_tokens)
         return message.content[0].text

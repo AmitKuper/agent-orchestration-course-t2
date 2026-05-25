@@ -1,4 +1,8 @@
-"""Persistent CLI backend — keeps a claude subprocess alive per agent."""
+"""Persistent CLI backend — keeps a claude subprocess alive per agent.
+
+``--dangerously-skip-permissions`` is conditional on the
+``CLAUDE_SKIP_PERMISSIONS`` environment variable (defaults to ``true``).
+"""
 
 from __future__ import annotations
 
@@ -12,6 +16,8 @@ from src.backends._base import Backend
 
 if TYPE_CHECKING:
     from src.cost import CostTracker
+
+_CLAUDE_SKIP_PERMS = os.getenv("CLAUDE_SKIP_PERMISSIONS", "true").lower() == "true"
 
 
 class PersistentCliBackend(Backend):
@@ -53,13 +59,15 @@ class PersistentCliBackend(Backend):
             model: Claude model ID.
             system: System prompt text injected via ``--system-prompt``.
         """
+        cmd = [
+            "claude", "--model", model,
+            "--output-format", "stream-json",
+            "--system-prompt", system,
+        ]
+        if _CLAUDE_SKIP_PERMS:
+            cmd.append("--dangerously-skip-permissions")
         self._sessions[name] = subprocess.Popen(
-            [
-                "claude", "--model", model,
-                "--output-format", "stream-json",
-                "--system-prompt", system,
-                "--dangerously-skip-permissions",
-            ],
+            cmd,
             stdin=subprocess.PIPE,
             stdout=subprocess.PIPE,
             text=True,

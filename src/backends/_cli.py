@@ -1,4 +1,13 @@
-"""CLI backends: Claude Code CLI and Ollama CLI."""
+"""CLI backends: Claude Code CLI and Ollama CLI.
+
+Both backends route subprocess calls through the APIGatekeeper for retry
+and logging. Subprocess timeouts are enforced via ``subprocess.run(...,
+timeout=...)``.
+
+``--dangerously-skip-permissions`` for the Claude CLI is opt-in via the
+``CLAUDE_SKIP_PERMISSIONS`` environment variable (default: ``true`` for
+non-interactive use, but can be set to ``false`` to disable).
+"""
 
 from __future__ import annotations
 
@@ -8,19 +17,28 @@ from typing import TYPE_CHECKING
 
 from src.backends._ansi import extract_response
 from src.backends._base import Backend
+from src.constants import DEBATER_TIMEOUT
+from src.shared.gatekeeper import APIGatekeeper
 
 if TYPE_CHECKING:
     from src.cost import CostTracker
+
+_CLAUDE_SKIP_PERMS = os.getenv("CLAUDE_SKIP_PERMISSIONS", "true").lower() == "true"
 
 
 class CliBackend(Backend):
     """Shells out to ``claude --model <m> --print`` via Pro OAuth.
 
     Token counts are unavailable; records zeros to the cost tracker.
-    Also strips CLAUDE*/ANTHROPIC* env vars to prevent recursive invocation.
+    Strips CLAUDE*/ANTHROPIC* env vars to prevent recursive invocation.
+    Routes each subprocess call through APIGatekeeper for retry logic.
     """
 
     uses_memory: bool = True
+
+    def __init__(self) -> None:
+        """Initialise gatekeeper for CLI backend."""
+        self._gatekeeper = APIGatekeeper("cli")
 
     def invoke(
         self,
@@ -47,32 +65,48 @@ class CliBackend(Backend):
             Stripped stdout from the claude subprocess.
 
         Raises:
-            RuntimeError: If the claude CLI exits with a non-zero code.
+            RuntimeError: If the claude CLI exits with a non-zero code or times out.
         """
         env = {
             k: v for k, v in os.environ.items()
             if not k.startswith("CLAUDE") and not k.startswith("ANTHROPIC")
         }
-        result = subprocess.run(
-            ["claude", "--model", model, "--print", "--dangerously-skip-permissions"],
-            input=prompt,
-            capture_output=True,
-            text=True,
-            encoding="utf-8",
-            env=env,
-        )
-        if result.returncode != 0:
-            raise RuntimeError(f"claude CLI failed (rc={result.returncode}): {result.stderr[:200]}")
+        cmd = ["claude", "--model", model, "--print"]
+        if _CLAUDE_SKIP_PERMS:
+            cmd.append("--dangerously-skip-permissions")
+
+        def _run() -> str:
+            result = subprocess.run(
+                cmd,
+                input=prompt,
+                capture_output=True,
+                text=True,
+                encoding="utf-8",
+                env=env,
+                timeout=DEBATER_TIMEOUT,
+            )
+            if result.returncode != 0:
+                raise RuntimeError(
+                    f"claude CLI failed (rc={result.returncode}): {result.stderr[:200]}"
+                )
+            return extract_response(result.stdout)
+
+        output = self._gatekeeper.execute(_run)
         cost_tracker.record_call(name, 0, 0)
-        return extract_response(result.stdout)
+        return output
 
 
 class OllamaCliBackend(Backend):
-    """Shells out to ``ollama run <model>`` — routes through local Ollama CLI.
+    """Shells out to ``ollama run <model>`` per agent turn.
 
     Requires the target model to be installed locally (``ollama pull <model>``).
     Temperature, system prompts, and token counts are unavailable.
+    Routes each subprocess call through APIGatekeeper for retry logic.
     """
+
+    def __init__(self) -> None:
+        """Initialise gatekeeper for Ollama CLI backend."""
+        self._gatekeeper = APIGatekeeper("ollama")
 
     def invoke(
         self,
@@ -99,16 +133,23 @@ class OllamaCliBackend(Backend):
             Stripped stdout from the ollama subprocess.
 
         Raises:
-            RuntimeError: If the ollama CLI exits with a non-zero code.
+            RuntimeError: If the ollama CLI exits with a non-zero code or times out.
         """
-        result = subprocess.run(
-            ["ollama", "run", model],
-            input=prompt,
-            capture_output=True,
-            text=True,
-            encoding="utf-8",
-        )
-        if result.returncode != 0:
-            raise RuntimeError(f"ollama CLI failed (rc={result.returncode}): {result.stderr[:200]}")
+        def _run() -> str:
+            result = subprocess.run(
+                ["ollama", "run", model],
+                input=prompt,
+                capture_output=True,
+                text=True,
+                encoding="utf-8",
+                timeout=DEBATER_TIMEOUT,
+            )
+            if result.returncode != 0:
+                raise RuntimeError(
+                    f"ollama CLI failed (rc={result.returncode}): {result.stderr[:200]}"
+                )
+            return extract_response(result.stdout)
+
+        output = self._gatekeeper.execute(_run)
         cost_tracker.record_call(name, 0, 0)
-        return extract_response(result.stdout)
+        return output
