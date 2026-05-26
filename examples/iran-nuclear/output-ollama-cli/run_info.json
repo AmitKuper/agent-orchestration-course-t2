@@ -1,0 +1,10 @@
+{
+  "timestamp": "2026-05-26 09:41:20",
+  "backend": "ollama-cli",
+  "command": "main.py --config examples/iran-nuclear/config-ollama-cli.json",
+  "argv": [
+    "main.py",
+    "--config",
+    "examples/iran-nuclear/config-ollama-cli.json"
+  ]
+}

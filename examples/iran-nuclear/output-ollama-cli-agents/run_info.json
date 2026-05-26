@@ -1,0 +1,16 @@
+{
+  "timestamp": "2026-05-26 17:18:55",
+  "backend": "ollama-cli-agents",
+  "command": "main.py --config examples/iran-nuclear/config-ollama-cli-agents.json --model-a gemma3:12b --model-b gemma3:12b --model-judge gemma3:12b",
+  "argv": [
+    "main.py",
+    "--config",
+    "examples/iran-nuclear/config-ollama-cli-agents.json",
+    "--model-a",
+    "gemma3:12b",
+    "--model-b",
+    "gemma3:12b",
+    "--model-judge",
+    "gemma3:12b"
+  ]
+}

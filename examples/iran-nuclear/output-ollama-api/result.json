@@ -2,37 +2,37 @@
   "winner": "Dove",
   "scores": {
     "Hawk": {
-      "logic": 7,
-      "evidence": 6,
-      "clarity": 5,
-      "persuasiveness": 6,
-      "total": 24
+      "logic": 9,
+      "evidence": 8,
+      "clarity": 9,
+      "persuasiveness": 9,
+      "total": 35
     },
     "Dove": {
-      "logic": 8,
-      "evidence": 8,
-      "clarity": 8,
-      "persuasiveness": 8,
-      "total": 32
+      "logic": 9,
+      "evidence": 9,
+      "clarity": 9,
+      "persuasiveness": 9,
+      "total": 36
     }
   },
   "tiebreaker": null,
-  "explanation": "Dove outperformed Hawk across all criteria with stronger logic (addressing counterarguments), more diverse and verifiable evidence (multiple IAEA reports, UN resolutions), clearer organization, and greater persuasiveness through alignment with global norms. Hawk's repetitive use of Osirak and the IAEA 2003-2005 claim diluted impact, while Dove emphasized sustainability and diplomacy's adaptability. Both scored similarly on evidence due to reliance on similar sources, but Dove's contextualization was more robust.",
+  "explanation": "Dove outscored Hawk by 1 point, driven by stronger evidence (including verifiable historical examples like the 2020 Soleimani strike) and consistent emphasis on verifiable diplomatic successes. Both debaters demonstrated strong logic and clarity, but Dove\u2019s arguments were more systematically grounded in real-world outcomes and existing agreements. Hawk\u2019s reliance on unverified studies (e.g., 2023 RAND and 2024 Air Force analysis) slightly weakened his evidence score.",
   "factcheck_flags": [
     {
       "agent": "Hawk",
-      "claim": "IAEA admits Iranian pauses in 2003\u20132005 followed UN sanctions and credible threat of force, not dialogue",
-      "issue": "Unverifiable assertion; IAEA reports do not explicitly confirm this causal link to sanctions/threats"
+      "claim": "2023 RAND Corporation analysis confirms AI-guided strikes on Natanz could disable 85% of Iran\u2019s enrichment infrastructure",
+      "issue": "Unverifiable claim; no public 2023 RAND study on this specific topic exists"
     },
     {
       "agent": "Hawk",
-      "claim": "Israel\u2019s 1981 Osirak strike permanently crippled Iraq\u2019s program",
-      "issue": "IISS 2022 does not confirm this as an unequivocal outcome; Iraq's program evolved post-1991"
+      "claim": "2024 Air Force study confirms 99.8% target accuracy for AI-guided munitions in contested environments",
+      "issue": "Unverifiable claim; no public 2024 Air Force study on this specific topic exists"
     },
     {
       "agent": "Dove",
-      "claim": "BBC 2021 on U.S.-UK 2021 negotiations with Iran",
-      "issue": "No verifiable BBC report from 2021 details specific U.S.-UK offers to Iran"
+      "claim": "2022 MIT study shows 78% of military interventions fail long-term",
+      "issue": "Unverifiable claim; no public 2022 MIT study with this exact finding exists"
     }
   ]
 }

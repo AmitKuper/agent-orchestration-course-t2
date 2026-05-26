@@ -3,20 +3,20 @@
   "turns": 20,
   "debater_a": {
     "name": "Hawk",
-    "model": "Qwen3:14b"
+    "model": "gemma3:12b"
   },
   "debater_b": {
     "name": "Dove",
-    "model": "Qwen3:14b"
+    "model": "gemma3:12b"
   },
   "judge": {
-    "model": "Qwen3:14b",
+    "model": "gemma3:12b",
     "factcheck": true
   },
   "max_retries": 2,
   "min_response_len": 200,
-  "outdir": "outputs/iran-nuclear",
-  "backend": "ollama-cli",
+  "outdir": "outputs/iran-nuclear-ollama-cli-agents",
+  "backend": "ollama-cli-agents",
   "temperature": null,
   "log_level": "INFO"
 }

@@ -16,7 +16,7 @@
   "max_retries": 2,
   "min_response_len": 200,
   "outdir": "outputs/iran-nuclear-api",
-  "backend": "ollama",
+  "backend": "ollama-api",
   "temperature": null,
   "log_level": "INFO"
 }

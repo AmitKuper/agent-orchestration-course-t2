@@ -1,0 +1,22 @@
+{
+  "winner": "TeamMessi",
+  "scores": {
+    "TeamMessi": {
+      "logic": 9,
+      "evidence": 9,
+      "clarity": 8,
+      "persuasiveness": 9,
+      "total": 45
+    },
+    "TeamRonaldo": {
+      "logic": 7,
+      "evidence": 7,
+      "clarity": 7,
+      "persuasiveness": 7,
+      "total": 35
+    }
+  },
+  "tiebreaker": null,
+  "explanation": "TeamMessi presented more consistent, data-driven arguments about Messi's longevity, all-around impact, and superior international performance, while TeamRonaldo's claims were often refuted with counter-evidence. Messi's 2019 and 2021 Ballon d'Or wins, along with his 818 career goals, were key differentiators.",
+  "factcheck_flags": []
+}

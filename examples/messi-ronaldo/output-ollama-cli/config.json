@@ -1,5 +1,5 @@
 {
-  "topic": "Who is the greatest soccer player of all time \u00e2\u20ac\u201d Lionel Messi or Cristiano Ronaldo?",
+  "topic": "Who is the greatest soccer player of all time \u2014 Lionel Messi or Cristiano Ronaldo?",
   "turns": 20,
   "debater_a": {
     "name": "TeamMessi",
@@ -15,8 +15,8 @@
   },
   "max_retries": 2,
   "min_response_len": 200,
-  "outdir": "outputs/messi-ronaldo-api",
-  "backend": "ollama-api",
+  "outdir": "outputs/messi-ronaldo-ollama-cli",
+  "backend": "ollama-cli",
   "temperature": null,
   "log_level": "INFO"
 }

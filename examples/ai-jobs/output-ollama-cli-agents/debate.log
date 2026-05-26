@@ -1,0 +1,45 @@
+2026-05-26 09:19:41,993 [INFO] debate.orchestrator: Debate starting: Will AI automation destroy more jobs than it creates, causing long-term unemployment, or will it generate new industries and opportunities that outweigh the losses?
+2026-05-26 09:19:46,364 [INFO] debate.orchestrator: Positions — A: Will AI automation destroy more jobs than it creates, causing long-term unemployment? | B: Will it generate new industries and opportunities that outweigh the losses?
+2026-05-26 09:19:46,365 [INFO] debate.orchestrator: Turn 1/20 — Pessimist
+2026-05-26 09:19:53,246 [INFO] debate.orchestrator: Turn 1/20 accepted from Pessimist.
+2026-05-26 09:19:53,246 [INFO] debate.orchestrator: Turn 2/20 — Optimist
+2026-05-26 09:20:05,458 [INFO] debate.orchestrator: Turn 2/20 accepted from Optimist.
+2026-05-26 09:20:05,462 [INFO] debate.orchestrator: Turn 3/20 — Pessimist
+2026-05-26 09:20:17,469 [INFO] debate.orchestrator: Turn 3/20 accepted from Pessimist.
+2026-05-26 09:20:17,470 [INFO] debate.orchestrator: Turn 4/20 — Optimist
+2026-05-26 09:20:33,001 [INFO] debate.orchestrator: Turn 4/20 accepted from Optimist.
+2026-05-26 09:20:33,002 [INFO] debate.orchestrator: Turn 5/20 — Pessimist
+2026-05-26 09:20:43,619 [WARNING] debate.agent.Pessimist: Attempt 1/3 failed for Pessimist: Invalid JSON: Expecting ',' delimiter: line 1 column 1157 (char 1156)
+2026-05-26 09:20:52,795 [INFO] debate.orchestrator: Turn 5/20 accepted from Pessimist.
+2026-05-26 09:20:52,795 [INFO] debate.orchestrator: Turn 6/20 — Optimist
+2026-05-26 09:21:06,144 [INFO] debate.orchestrator: Turn 6/20 accepted from Optimist.
+2026-05-26 09:21:06,144 [INFO] debate.orchestrator: Turn 7/20 — Pessimist
+2026-05-26 09:21:16,295 [INFO] debate.orchestrator: Turn 7/20 accepted from Pessimist.
+2026-05-26 09:21:16,296 [INFO] debate.orchestrator: Turn 8/20 — Optimist
+2026-05-26 09:21:32,428 [INFO] debate.orchestrator: Turn 8/20 accepted from Optimist.
+2026-05-26 09:21:32,429 [INFO] debate.orchestrator: Turn 9/20 — Pessimist
+2026-05-26 09:21:46,661 [INFO] debate.orchestrator: Turn 9/20 accepted from Pessimist.
+2026-05-26 09:21:46,662 [INFO] debate.orchestrator: Turn 10/20 — Optimist
+2026-05-26 09:22:02,569 [INFO] debate.orchestrator: Turn 10/20 accepted from Optimist.
+2026-05-26 09:22:02,570 [INFO] debate.orchestrator: Turn 11/20 — Pessimist
+2026-05-26 09:22:16,977 [INFO] debate.orchestrator: Turn 11/20 accepted from Pessimist.
+2026-05-26 09:22:16,977 [INFO] debate.orchestrator: Turn 12/20 — Optimist
+2026-05-26 09:22:28,127 [INFO] debate.orchestrator: Turn 12/20 accepted from Optimist.
+2026-05-26 09:22:28,127 [INFO] debate.orchestrator: Turn 13/20 — Pessimist
+2026-05-26 09:22:41,725 [INFO] debate.orchestrator: Turn 13/20 accepted from Pessimist.
+2026-05-26 09:22:41,726 [INFO] debate.orchestrator: Turn 14/20 — Optimist
+2026-05-26 09:22:59,599 [INFO] debate.orchestrator: Turn 14/20 accepted from Optimist.
+2026-05-26 09:22:59,599 [INFO] debate.orchestrator: Turn 15/20 — Pessimist
+2026-05-26 09:23:12,820 [WARNING] debate.agent.Pessimist: Attempt 1/3 failed for Pessimist: Your argument is too similar to a previous turn. You must introduce new points, angles, or evidence.
+2026-05-26 09:23:32,124 [INFO] debate.orchestrator: Turn 15/20 accepted from Pessimist.
+2026-05-26 09:23:32,124 [INFO] debate.orchestrator: Turn 16/20 — Optimist
+2026-05-26 09:23:46,399 [INFO] debate.orchestrator: Turn 16/20 accepted from Optimist.
+2026-05-26 09:23:46,399 [INFO] debate.orchestrator: Turn 17/20 — Pessimist
+2026-05-26 09:24:02,875 [INFO] debate.orchestrator: Turn 17/20 accepted from Pessimist.
+2026-05-26 09:24:02,876 [INFO] debate.orchestrator: Turn 18/20 — Optimist
+2026-05-26 09:24:20,130 [INFO] debate.orchestrator: Turn 18/20 accepted from Optimist.
+2026-05-26 09:24:20,131 [INFO] debate.orchestrator: Turn 19/20 — Pessimist
+2026-05-26 09:24:35,669 [INFO] debate.orchestrator: Turn 19/20 accepted from Pessimist.
+2026-05-26 09:24:35,670 [INFO] debate.orchestrator: Turn 20/20 — Optimist
+2026-05-26 09:24:50,986 [INFO] debate.orchestrator: Turn 20/20 accepted from Optimist.
+2026-05-26 09:25:16,213 [INFO] debate.orchestrator: Verdict written to outputs\ai-jobs-ollama-cli-agents\20260526_091941\result.json.

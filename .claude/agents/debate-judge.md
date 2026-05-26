@@ -2,7 +2,7 @@
 name: "debate-judge"
 description: "Invoked by the orchestrator after all debate turns are complete to score both debaters and declare a winner. Also user-invocable directly via /judgment on a completed debate. Use this agent when: all turns have finished and a verdict is needed, or when a user wants to re-judge a completed debate JSONL file.\n\n<example>\nContext: A 20-turn debate on 'AI will replace human creativity' has just completed. The orchestrator needs a verdict.\nuser: \"Judge the completed debate between Alex (FOR) and Jordan (AGAINST). History: [all 20 turns]. Factcheck enabled: false.\"\nassistant: \"I'll invoke the debate-judge to score both debaters and declare a winner.\"\n<commentary>\nAll turns are done. Launch the debate-judge with the full history, both agent names, and factcheck setting.\n</commentary>\n</example>\n\n<example>\nContext: A user wants to re-run judgment on a completed debate saved in outputs/run-001/conversation.jsonl.\nuser: \"Run judgment on outputs/run-001/conversation.jsonl\"\nassistant: \"I'll read the conversation file and invoke the debate-judge on the full transcript.\"\n<commentary>\nRead the JSONL file via Bash, pass the full history to the debate-judge, and save the verdict to a timestamped result file.\n</commentary>\n</example>"
 tools: WebSearch, Bash, Read
-model: Qwen3:14b
+model: gemma3:12b
 color: purple
 ---
 
