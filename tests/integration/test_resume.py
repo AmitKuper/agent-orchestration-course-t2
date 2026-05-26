@@ -44,6 +44,13 @@ def _verdict_response() -> MagicMock:
     return m
 
 
+def _mock_ant(side_effects: list) -> MagicMock:
+    """Return a mock anthropic module with configured side effects."""
+    mock_mod = MagicMock()
+    mock_mod.Anthropic.return_value.messages.create.side_effect = side_effects
+    return mock_mod
+
+
 @pytest.fixture
 def partial_setup(tmp_path: Path):
     """Set up a debate with 2 turns already completed in the JSONL file."""
@@ -78,9 +85,9 @@ def test_resume_starts_from_turn_3(partial_setup):
 
     with (
         patch("orchestrator.validate_topic", return_value=("FOR", "AGAINST")),
-        patch("anthropic.Anthropic") as mock_anthropic,
+        patch("src.backends._api._get_anthropic", return_value=_mock_ant(resume_responses)),
+        patch("src.shared.gatekeeper.time.sleep"),
     ):
-        mock_anthropic.return_value.messages.create.side_effect = resume_responses
         orch.resume_debate()
 
     turns = state.get_turns()
@@ -99,13 +106,16 @@ def test_resume_preserves_existing_turns(partial_setup):
 
     with (
         patch("orchestrator.validate_topic", return_value=("FOR", "AGAINST")),
-        patch("anthropic.Anthropic") as mock_anthropic,
+        patch(
+            "src.backends._api._get_anthropic",
+            return_value=_mock_ant([
+                _api_response(cfg.name_a, 3),
+                _api_response(cfg.name_b, 4),
+                _verdict_response(),
+            ]),
+        ),
+        patch("src.shared.gatekeeper.time.sleep"),
     ):
-        mock_anthropic.return_value.messages.create.side_effect = [
-            _api_response(cfg.name_a, 3),
-            _api_response(cfg.name_b, 4),
-            _verdict_response(),
-        ]
         orch.resume_debate()
 
     turns = state.get_turns()

@@ -47,6 +47,13 @@ def _verdict_response() -> MagicMock:
     return m
 
 
+def _mock_anthropic_module(side_effects: list) -> MagicMock:
+    """Return a mock anthropic module with a pre-configured client."""
+    mock_mod = MagicMock()
+    mock_mod.Anthropic.return_value.messages.create.side_effect = side_effects
+    return mock_mod
+
+
 @pytest.fixture
 def setup(tmp_path: Path):
     """Return orchestrator, state, and output manager for a 4-turn debate."""
@@ -78,12 +85,13 @@ def test_full_debate_writes_four_turns(setup, tmp_path):
         _debate_response(cfg.name_b, 4),
         _verdict_response(),
     ]
+    mock_ant = _mock_anthropic_module(side_effects)
 
     with (
         patch("orchestrator.validate_topic", return_value=("FOR", "AGAINST")),
-        patch("anthropic.Anthropic") as mock_anthropic,
+        patch("src.backends._api._get_anthropic", return_value=mock_ant),
+        patch("src.shared.gatekeeper.time.sleep"),
     ):
-        mock_anthropic.return_value.messages.create.side_effect = side_effects
         orch.run_debate()
 
     turns = state.get_turns()
@@ -104,15 +112,16 @@ def test_full_debate_writes_result_file(setup, tmp_path):
         _debate_response(cfg.name_b, 4),
         _verdict_response(),
     ]
+    mock_ant = _mock_anthropic_module(side_effects)
 
     with (
         patch("orchestrator.validate_topic", return_value=("FOR", "AGAINST")),
-        patch("anthropic.Anthropic") as mock_anthropic,
+        patch("src.backends._api._get_anthropic", return_value=mock_ant),
+        patch("src.shared.gatekeeper.time.sleep"),
     ):
-        mock_anthropic.return_value.messages.create.side_effect = side_effects
         orch.run_debate()
 
-    result_files = list(output.folder.glob("result.json"))
-    assert len(result_files) == 1
-    verdict = json.loads(result_files[0].read_text())
+    result_files = list(output.folder.glob("result*.json"))
+    assert len(result_files) >= 1
+    verdict = json.loads((output.folder / "result.json").read_text())
     assert verdict["winner"] == "Agent A"

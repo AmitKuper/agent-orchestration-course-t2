@@ -7,6 +7,7 @@ from typing import TYPE_CHECKING
 
 from src.agents.base import BaseAgent, load_agent_def
 from src.constants import MAX_TOKENS_JUDGE
+from src.validator import ValidationResult
 
 _SCORE_KEYS = ("logic", "evidence", "clarity", "persuasiveness")
 
@@ -56,6 +57,19 @@ class JudgeAgent(BaseAgent):
         self.agent_a_name = agent_a_name
         self.agent_b_name = agent_b_name
         self._max_tokens = MAX_TOKENS_JUDGE
+
+    def _validate_response(self, response: str) -> ValidationResult:
+        """Validate a judge verdict using the verdict schema instead of debate-turn schema.
+
+        Args:
+            response: Raw JSON string from the judge backend.
+
+        Returns:
+            ValidationResult from validate_judge_verdict().
+        """
+        return self._validator.validate_judge_verdict(
+            response, self.agent_a_name, self.agent_b_name
+        )
 
     def build_scoring_prompt(self, history: list[dict], factcheck_enabled: bool) -> str:
         """Build the judge scoring prompt from the full debate transcript.

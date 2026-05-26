@@ -30,10 +30,7 @@ def main() -> None:
 
     sdk = DebateSDK()
     try:
-        if config.resume:
-            result = sdk.resume(config)
-        else:
-            result = sdk.run(config)
+        result = sdk.resume(config) if config.resume else sdk.run(config)
     except InvalidTopicError as e:
         print(f"Invalid topic: {e}", file=sys.stderr)
         sys.exit(1)

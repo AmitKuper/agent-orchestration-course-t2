@@ -31,7 +31,7 @@ class Backend(ABC):
     uses_memory: bool = False
     """True for CLI backends that rely on project memory for conversation history."""
 
-    def close(self) -> None:
+    def close(self) -> None:  # noqa: B027
         """Release any resources held by this backend. No-op by default."""
 
     @abstractmethod

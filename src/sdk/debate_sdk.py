@@ -53,7 +53,7 @@ class DebateSDK:
         Returns:
             DebateResult with output path, verdict, and cost summary.
         """
-        import sys  # noqa: PLC0415
+        import sys  # noqa: PLC0415, I001
         from orchestrator import DebateOrchestrator  # noqa: PLC0415
 
         output = OutputManager.create_run_folder(config.outdir)

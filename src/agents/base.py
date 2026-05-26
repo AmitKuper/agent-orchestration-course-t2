@@ -8,7 +8,7 @@ from typing import TYPE_CHECKING
 from src.agents.loader import load_agent_def  # noqa: F401 — re-exported
 from src.constants import MAX_TOKENS_DEBATE
 from src.stance_validator import StanceValidator
-from src.validator import ResponseValidator
+from src.validator import ResponseValidator, ValidationResult
 
 if TYPE_CHECKING:
     from src.backends import Backend
@@ -77,11 +77,7 @@ class BaseAgent:
         current_prompt = full_prompt
         for attempt in range(self.config.max_retries + 1):
             response = self._invoke(current_prompt)
-            result = self._validator.validate(
-                response,
-                self.config.min_response_len,
-                require_references=getattr(self.config, "require_references", False),
-            )
+            result = self._validate_response(response)
             if result.valid and self._assigned_position is not None:
                 stance = self._stance_validator.validate(
                     response, self._assigned_position, self.name
@@ -101,6 +97,21 @@ class BaseAgent:
                     current_prompt = self._build_content_retry_prompt(full_prompt, result.reason)
         self._logger.error("All retries exhausted for %s — skipping turn.", self.name)
         return ""
+
+    def _validate_response(self, response: str) -> ValidationResult:
+        """Validate a raw agent response. Subclasses may override for different schemas.
+
+        Args:
+            response: Raw string returned by the agent backend.
+
+        Returns:
+            ValidationResult from the appropriate validator method.
+        """
+        return self._validator.validate(
+            response,
+            self.config.min_response_len,
+            require_references=getattr(self.config, "require_references", False),
+        )
 
     def _invoke(self, prompt: str) -> str:
         """Send prompt to the configured backend and return the raw response.

@@ -3,9 +3,11 @@
 A multi-agent pipeline where two Claude agents argue opposing sides of a topic, managed by an orchestrator, and scored by a judge agent.
 
 ## Table of Contents
+- [Architecture](#architecture)
 - [Installation](#installation)
 - [Usage](#usage)
 - [Sample Run](#sample-run)
+- [JSON Communication Protocol](#json-communication-protocol)
 - [Backends](#backends)
 - [Running with Ollama (free local backend)](#running-with-ollama-free-local-backend)
 - [Configuration](#configuration)
@@ -13,6 +15,32 @@ A multi-agent pipeline where two Claude agents argue opposing sides of a topic, 
 - [Running Tests](#running-tests)
 - [Contributing](#contributing)
 - [License](#license)
+
+---
+
+## Architecture
+
+```
+main.py
+  └── DebateSDK              # public entry point; CLI delegates here
+        └── DebateOrchestrator
+              ├── TopicValidator     # rejects non-debatable topics
+              ├── DebateAgent (A)    # argues FOR position
+              ├── DebateAgent (B)    # argues AGAINST position
+              └── JudgeAgent         # scores completed debate
+```
+
+Every agent call passes through **APIGatekeeper** — a centralized router that enforces per-backend retry/backoff and logs every call. Backends are swappable (`api`, `cli`, `ollama-cli`, `ollama`); the rest of the system is backend-agnostic.
+
+**Validation pipeline** (applied to every response before acceptance):
+
+1. Empty / too-short check
+2. API error marker detection
+3. Disrespectful language filter
+4. Markdown fence rejection (raw JSON only)
+5. Unresolved placeholder rejection
+6. JSON schema check (debate turn or judge verdict, depending on agent type)
+7. **StanceValidator** — rejects concession phrases; agents may never agree with or yield to each other
 
 ---
 
@@ -28,7 +56,7 @@ A multi-agent pipeline where two Claude agents argue opposing sides of a topic, 
 git clone <repo-url>
 cd HW2
 uv sync            # installs all dependencies
-copy .env-example .env
+copy .env.example .env
 # Edit .env — add your ANTHROPIC_API_KEY for --backend api
 ```
 
@@ -38,7 +66,7 @@ copy .env-example .env
 git clone <repo-url>
 cd HW2
 uv sync
-cp .env-example .env
+cp .env.example .env
 # Edit .env — add your ANTHROPIC_API_KEY for --backend api
 ```
 
@@ -48,7 +76,7 @@ cp .env-example .env
 pip install -e .
 pip install -e ".[dev]"      # includes ruff, pytest, pytest-cov
 pip install -e ".[ollama]"   # adds requests for Ollama API backend
-cp .env-example .env
+cp .env.example .env
 ```
 
 ---
@@ -151,6 +179,40 @@ outputs/ai-jobs/20260524_220438/
 ```
 
 Complete example outputs for three debates are available in [`examples/`](examples/).
+
+---
+
+## JSON Communication Protocol
+
+All agent-to-orchestrator communication uses strict JSON. Responses not matching the schema are rejected and retried.
+
+**Debate turn** (debater agents):
+
+```json
+{
+  "agent": "Agent A",
+  "turn": 3,
+  "argument": "Solar energy adoption has accelerated dramatically...",
+  "references": ["https://iea.org/reports/solar-2024"]
+}
+```
+
+**Judge verdict** (judge agent):
+
+```json
+{
+  "winner": "Agent A",
+  "scores": {
+    "Agent A": { "logic": 9, "evidence": 8, "clarity": 8, "persuasiveness": 9, "total": 34 },
+    "Agent B": { "logic": 7, "evidence": 7, "clarity": 7, "persuasiveness": 7, "total": 28 }
+  },
+  "tiebreaker": null,
+  "explanation": "Agent A cited more recent empirical data...",
+  "factcheck_flags": []
+}
+```
+
+Use `--require-references` to reject any turn where `references` is an empty list.
 
 ---
 
@@ -299,11 +361,14 @@ Each run creates a timestamped folder under `--outdir`:
 
 ```
 outputs/20260101_120000/
-  config.json          # resolved configuration for this run
-  conversation.jsonl   # one line per completed turn
-  debate.log           # full execution log
-  result.json          # judge verdict and scores
+  config.json                    # resolved configuration for this run
+  conversation.jsonl             # one line per completed turn
+  debate.log                     # full execution log
+  result.json                    # latest judge verdict (convenience pointer)
+  result_20260101_120500.json    # timestamped copy — never overwritten
 ```
+
+Running the judge multiple times on the same debate appends new `result_<timestamp>.json` files without overwriting previous verdicts.
 
 ---
 

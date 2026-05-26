@@ -79,11 +79,14 @@ def test_full_debate_writes_config_file(setup):
         _verdict_response(),
     ]
 
+    mock_mod = MagicMock()
+    mock_mod.Anthropic.return_value.messages.create.side_effect = side_effects
+
     with (
         patch("orchestrator.validate_topic", return_value=("FOR", "AGAINST")),
-        patch("anthropic.Anthropic") as mock_anthropic,
+        patch("src.backends._api._get_anthropic", return_value=mock_mod),
+        patch("src.shared.gatekeeper.time.sleep"),
     ):
-        mock_anthropic.return_value.messages.create.side_effect = side_effects
         orch.run_debate()
 
     assert output.config_path.exists()
