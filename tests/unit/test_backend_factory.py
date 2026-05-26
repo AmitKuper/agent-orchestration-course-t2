@@ -42,9 +42,9 @@ def test_make_backend_ollama_returns_ollama_backend():
     assert isinstance(backend, OllamaBackend)
 
 
-def test_make_backend_ollama_cli_returns_ollama_cli_backend():
-    """make_backend('ollama-cli') returns a per-agent OllamaCliBackend instance."""
-    assert isinstance(make_backend("ollama-cli"), OllamaCliBackend)
+def test_make_backend_ollama_cli_returns_ollama_orchestrator_backend():
+    """make_backend('ollama-cli') returns an OllamaOrchestratorBackend instance."""
+    assert isinstance(make_backend("ollama-cli"), OllamaOrchestratorBackend)
 
 
 def test_make_backend_ollama_orchestrator_returns_orchestrator_backend():

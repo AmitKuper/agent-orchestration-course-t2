@@ -6,8 +6,10 @@ import json
 import subprocess
 from typing import TYPE_CHECKING
 
-from src.backends._ansi import extract_response
+from src.backends._ansi import render_ansi
 from src.backends._orchestrator_base import OrchestratorBackend
+
+_DONE_THINKING = "...done thinking."
 
 if TYPE_CHECKING:
     from src.config import DebateConfig
@@ -19,9 +21,6 @@ class OllamaOrchestratorBackend(OrchestratorBackend):
     Sends a single comprehensive prompt to ``ollama run <model>`` asking the
     model to generate all debate turns and a judge verdict as JSONL output.
     The model manages both sides of the argument and the scoring itself.
-
-    This contrasts with ``OllamaCliBackend`` (``ollama-cli-agents``) where
-    Python orchestrates each turn individually.
     """
 
     def run_debate(
@@ -32,14 +31,8 @@ class OllamaOrchestratorBackend(OrchestratorBackend):
     ) -> tuple[list[dict], dict | None]:
         """Send a single prompt to Ollama and parse the full debate output.
 
-        Args:
-            config: Debate config providing model, turns, agent names, etc.
-            position_a: Assigned position for Agent A.
-            position_b: Assigned position for Agent B.
-
         Returns:
-            Tuple of (turns, verdict). turns may be partial if the model
-            failed to generate all turns. verdict is None if unparseable.
+            Tuple of (turns, verdict). turns may be partial; verdict is None if unparseable.
         """
         prompt = self._build_prompt(config, position_a, position_b)
         result = subprocess.run(
@@ -49,22 +42,13 @@ class OllamaOrchestratorBackend(OrchestratorBackend):
             text=True,
             encoding="utf-8",
         )
-        raw = extract_response(result.stdout)
-        return self._parse(raw)
+        rendered = render_ansi(result.stdout)
+        if _DONE_THINKING in rendered:
+            rendered = rendered.split(_DONE_THINKING, 1)[1]
+        return self._parse(rendered)
 
-    def _build_prompt(
-        self, config: DebateConfig, pos_a: str, pos_b: str
-    ) -> str:
-        """Construct the single-shot debate generation prompt.
-
-        Args:
-            config: Debate configuration.
-            pos_a: Position for Agent A.
-            pos_b: Position for Agent B.
-
-        Returns:
-            Full prompt string to send to the model.
-        """
+    def _build_prompt(self, config: DebateConfig, pos_a: str, pos_b: str) -> str:
+        """Construct the single-shot debate generation prompt."""
         turns = config.turns
         a, b = config.name_a, config.name_b
         score_schema = (
@@ -90,26 +74,52 @@ class OllamaOrchestratorBackend(OrchestratorBackend):
         )
 
     def _parse(self, raw: str) -> tuple[list[dict], dict | None]:
-        """Extract turn dicts and verdict dict from raw model output.
+        """Extract turn and verdict dicts from rendered model output.
 
-        Args:
-            raw: Cleaned model output string.
-
-        Returns:
-            Tuple of (turns list, verdict dict or None).
+        Handles both one-JSON-per-line and word-wrapped output where a JSON
+        object may span multiple terminal lines.
         """
         turns: list[dict] = []
         verdict: dict | None = None
-        for line in raw.splitlines():
-            line = line.strip()
-            if not line.startswith("{"):
-                continue
-            try:
-                obj = json.loads(line)
-            except json.JSONDecodeError:
-                continue
+
+        def _accept(obj: dict) -> None:
+            nonlocal verdict
             if "agent" in obj and "turn" in obj and "argument" in obj:
                 turns.append(obj)
             elif "winner" in obj and "scores" in obj:
                 verdict = obj
+
+        # First pass: try each line as a complete JSON object.
+        remaining: list[str] = []
+        for line in raw.splitlines():
+            line = line.strip()
+            if not line:
+                continue
+            if line.startswith("{"):
+                try:
+                    _accept(json.loads(line))
+                    continue
+                except json.JSONDecodeError:
+                    pass
+            remaining.append(line)
+
+        # Second pass: scan joined text for brace-balanced JSON objects.
+        joined = " ".join(remaining)
+        depth = start = 0
+        in_obj = False
+        for idx, ch in enumerate(joined):
+            if ch == "{":
+                if not in_obj:
+                    start = idx
+                    in_obj = True
+                depth += 1
+            elif ch == "}" and in_obj:
+                depth -= 1
+                if depth == 0:
+                    try:
+                        _accept(json.loads(joined[start : idx + 1]))
+                    except json.JSONDecodeError:
+                        pass
+                    in_obj = False
+
         return turns, verdict

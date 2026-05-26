@@ -40,3 +40,6 @@ class OrchestratorBackend(ABC):
             (same schema as conversation.jsonl entries) and verdict is the
             judge result dict or None if judgment failed.
         """
+
+    def close(self) -> None:
+        """Release any resources. No-op by default."""

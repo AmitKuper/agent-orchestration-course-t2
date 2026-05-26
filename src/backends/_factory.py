@@ -61,10 +61,9 @@ def make_backend(
         return PersistentCliBackend(output_path)
     if backend_type == "ollama-api":
         return OllamaBackend()
-    if backend_type in ("ollama-cli-agents", "ollama-cli"):
-        # Both names mean per-agent CLI invocation (ollama run per turn)
+    if backend_type == "ollama-cli-agents":
         return OllamaCliBackend()
-    if backend_type == "ollama-orchestrator":
+    if backend_type in ("ollama-cli", "ollama-orchestrator"):
         # Single model call that self-orchestrates the entire debate
         return OllamaOrchestratorBackend()
 
