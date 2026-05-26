@@ -117,7 +117,7 @@ class ResponseValidator:
                 False, "Response must be a JSON object, not an array or scalar.",
                 category="format"
             )
-        for field in ("agent", "turn", "argument", "references"):
+        for field in ("agent", "turn", "argument"):
             if field not in data:
                 return ValidationResult(
                     False, f"Missing required field: '{field}'.", category="format"
@@ -134,11 +134,13 @@ class ResponseValidator:
             return ValidationResult(
                 False, "Field 'argument' must be a non-empty string.", category="format"
             )
-        if not isinstance(data["references"], list):
+        # references is optional — default to [] if absent
+        refs = data.get("references", [])
+        if not isinstance(refs, list):
             return ValidationResult(
                 False, "Field 'references' must be a list.", category="format"
             )
-        if not all(isinstance(r, str) for r in data["references"]):
+        if not all(isinstance(r, str) for r in refs):
             return ValidationResult(
                 False, "All entries in 'references' must be strings.", category="format"
             )
@@ -214,7 +216,7 @@ class ResponseValidator:
                     False, f"scores['{agent_name}'] must be a dict.", category="format"
                 )
             for criterion in criteria:
-                val = agent_scores.get(criterion)
+                val = agent_scores.get(criterion, agent_scores.get(criterion.capitalize()))
                 if val is None:
                     return ValidationResult(
                         False,

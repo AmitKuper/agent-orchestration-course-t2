@@ -110,11 +110,11 @@ def test_missing_argument_field_fails(v: ResponseValidator):
     assert "argument" in result.reason
 
 
-def test_missing_references_field_fails(v: ResponseValidator):
-    data = {"agent": "A", "turn": 1, "argument": "test"}
+def test_missing_references_field_passes(v: ResponseValidator):
+    """references is optional — omitting it is treated as an empty list."""
+    data = {"agent": "A", "turn": 1, "argument": "x" * 80}
     result = v.validate_debate_turn(json.dumps(data))
-    assert not result.valid
-    assert "references" in result.reason
+    assert result.valid
 
 
 def test_wrong_agent_name_fails(v: ResponseValidator):

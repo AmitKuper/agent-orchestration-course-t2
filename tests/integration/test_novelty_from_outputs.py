@@ -19,11 +19,8 @@ OUTPUTS = Path("outputs")
 THRESHOLD = 0.75
 
 # Confirmed from post-run analysis: consecutive same-agent turns exceed threshold.
-# messi-ronaldo-ollama-cli-agents has borderline pairs (0.77, 0.79) that remained
-# after retry corrected similarity to the triggering turn but not to other prior turns.
-KNOWN_REPEATING = [
-    "messi-ronaldo-ollama-cli-agents",
-]
+# Empty for this sweep — all 9 runs are clean after novelty validation.
+KNOWN_REPEATING: list[str] = []
 
 # Confirmed from post-run analysis: no consecutive same-agent turns exceed threshold.
 KNOWN_CLEAN = [
@@ -35,6 +32,7 @@ KNOWN_CLEAN = [
     "iran-nuclear-ollama-cli-agents",
     "messi-ronaldo-api",
     "messi-ronaldo-ollama-cli",
+    "messi-ronaldo-ollama-cli-agents",
 ]
 
 
