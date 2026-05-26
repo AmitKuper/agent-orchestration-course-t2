@@ -1,0 +1,20 @@
+{
+  "topic": "Will AI automation destroy more jobs than it creates, causing long-term unemployment, or will it generate new industries and opportunities that outweigh the losses?",
+  "turns": 20,
+  "backend": "claude-api",
+  "debater_a": {
+    "name": "Pessimist",
+    "model": "claude-haiku-4-5-20251001"
+  },
+  "debater_b": {
+    "name": "Optimist",
+    "model": "claude-haiku-4-5-20251001"
+  },
+  "judge": {
+    "model": "claude-haiku-4-5-20251001",
+    "factcheck": true
+  },
+  "max_retries": 2,
+  "min_response_len": 200,
+  "outdir": "outputs/ai-jobs-claude-api"
+}

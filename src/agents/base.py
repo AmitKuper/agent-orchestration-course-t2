@@ -53,6 +53,16 @@ class BaseAgent:
         self._assigned_position: str | None = None
         self._logger = logging.getLogger(f"debate.agent.{name}")
 
+    @staticmethod
+    def _strip_fences(text: str) -> str:
+        """Strip markdown code fences from a response if present."""
+        stripped = text.strip()
+        if stripped.startswith("```"):
+            lines = stripped.splitlines()
+            if len(lines) >= 2 and lines[-1].strip() == "```":
+                return "\n".join(lines[1:-1]).strip()
+        return stripped
+
     def invoke_with_retry(self, prompt: str, context: str = "") -> str:
         """Invoke the agent, validate, and retry up to max_retries on failure.
 
@@ -61,7 +71,7 @@ class BaseAgent:
         full_prompt = f"{context}\n\n{prompt}".strip() if context else prompt
         current_prompt = full_prompt
         for attempt in range(self.config.max_retries + 1):
-            response = self._invoke(current_prompt)
+            response = self._strip_fences(self._invoke(current_prompt))
             result = self._validate_response(response)
             if result.valid and self._assigned_position is not None:
                 stance = self._stance_validator.validate(
