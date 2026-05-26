@@ -17,6 +17,7 @@ MAX_TOKENS_JUDGE = 4096
 # Validation defaults
 MIN_RESPONSE_LEN = 50
 MAX_RETRIES = 3
+NOVELTY_THRESHOLD = 0.75  # SequenceMatcher ratio above which a response is "too similar"
 
 # Timeouts in seconds
 DEBATER_TIMEOUT = 300

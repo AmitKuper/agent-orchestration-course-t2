@@ -1,10 +1,12 @@
-"""Debate agent: prompt builder for debate turns."""
+"""Debate agent: prompt builder and novelty validation for debate turns."""
 
 from __future__ import annotations
 
+import json
 from typing import TYPE_CHECKING
 
 from src.agents.base import BaseAgent, load_agent_def
+from src.validator import ValidationResult
 
 if TYPE_CHECKING:
     from src.backends import Backend
@@ -82,6 +84,19 @@ class DebateAgent(BaseAgent):
             f'{{"agent": "{self.name}", "turn": {turn_number}, '
             f'"argument": "...", "references": ["..."]}}'
         )
+
+    def _extra_validate(self, response: str) -> ValidationResult:
+        """Reject responses that are too similar to this agent's prior turns."""
+        try:
+            argument = json.loads(response).get("argument", response)
+        except (json.JSONDecodeError, AttributeError):
+            argument = response
+        prior = [
+            t.get("argument", "")
+            for t in self.state.get_turns()
+            if t.get("agent") == self.name
+        ]
+        return self._validator.validate_novelty(argument, prior)
 
     def _format_history(self, turns: list[dict]) -> str:
         """Format conversation turns as readable text for prompt injection.

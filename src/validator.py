@@ -8,8 +8,9 @@ from __future__ import annotations
 import json
 import re
 from dataclasses import dataclass
+from difflib import SequenceMatcher
 
-from src.constants import API_ERROR_MARKERS, DISRESPECTFUL_PATTERNS
+from src.constants import API_ERROR_MARKERS, DISRESPECTFUL_PATTERNS, NOVELTY_THRESHOLD
 
 _PLACEHOLDER_RE = re.compile(r"\$[A-Z_]+")
 _MD_FENCE_RE = re.compile(r"^```", re.MULTILINE)
@@ -257,6 +258,27 @@ class ResponseValidator:
             return ValidationResult(True)
         except json.JSONDecodeError as exc:
             return ValidationResult(False, f"Invalid JSON: {exc}", category="format")
+
+    def validate_novelty(self, argument: str, prior_arguments: list[str]) -> ValidationResult:
+        """Check that the argument is not near-duplicate of any prior turn by the same agent.
+
+        Args:
+            argument: The new argument text to check.
+            prior_arguments: All previous argument texts from this agent.
+
+        Returns:
+            ValidationResult — invalid if similarity exceeds NOVELTY_THRESHOLD.
+        """
+        for prior in prior_arguments:
+            ratio = SequenceMatcher(None, argument.lower(), prior.lower()).ratio()
+            if ratio > NOVELTY_THRESHOLD:
+                return ValidationResult(
+                    False,
+                    "Your argument is too similar to a previous turn. "
+                    "You must introduce new points, angles, or evidence.",
+                    category="content",
+                )
+        return ValidationResult(True)
 
     def _contains_api_error(self, response: str) -> bool:
         """Return True if the response resembles an API error string."""
