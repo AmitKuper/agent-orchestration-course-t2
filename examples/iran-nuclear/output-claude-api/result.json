@@ -1,0 +1,43 @@
+{
+  "winner": "Dove",
+  "scores": {
+    "Hawk": {
+      "logic": 6,
+      "evidence": 5,
+      "clarity": 7,
+      "persuasiveness": 5,
+      "total": 23
+    },
+    "Dove": {
+      "logic": 7,
+      "evidence": 6,
+      "clarity": 8,
+      "persuasiveness": 7,
+      "total": 28
+    }
+  },
+  "tiebreaker": null,
+  "explanation": "Dove prevails on logical coherence, evidence quality, and persuasiveness. Hawk's position depends on cascading logical contradictions: he admits Iran responds rationally to enforcement structures (supporting Dove's snapback argument), claims military strikes eliminate Iranian choice while simultaneously arguing Iran ignores maximum existing pressure, and concedes strikes trigger inspector expulsion yet insists they create verifiable non-weapons status. Dove consistently maintains that Iran's 2015-2018 JCPOA compliance at 3.67% demonstrates diplomacy works when enforcement is credible, and that renewed multilateral snapback (with guaranteed enforcement) replicates that constraint without permanent military escalation. Hawk relies heavily on worst-case speculation (Iran will inevitably weaponize) and invokes Iraq/North Korea precedents that actually undermine his case\u2014both show military strikes delay programs by years, not eliminate them, and trigger decentralization/inspector expulsion. Dove's argument is more logically integrated and better accounts for observed Iranian behavior under different incentive structures. Both debaters are clear writers, but Dove's organization and burden-shifting are superior.",
+  "factcheck_flags": [
+    {
+      "agent": "Hawk",
+      "claim": "Israel's 1981 Osirak strike on Iraq's reactor...Iraq subsequently remained under IAEA oversight for over a decade",
+      "issue": "Misleading: Iraq was under UNSCOM (UN weapons inspectors, not IAEA) from 1991-1998, not IAEA. Iraq expelled UNSCOM in 1998 and operated without comprehensive international inspections until 2003 Gulf War. Hawk conflates UNSCOM with IAEA oversight."
+    },
+    {
+      "agent": "Hawk",
+      "claim": "Iraq's weapons facilities were bombed repeatedly; inspections still failed to achieve certainty",
+      "issue": "Partially inaccurate framing: Iraq did not undergo IAEA inspections post-1981 Osirak strike for most of the 1980s-1990s. UNSCOM inspections (1991-1998) actually did discover extensive covert programs, suggesting inspections worked when implemented. The characterization omits that Iraq operated largely inspector-free."
+    },
+    {
+      "agent": "Hawk",
+      "claim": "Iran has enriched uranium to 84% purity at facilities Iran concealed from inspectors for years",
+      "issue": "Partially overstated: Iran has enriched to 84% at Fordow, but Fordow's existence was disclosed to the IAEA before the JCPOA. The 84% enrichment occurred *after* 2018 U.S. withdrawal, not during secret concealment. Hawk conflates facility disclosure timing with ongoing concealment."
+    },
+    {
+      "agent": "Dove",
+      "claim": "The IAEA's 2015 Final Assessment\u2014explicitly concluded Iran's military nuclear program halted in 2003 and found no credible evidence of weapons development *after* that date",
+      "issue": "Accurate but incomplete: The IAEA's 2015 assessment did conclude the program halted in 2003, but the assessment also noted it could not resolve all outstanding issues regarding Iran's non-cooperation on some 'possible military dimensions' questions. The statement is technically correct but omits the IAEA's own caveats about verification limitations."
+    }
+  ]
+}

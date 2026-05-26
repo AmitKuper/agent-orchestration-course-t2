@@ -1,0 +1,23 @@
+{
+  "topic": "Will attacking Iran prevent them from achieving a nuclear weapon, or is diplomacy the way to go?",
+  "turns": 20,
+  "debater_a": {
+    "name": "Hawk",
+    "model": "claude-sonnet-4-6"
+  },
+  "debater_b": {
+    "name": "Dove",
+    "model": "claude-sonnet-4-6"
+  },
+  "judge": {
+    "model": "claude-sonnet-4-6",
+    "factcheck": true
+  },
+  "max_retries": 2,
+  "min_response_len": 200,
+  "require_references": false,
+  "outdir": "outputs/iran-nuclear-claude-api-sonnet",
+  "backend": "claude-api",
+  "temperature": null,
+  "log_level": "INFO"
+}

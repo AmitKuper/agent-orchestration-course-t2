@@ -1,0 +1,49 @@
+2026-05-26 22:15:35,280 [INFO] debate.orchestrator: Debate starting: Will AI automation destroy more jobs than it creates, causing long-term unemployment, or will it generate new industries and opportunities that outweigh the losses?
+2026-05-26 22:15:38,994 [INFO] debate.orchestrator: Positions — A: AI automation will destroy more jobs than it creates, causing long-term structural unemployment and economic hardship that outweighs any new opportunities generated | B: AI automation will generate new industries and job opportunities that will ultimately outweigh job losses, similar to previous technological revolutions
+2026-05-26 22:15:38,998 [INFO] debate.orchestrator: Turn 1/20 — Pessimist
+2026-05-26 22:15:43,587 [INFO] debate.orchestrator: Turn 1/20 accepted from Pessimist.
+2026-05-26 22:15:43,588 [INFO] debate.orchestrator: Turn 2/20 — Optimist
+2026-05-26 22:15:53,139 [WARNING] debate.agent.Optimist: Attempt 1/3 failed for Optimist: Invalid JSON: Expecting value: line 1 column 1 (char 0)
+2026-05-26 22:15:58,947 [INFO] debate.orchestrator: Turn 2/20 accepted from Optimist.
+2026-05-26 22:15:58,948 [INFO] debate.orchestrator: Turn 3/20 — Pessimist
+2026-05-26 22:16:06,568 [WARNING] debate.agent.Pessimist: Attempt 1/3 failed for Pessimist: Invalid JSON: Expecting value: line 1 column 1 (char 0)
+2026-05-26 22:16:13,391 [WARNING] debate.agent.Pessimist: Attempt 2/3 failed for Pessimist: Invalid JSON: Extra data: line 1 column 2099 (char 2098)
+2026-05-26 22:16:19,124 [INFO] debate.orchestrator: Turn 3/20 accepted from Pessimist.
+2026-05-26 22:16:19,125 [INFO] debate.orchestrator: Turn 4/20 — Optimist
+2026-05-26 22:16:25,857 [INFO] debate.orchestrator: Turn 4/20 accepted from Optimist.
+2026-05-26 22:16:25,858 [INFO] debate.orchestrator: Turn 5/20 — Pessimist
+2026-05-26 22:16:32,734 [WARNING] debate.agent.Pessimist: Attempt 1/3 failed for Pessimist: Response contains an API error message.
+2026-05-26 22:16:39,447 [INFO] debate.orchestrator: Turn 5/20 accepted from Pessimist.
+2026-05-26 22:16:39,448 [INFO] debate.orchestrator: Turn 6/20 — Optimist
+2026-05-26 22:16:47,808 [INFO] debate.orchestrator: Turn 6/20 accepted from Optimist.
+2026-05-26 22:16:47,808 [INFO] debate.orchestrator: Turn 7/20 — Pessimist
+2026-05-26 22:16:55,661 [WARNING] debate.agent.Pessimist: Attempt 1/3 failed for Pessimist: Response contains an API error message.
+2026-05-26 22:17:02,852 [INFO] debate.orchestrator: Turn 7/20 accepted from Pessimist.
+2026-05-26 22:17:02,853 [INFO] debate.orchestrator: Turn 8/20 — Optimist
+2026-05-26 22:17:11,038 [INFO] debate.orchestrator: Turn 8/20 accepted from Optimist.
+2026-05-26 22:17:11,039 [INFO] debate.orchestrator: Turn 9/20 — Pessimist
+2026-05-26 22:17:18,553 [INFO] debate.orchestrator: Turn 9/20 accepted from Pessimist.
+2026-05-26 22:17:18,553 [INFO] debate.orchestrator: Turn 10/20 — Optimist
+2026-05-26 22:17:27,764 [INFO] debate.orchestrator: Turn 10/20 accepted from Optimist.
+2026-05-26 22:17:27,765 [INFO] debate.orchestrator: Turn 11/20 — Pessimist
+2026-05-26 22:17:37,868 [WARNING] debate.agent.Pessimist: Attempt 1/3 failed for Pessimist: Invalid JSON: Extra data: line 2 column 1 (char 3053)
+2026-05-26 22:17:45,456 [INFO] debate.orchestrator: Turn 11/20 accepted from Pessimist.
+2026-05-26 22:17:45,457 [INFO] debate.orchestrator: Turn 12/20 — Optimist
+2026-05-26 22:17:53,546 [INFO] debate.orchestrator: Turn 12/20 accepted from Optimist.
+2026-05-26 22:17:53,547 [INFO] debate.orchestrator: Turn 13/20 — Pessimist
+2026-05-26 22:18:03,283 [INFO] debate.orchestrator: Turn 13/20 accepted from Pessimist.
+2026-05-26 22:18:03,284 [INFO] debate.orchestrator: Turn 14/20 — Optimist
+2026-05-26 22:18:11,402 [INFO] debate.orchestrator: Turn 14/20 accepted from Optimist.
+2026-05-26 22:18:11,403 [INFO] debate.orchestrator: Turn 15/20 — Pessimist
+2026-05-26 22:18:20,021 [INFO] debate.orchestrator: Turn 15/20 accepted from Pessimist.
+2026-05-26 22:18:20,022 [INFO] debate.orchestrator: Turn 16/20 — Optimist
+2026-05-26 22:18:28,930 [INFO] debate.orchestrator: Turn 16/20 accepted from Optimist.
+2026-05-26 22:18:28,930 [INFO] debate.orchestrator: Turn 17/20 — Pessimist
+2026-05-26 22:18:37,637 [INFO] debate.orchestrator: Turn 17/20 accepted from Pessimist.
+2026-05-26 22:18:37,637 [INFO] debate.orchestrator: Turn 18/20 — Optimist
+2026-05-26 22:18:49,129 [INFO] debate.orchestrator: Turn 18/20 accepted from Optimist.
+2026-05-26 22:18:49,129 [INFO] debate.orchestrator: Turn 19/20 — Pessimist
+2026-05-26 22:18:57,270 [INFO] debate.orchestrator: Turn 19/20 accepted from Pessimist.
+2026-05-26 22:18:57,271 [INFO] debate.orchestrator: Turn 20/20 — Optimist
+2026-05-26 22:19:08,166 [INFO] debate.orchestrator: Turn 20/20 accepted from Optimist.
+2026-05-26 22:19:26,948 [INFO] debate.orchestrator: Verdict written to outputs\ai-jobs-claude-api\20260526_221535\result_20260526_221926.json.

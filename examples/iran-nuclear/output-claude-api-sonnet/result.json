@@ -1,0 +1,48 @@
+{
+  "winner": "Dove",
+  "scores": {
+    "Hawk": {
+      "logic": 7,
+      "evidence": 7,
+      "clarity": 8,
+      "persuasiveness": 7,
+      "total": 29
+    },
+    "Dove": {
+      "logic": 8,
+      "evidence": 8,
+      "clarity": 8,
+      "persuasiveness": 8,
+      "total": 32
+    }
+  },
+  "tiebreaker": null,
+  "explanation": "Dove consistently demonstrated stronger logical discipline by turning Hawk's own evidence against him \u2014 most effectively showing that Iran's enrichment surge began precisely after the 2018 JCPOA withdrawal, directly undercutting Hawk's claim that diplomacy failed. Dove also made better use of verifiable, sourced evidence (IAEA quarterly reports, specific stockpile figures, named institutional assessments) and successfully reframed contested historical cases like Osirak and Libya. Hawk argued forcefully and with clarity, and his 'zone of immunity' urgency argument and the convergence-axis dimension added genuine strategic weight, but his core thesis repeatedly relied on a logical gap: attributing the consequences of abandoning diplomacy as evidence against diplomacy itself. Hawk's repetitive invocation of Osirak and Al-Kibar as permanent successes was never fully reconciled with Dove's documented counter-evidence about post-strike program dispersal, and his refutation of expert consensus via a tu quoque on Iraqi WMD intelligence was the weakest argumentative move in the debate.",
+  "factcheck_flags": [
+    {
+      "agent": "Hawk",
+      "claim": "Iran received approximately $150 billion in frozen assets under the JCPOA",
+      "issue": "Widely contested and likely inflated. U.S. Treasury and Peterson Institute assessments placed Iran's actually accessible, unfrozen assets at approximately $50\u201356 billion, not $150 billion. Hawk used this figure in Turn 3 before partially acknowledging the dispute in Turn 5."
+    },
+    {
+      "agent": "Hawk",
+      "claim": "The Pentagon has publicly confirmed the GBU-57 Massive Ordnance Penetrator's capability to destroy Fordow",
+      "issue": "Partially misleading. While the MOP was developed with Fordow in mind, Congressional Research Service reporting noted significant uncertainty about efficacy against the deepest portions of the facility. No unambiguous public Pentagon confirmation of guaranteed Fordow destruction has been identified."
+    },
+    {
+      "agent": "Hawk",
+      "claim": "Iran's enriched uranium stockpile has grown 1,500% since the JCPOA's collapse",
+      "issue": "Directionally accurate but imprecise. IAEA reports confirm dramatic stockpile growth from the 300 kg JCPOA cap to over 4,700 kg by 2024, which represents roughly a 1,500% increase. The figure is approximately correct but the framing attributes this to diplomacy's failure rather than the U.S. withdrawal."
+    },
+    {
+      "agent": "Dove",
+      "claim": "The Libya disarmament negotiation had been underway since 1999, four years before the Iraq invasion",
+      "issue": "Plausible and broadly supported by historical accounts of back-channel contacts beginning in the late 1990s, though the precise start date of substantive negotiations is contested among historians. The claim that Libya's disarmament was solely or primarily caused by diplomatic incentives rather than the Iraq invasion is disputed, as multiple British and American officials have cited the invasion as a significant factor."
+    },
+    {
+      "agent": "Dove",
+      "claim": "The JCPOA resulted in dismantlement of approximately 13,000 centrifuges",
+      "issue": "Slightly overstated. The JCPOA required Iran to reduce its operating centrifuges from approximately 19,000 to 6,104, with the remainder placed in monitored storage \u2014 not destroyed. 'Dismantled' overstates the permanence of the reduction, though the stockpile and enrichment caps were accurately described."
+    }
+  ]
+}

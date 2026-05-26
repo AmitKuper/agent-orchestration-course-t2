@@ -1,0 +1,10 @@
+{
+  "timestamp": "2026-05-26 22:58:37",
+  "backend": "claude-api",
+  "command": "main.py --config examples/iran-nuclear/config-claude-api-sonnet.json",
+  "argv": [
+    "main.py",
+    "--config",
+    "examples/iran-nuclear/config-claude-api-sonnet.json"
+  ]
+}
