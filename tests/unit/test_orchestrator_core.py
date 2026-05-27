@@ -9,6 +9,7 @@ from unittest.mock import MagicMock, patch
 import pytest
 
 from orchestrator import DebateOrchestrator, InvalidTopicError
+from src.backends._ollama_orchestrator import OllamaOrchestratorBackend
 from src.config import DebateConfig
 from src.cost import CostTracker
 from src.output import OutputManager
@@ -128,6 +129,17 @@ def test_run_turns_alternates_ab(orch):
     agents_in_order = [name for name, _ in calls]
     assert agents_in_order[0] == orch.config.name_a
     assert agents_in_order[1] == orch.config.name_b
+
+
+def test_validate_topic_fallback_for_orchestrator_backend(orch):
+    """OrchestratorBackend uses its own fallback_backend_type for topic validation."""
+    orch._backend = OllamaOrchestratorBackend()
+    with (
+        patch("orchestrator.make_backend", return_value=MagicMock()) as mk,
+        patch("orchestrator.validate_topic", return_value=("FOR", "AGAINST")),
+    ):
+        orch.validate_topic("test topic")
+    mk.assert_called_once_with(OllamaOrchestratorBackend.fallback_backend_type)
 
 
 def test_resume_raises_if_complete(orch, state):

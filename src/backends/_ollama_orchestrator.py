@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import contextlib
 import json
 import subprocess
 from typing import TYPE_CHECKING
@@ -21,7 +22,12 @@ class OllamaOrchestratorBackend(OrchestratorBackend):
     Sends a single comprehensive prompt to ``ollama run <model>`` asking the
     model to generate all debate turns and a judge verdict as JSONL output.
     The model manages both sides of the argument and the scoring itself.
+
+    Falls back to ``ollama-cli-agents`` for single per-turn calls (e.g. topic
+    validation): subprocess-based, requires no HTTP server.
     """
+
+    fallback_backend_type: str = "ollama-cli-agents"
 
     def run_debate(
         self,
@@ -116,10 +122,8 @@ class OllamaOrchestratorBackend(OrchestratorBackend):
             elif ch == "}" and in_obj:
                 depth -= 1
                 if depth == 0:
-                    try:
+                    with contextlib.suppress(json.JSONDecodeError):
                         _accept(json.loads(joined[start : idx + 1]))
-                    except json.JSONDecodeError:
-                        pass
                     in_obj = False
 
         return turns, verdict
