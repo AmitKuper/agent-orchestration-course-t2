@@ -32,11 +32,10 @@ class CliBackend(Backend):
     Token counts are unavailable; records zeros to the cost tracker.
     Strips CLAUDE*/ANTHROPIC* env vars to prevent recursive invocation.
     Routes each subprocess call through APIGatekeeper for retry logic.
-    Runs from ``workdir`` so the claude subprocess reads that directory's
-    ``.claude/`` context instead of the project root's CLAUDE.md.
+    History is injected into the prompt by the orchestrator (uses_memory=False).
     """
 
-    uses_memory: bool = True
+    uses_memory: bool = False
 
     def __init__(self, workdir: str | None = None) -> None:
         """Initialise gatekeeper for CLI backend.
