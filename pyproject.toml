@@ -22,6 +22,10 @@ dev = [
 ollama = [
     "requests>=2.31.0",
 ]
+notebooks = [
+    "matplotlib>=3.8.0",
+    "numpy>=1.26.0",
+]
 
 [tool.ruff]
 line-length = 88
