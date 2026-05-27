@@ -96,6 +96,11 @@
 - [x] `.env.example` consolidated; `.gitignore` updated; `docs/AUDIT.md` + `docs/CHANGELOG_COURSE_FIXES.md`
 - [x] 190 tests, 0 failures, ≥ 85% coverage
 
+## Phase 11 — Bug Fixes & Example Cleanup ✅ Complete
+- [x] `src/backends/_cli.py` — `CliBackend.uses_memory` changed `True` → `False`; history now injected via prompt (consistent with all other backends). Previously the agent received no history because prompt injection was suppressed but memory files were never written.
+- [x] `examples/*/config-claude-cli.json` — deleted from all 3 topic folders; no output exists for `claude-cli-agents` backend so config files were orphaned
+- [x] `CLAUDE.md` — State & History section updated to reflect prompt-injection mechanism
+
 ## Phase 10 — Novelty Validation & Ollama Orchestrator ✅ Complete (ef35e99, 4f9ac4a)
 - [x] `OllamaOrchestratorBackend` — single-call backend; Qwen3 thinking-mode output parsed with brace-balanced scanner
 - [x] `validate_novelty()` in `ResponseValidator` — SequenceMatcher threshold 0.75
