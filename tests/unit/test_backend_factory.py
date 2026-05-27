@@ -10,7 +10,6 @@ from src.backends import (
     ApiBackend,
     CliBackend,
     OllamaBackend,
-    OllamaCliBackend,
     OllamaOrchestratorBackend,
     make_backend,
 )

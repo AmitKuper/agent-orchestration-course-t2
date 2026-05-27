@@ -1,4 +1,4 @@
-"""Unit tests for src/validator.py — ResponseValidator and ValidationResult."""
+"""Unit tests for ResponseValidator base checks and validate_json/validate_novelty."""
 
 from __future__ import annotations
 
@@ -88,144 +88,6 @@ def test_min_len_boundary_fails(v: ResponseValidator):
     assert not v.validate(response, 50).valid
 
 
-# ── validate_debate_turn() — protocol field checks ───────────────────────────
-
-
-def test_valid_turn_passes_protocol(v: ResponseValidator):
-    """A fully valid debate turn passes all protocol checks."""
-    assert v.validate_debate_turn(_valid_turn()).valid
-
-
-def test_missing_agent_field_fails(v: ResponseValidator):
-    data = {"turn": 1, "argument": "test", "references": []}
-    result = v.validate_debate_turn(json.dumps(data))
-    assert not result.valid
-    assert "agent" in result.reason
-
-
-def test_missing_argument_field_fails(v: ResponseValidator):
-    data = {"agent": "A", "turn": 1, "references": []}
-    result = v.validate_debate_turn(json.dumps(data))
-    assert not result.valid
-    assert "argument" in result.reason
-
-
-def test_missing_references_field_passes(v: ResponseValidator):
-    """references is optional — omitting it is treated as an empty list."""
-    data = {"agent": "A", "turn": 1, "argument": "x" * 80}
-    result = v.validate_debate_turn(json.dumps(data))
-    assert result.valid
-
-
-def test_wrong_agent_name_fails(v: ResponseValidator):
-    """agent field mismatch fails when expected_agent is set."""
-    result = v.validate_debate_turn(
-        _valid_turn("Agent B"), expected_agent="Agent A"
-    )
-    assert not result.valid
-    assert "mismatch" in result.reason
-
-
-def test_wrong_turn_number_fails(v: ResponseValidator):
-    """turn field mismatch fails when expected_turn is set."""
-    result = v.validate_debate_turn(
-        _valid_turn(turn=3), expected_turn=1
-    )
-    assert not result.valid
-
-
-def test_require_references_with_empty_list_fails(v: ResponseValidator):
-    """require_references=True rejects an empty references list."""
-    result = v.validate_debate_turn(_valid_turn(), require_references=True)
-    assert not result.valid
-    assert "reference" in result.reason.lower()
-
-
-def test_require_references_with_non_empty_list_passes(v: ResponseValidator):
-    """require_references=True passes when references is non-empty."""
-    data = {"agent": "A", "turn": 1, "argument": "x" * 80, "references": ["https://example.com"]}
-    result = v.validate_debate_turn(json.dumps(data), require_references=True)
-    assert result.valid
-
-
-def test_non_dict_json_fails(v: ResponseValidator):
-    """A JSON array instead of object is rejected."""
-    result = v.validate_debate_turn("[1, 2, 3]")
-    assert not result.valid
-    assert result.category == "format"
-
-
-def test_invalid_json_fails_as_format(v: ResponseValidator):
-    result = v.validate_debate_turn("{bad json}")
-    assert not result.valid
-    assert result.category == "format"
-
-
-# ── validate_judge_verdict() ─────────────────────────────────────────────────
-
-
-def _valid_verdict(agent_a: str = "Agent A", agent_b: str = "Agent B") -> dict:
-    """Return a valid judge verdict dict."""
-    return {
-        "winner": agent_a,
-        "scores": {
-            agent_a: {"logic": 8, "evidence": 9, "clarity": 7, "persuasiveness": 8},
-            agent_b: {"logic": 6, "evidence": 7, "clarity": 6, "persuasiveness": 7},
-        },
-        "tiebreaker": None,
-        "explanation": "Agent A presented stronger evidence.",
-        "factcheck_flags": [],
-    }
-
-
-def test_valid_verdict_passes(v: ResponseValidator):
-    result = v.validate_judge_verdict(json.dumps(_valid_verdict()), "Agent A", "Agent B")
-    assert result.valid
-
-
-def test_invalid_winner_fails(v: ResponseValidator):
-    verdict = _valid_verdict()
-    verdict["winner"] = "Unknown Agent"
-    result = v.validate_judge_verdict(json.dumps(verdict), "Agent A", "Agent B")
-    assert not result.valid
-    assert "winner" in result.reason
-
-
-def test_missing_scores_fails(v: ResponseValidator):
-    verdict = _valid_verdict()
-    del verdict["scores"]
-    result = v.validate_judge_verdict(json.dumps(verdict), "Agent A", "Agent B")
-    assert not result.valid
-
-
-def test_score_out_of_range_fails(v: ResponseValidator):
-    verdict = _valid_verdict()
-    verdict["scores"]["Agent A"]["logic"] = 15
-    result = v.validate_judge_verdict(json.dumps(verdict), "Agent A", "Agent B")
-    assert not result.valid
-
-
-def test_empty_explanation_fails(v: ResponseValidator):
-    verdict = _valid_verdict()
-    verdict["explanation"] = ""
-    result = v.validate_judge_verdict(json.dumps(verdict), "Agent A", "Agent B")
-    assert not result.valid
-
-
-def test_missing_factcheck_flags_fails(v: ResponseValidator):
-    verdict = _valid_verdict()
-    del verdict["factcheck_flags"]
-    result = v.validate_judge_verdict(json.dumps(verdict), "Agent A", "Agent B")
-    assert not result.valid
-
-
-def test_verdict_with_markdown_fence_fails(v: ResponseValidator):
-    payload = "```json\n" + json.dumps(_valid_verdict()) + "\n```"
-    result = v.validate_judge_verdict(payload, "Agent A", "Agent B")
-    assert not result.valid
-    assert result.category == "format"
-
-
 # ── validate_json() ──────────────────────────────────────────────────────────
 
 
@@ -250,3 +112,23 @@ def test_empty_json_string_is_rejected(v: ResponseValidator):
 
 def test_plain_text_is_rejected(v: ResponseValidator):
     assert not v.validate_json("just some text").valid
+
+
+# ── validate_novelty() ───────────────────────────────────────────────────────
+
+
+def test_novelty_passes_for_distinct_argument(v: ResponseValidator):
+    prior = ["Solar panels produce clean energy and reduce carbon emissions significantly."]
+    new_arg = "Nuclear power provides reliable baseload and has the lowest lifecycle emissions."
+    assert v.validate_novelty(new_arg, prior).valid
+
+
+def test_novelty_fails_for_near_duplicate(v: ResponseValidator):
+    text = "Solar panels produce clean energy and significantly reduce carbon emissions worldwide."
+    result = v.validate_novelty(text, [text])
+    assert not result.valid
+    assert result.category == "content"
+
+
+def test_novelty_passes_with_no_prior_turns(v: ResponseValidator):
+    assert v.validate_novelty("Any opening argument.", []).valid

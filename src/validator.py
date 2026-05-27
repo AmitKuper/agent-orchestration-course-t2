@@ -1,35 +1,20 @@
-"""Response validation rules for debate and judge agent outputs.
-
-Validates the full JSON communication protocol, not just json.loads.
-"""
+"""Response validation for debate and judge agent outputs."""
 
 from __future__ import annotations
 
 import json
 import re
-from dataclasses import dataclass
 from difflib import SequenceMatcher
 
 from src.constants import API_ERROR_MARKERS, DISRESPECTFUL_PATTERNS, NOVELTY_THRESHOLD
+from src.protocol_validator import validate_debate_turn as _validate_debate_turn
+from src.validation_result import ValidationResult
+from src.verdict_validator import validate_judge_verdict as _validate_judge_verdict
+
+__all__ = ["ResponseValidator", "ValidationResult"]
 
 _PLACEHOLDER_RE = re.compile(r"\$[A-Z_]+")
 _MD_FENCE_RE = re.compile(r"^```", re.MULTILINE)
-
-
-@dataclass
-class ValidationResult:
-    """Outcome of a single response validation check.
-
-    Attributes:
-        valid: True if the response passed all checks.
-        reason: Human-readable explanation of why the check failed.
-        category: 'format' for structural/JSON errors; 'content' for all others.
-            Retry logic uses this to decide whether to re-attach history context.
-    """
-
-    valid: bool
-    reason: str = ""
-    category: str = "content"
 
 
 class ResponseValidator:
@@ -96,9 +81,6 @@ class ResponseValidator:
     ) -> ValidationResult:
         """Validate a debate-turn response against the JSONL protocol.
 
-        Checks: valid JSON, required fields (agent, turn, argument, references),
-        field types, optional agent/turn equality, optional non-empty references.
-
         Args:
             response: Stripped response string.
             expected_agent: If provided, must equal the ``agent`` field.
@@ -108,61 +90,7 @@ class ResponseValidator:
         Returns:
             ValidationResult with category='format' for structural issues.
         """
-        try:
-            data = json.loads(response)
-        except json.JSONDecodeError as exc:
-            return ValidationResult(False, f"Invalid JSON: {exc}", category="format")
-        if not isinstance(data, dict):
-            return ValidationResult(
-                False, "Response must be a JSON object, not an array or scalar.",
-                category="format"
-            )
-        for field in ("agent", "turn", "argument"):
-            if field not in data:
-                return ValidationResult(
-                    False, f"Missing required field: '{field}'.", category="format"
-                )
-        if not isinstance(data["agent"], str) or not data["agent"].strip():
-            return ValidationResult(
-                False, "Field 'agent' must be a non-empty string.", category="format"
-            )
-        if not isinstance(data["turn"], int):
-            return ValidationResult(
-                False, "Field 'turn' must be an integer.", category="format"
-            )
-        if not isinstance(data["argument"], str) or not data["argument"].strip():
-            return ValidationResult(
-                False, "Field 'argument' must be a non-empty string.", category="format"
-            )
-        # references is optional — default to [] if absent
-        refs = data.get("references", [])
-        if not isinstance(refs, list):
-            return ValidationResult(
-                False, "Field 'references' must be a list.", category="format"
-            )
-        if not all(isinstance(r, str) for r in refs):
-            return ValidationResult(
-                False, "All entries in 'references' must be strings.", category="format"
-            )
-        if expected_agent is not None and data["agent"] != expected_agent:
-            return ValidationResult(
-                False,
-                f"Agent mismatch: expected '{expected_agent}', got '{data['agent']}'.",
-                category="content",
-            )
-        if expected_turn is not None and data["turn"] != expected_turn:
-            return ValidationResult(
-                False,
-                f"Turn mismatch: expected {expected_turn}, got {data['turn']}.",
-                category="content",
-            )
-        if require_references and not data["references"]:
-            return ValidationResult(
-                False,
-                "References list is empty. Provide at least one source citation.",
-                category="content",
-            )
-        return ValidationResult(True)
+        return _validate_debate_turn(response, expected_agent, expected_turn, require_references)
 
     def validate_judge_verdict(
         self,
@@ -180,71 +108,7 @@ class ResponseValidator:
         Returns:
             ValidationResult — valid=True only if all checks pass.
         """
-        if _MD_FENCE_RE.search(response.strip()):
-            return ValidationResult(
-                False, "Verdict contains markdown fences. Output raw JSON only.",
-                category="format"
-            )
-        try:
-            data = json.loads(response.strip())
-        except json.JSONDecodeError as exc:
-            return ValidationResult(False, f"Invalid JSON: {exc}", category="format")
-        if not isinstance(data, dict):
-            return ValidationResult(False, "Verdict must be a JSON object.", category="format")
-
-        # winner
-        winner = data.get("winner")
-        if winner not in (agent_a, agent_b):
-            return ValidationResult(
-                False,
-                f"'winner' must be one of '{agent_a}' or '{agent_b}', got {winner!r}.",
-                category="content",
-            )
-        # scores
-        scores = data.get("scores")
-        if not isinstance(scores, dict):
-            return ValidationResult(False, "'scores' must be a dict.", category="format")
-        criteria = ("logic", "evidence", "clarity", "persuasiveness")
-        for agent_name in (agent_a, agent_b):
-            if agent_name not in scores:
-                return ValidationResult(
-                    False, f"'scores' missing entry for '{agent_name}'.", category="format"
-                )
-            agent_scores = scores[agent_name]
-            if not isinstance(agent_scores, dict):
-                return ValidationResult(
-                    False, f"scores['{agent_name}'] must be a dict.", category="format"
-                )
-            for criterion in criteria:
-                val = agent_scores.get(criterion, agent_scores.get(criterion.capitalize()))
-                if val is None:
-                    return ValidationResult(
-                        False,
-                        f"scores['{agent_name}'] missing '{criterion}'.",
-                        category="format",
-                    )
-                if not isinstance(val, (int, float)) or not (0 <= val <= 10):
-                    return ValidationResult(
-                        False,
-                        f"scores['{agent_name}']['{criterion}'] must be 0–10.",
-                        category="content",
-                    )
-        # explanation
-        explanation = data.get("explanation")
-        if not isinstance(explanation, str) or not explanation.strip():
-            return ValidationResult(
-                False, "'explanation' must be a non-empty string.", category="format"
-            )
-        # factcheck_flags
-        if "factcheck_flags" not in data:
-            return ValidationResult(
-                False, "'factcheck_flags' field is required.", category="format"
-            )
-        if not isinstance(data["factcheck_flags"], list):
-            return ValidationResult(
-                False, "'factcheck_flags' must be a list.", category="format"
-            )
-        return ValidationResult(True)
+        return _validate_judge_verdict(response, agent_a, agent_b)
 
     def validate_json(self, response: str) -> ValidationResult:
         """Verify that response is well-formed JSON using json.loads.

@@ -15,7 +15,7 @@ for result_path in sorted(outputs.rglob("result.json")):
     conv_path = result_path.parent / "conversation.jsonl"
     turns = []
     if conv_path.exists():
-        turns = [json.loads(l) for l in conv_path.read_text(encoding="utf-8").splitlines() if l.strip()]
+        turns = [json.loads(line) for line in conv_path.read_text(encoding="utf-8").splitlines() if line.strip()]
 
     # Novelty check
     by_agent = {}
