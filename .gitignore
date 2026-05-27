@@ -11,6 +11,7 @@ outputs/
 .ruff_cache/
 htmlcov/
 .coverage
+reports/
 *.egg-info/
 dist/
 build/
