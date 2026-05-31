@@ -5,7 +5,9 @@ A multi-agent pipeline where two Claude agents argue opposing sides of a topic, 
 ## Table of Contents
 - [Architecture](#architecture)
 - [Installation](#installation)
+- [Quick Start](#quick-start)
 - [Usage](#usage)
+- [Environment Variables](#environment-variables)
 - [Sample Run](#sample-run)
 - [JSON Communication Protocol](#json-communication-protocol)
 - [Backends](#backends)
@@ -13,6 +15,8 @@ A multi-agent pipeline where two Claude agents argue opposing sides of a topic, 
 - [Configuration](#configuration)
 - [Output](#output)
 - [Running Tests](#running-tests)
+- [Linting](#linting)
+- [Known Limitations](#known-limitations)
 - [Contributing](#contributing)
 - [License](#license)
 
@@ -48,35 +52,43 @@ Every agent call passes through **APIGatekeeper** — a centralized router that 
 
 ### Prerequisites
 - Python 3.11+
-- [uv](https://docs.astral.sh/uv/) (recommended) or pip
+- [uv](https://docs.astral.sh/uv/) — the project package manager
 
-### Windows
+Install uv if you don't have it:
+```bash
+# Windows (PowerShell)
+powershell -c "irm https://astral.sh/uv/install.ps1 | iex"
 
-```powershell
-git clone <repo-url>
-cd HW2
-uv sync            # installs all dependencies
-copy .env.example .env
+# macOS / Linux
+curl -LsSf https://astral.sh/uv/install.sh | sh
+```
+
+### Setup
+
+```bash
+git clone https://github.com/AmitKuper/agent-orchestration-course-t2.git
+cd agent-orchestration-course-t2
+uv sync --extra dev    # installs all dependencies including dev tools
+cp .env.example .env   # Windows: copy .env.example .env
 # Edit .env — add your ANTHROPIC_API_KEY for --backend api
 ```
 
-### macOS / Linux
+> **Note:** `pip` is not the course workflow. Use `uv` for all dependency management.
+
+---
+
+## Quick Start
 
 ```bash
-git clone <repo-url>
-cd HW2
-uv sync
-cp .env.example .env
-# Edit .env — add your ANTHROPIC_API_KEY for --backend api
-```
+# Run a short 4-turn debate (uses Anthropic API by default)
+uv run python main.py --topic "AI will replace most jobs" --turns 4
 
-### With pip (alternative)
+# Run with a free local model (no API key needed)
+uv run python main.py --topic "AI will replace most jobs" --turns 4 \
+  --backend ollama-cli --model-a llama3.2 --model-b llama3.2 --model-judge llama3.2
 
-```bash
-pip install -e .
-pip install -e ".[dev]"      # includes ruff, pytest, pytest-cov
-pip install -e ".[ollama]"   # adds requests for Ollama API backend
-cp .env.example .env
+# Resume an interrupted debate
+uv run python main.py --resume --outdir outputs/my-run-folder
 ```
 
 ---
@@ -86,13 +98,13 @@ cp .env.example .env
 ### New debate
 
 ```bash
-python main.py --topic "AI will replace most jobs" --turns 4
+uv run python main.py --topic "AI will replace most jobs" --turns 4
 ```
 
 ### Resume an interrupted debate
 
 ```bash
-python main.py --resume --outdir path/to/run/folder
+uv run python main.py --resume --outdir path/to/run/folder
 ```
 
 ### Common options
@@ -109,8 +121,9 @@ python main.py --resume --outdir path/to/run/folder
 | `--max-retries` | 3 | Retries per invalid response |
 | `--outdir` | outputs/ | Base output directory |
 | `--factcheck` | off | Enable factual accuracy checks |
+| `--require-references` | off | Reject turns with empty references list |
 | `--log-level` | INFO | DEBUG / INFO / WARNING / ERROR |
-| `--config` | — | Path to YAML config file |
+| `--config` | — | Path to YAML/JSON config file |
 | `--backend` | api | Invocation backend — see [Backends](#backends) |
 
 ### YAML config file
@@ -124,8 +137,20 @@ factcheck: true
 ```
 
 ```bash
-python main.py --config debate.yaml --turns 6   # CLI overrides YAML
+uv run python main.py --config debate.yaml --turns 6   # CLI overrides YAML
 ```
+
+---
+
+## Environment Variables
+
+| Variable | Required | Description |
+|----------|----------|-------------|
+| `ANTHROPIC_API_KEY` | For `--backend api` | Your Anthropic API key |
+| `OLLAMA_BASE_URL` | No | Ollama server URL (default: `http://localhost:11434`) |
+| `CLAUDE_SKIP_PERMISSIONS` | No | Set to `false` to disable `--dangerously-skip-permissions` in CLI backend (default: `true`) |
+
+Copy `.env.example` to `.env` and fill in your values. Never commit `.env`.
 
 ---
 
@@ -135,7 +160,7 @@ The following shows a real 20-turn debate run using the Ollama CLI backend (Qwen
 No API tokens are consumed.
 
 ```
-$ python main.py --config examples/ai-jobs/output-ollama/config.json
+$ uv run python main.py --config examples/ai-jobs/output-ollama/config.json
 
 [INFO]  debate.orchestrator: Debate starting: Will AI automation destroy more jobs than it creates...
 [INFO]  debate.orchestrator: Positions — A: AI automation will destroy more jobs... | B: AI will generate new industries...
@@ -174,7 +199,8 @@ outputs/ai-jobs/20260524_220438/
   config.json          ← resolved configuration used for this run
   conversation.jsonl   ← one JSON line per accepted turn with token usage
   debate.log           ← full execution log (INFO + WARNING + ERROR)
-  result.json          ← judge verdict, scores, explanation, factcheck flags
+  result.json          ← latest judge verdict (convenience pointer)
+  result_YYYYMMDD_HHMMSS.json  ← timestamped copy, never overwritten
   run_info.json        ← timestamp, backend, command used
 ```
 
@@ -225,12 +251,12 @@ Four backends are available via `--backend`:
 | Anthropic API | `--backend api` (default) | `ANTHROPIC_API_KEY` in `.env` | Yes |
 | Claude Code CLI | `--backend cli` | Claude Code installed + Pro subscription | No |
 | Ollama CLI | `--backend ollama-cli` | Ollama installed with target model | No |
-| Ollama API | `--backend ollama` | Ollama running locally + `pip install requests` | Yes |
+| Ollama API | `--backend ollama` | Ollama running locally + requests package | Yes |
 
 ### api — Anthropic SDK (default)
 
 ```bash
-python main.py --topic "..." --backend api
+uv run python main.py --topic "..." --backend api
 ```
 
 Requires `ANTHROPIC_API_KEY` in `.env`.
@@ -238,7 +264,7 @@ Requires `ANTHROPIC_API_KEY` in `.env`.
 ### cli — Claude Code CLI
 
 ```bash
-python main.py --topic "..." --backend cli --model-a claude-sonnet-4-6
+uv run python main.py --topic "..." --backend cli --model-a claude-sonnet-4-6
 ```
 
 Uses `claude --model <model> --print`. Requires Claude Code and a Pro subscription.
@@ -248,27 +274,29 @@ Also updates `.claude/agents/*.md` model fields to match config.
 
 ```bash
 ollama pull llama3.2
-python main.py --topic "..." --backend ollama-cli --model-a llama3.2 --model-b llama3.2 --model-judge llama3.2
+uv run python main.py --topic "..." --backend ollama-cli \
+  --model-a llama3.2 --model-b llama3.2 --model-judge llama3.2
 ```
 
 ### ollama — Ollama HTTP API
 
 ```bash
-pip install ".[ollama]"
-python main.py --topic "..." --backend ollama --model-a llama3.2 --model-b llama3.2 --model-judge llama3.2
+uv sync --extra ollama    # installs requests package
+uv run python main.py --topic "..." --backend ollama \
+  --model-a llama3.2 --model-b llama3.2 --model-judge llama3.2
 ```
 
 Override the Ollama server URL:
 
 ```bash
-OLLAMA_BASE_URL=http://192.168.1.10:11434 python main.py --topic "..." --backend ollama --model-a llama3.2
+OLLAMA_BASE_URL=http://192.168.1.10:11434 uv run python main.py --topic "..." --backend ollama
 ```
 
 ---
 
 ## Running with Ollama (free local backend)
 
-During development and testing, running every debate turn against the Anthropic API burns real tokens quickly — a 20-turn debate with a judge call can cost $0.05–$0.20 per run. [Ollama](https://ollama.com) lets you run open-source models locally at zero cost, making it practical to iterate freely without watching your API bill.
+During development and testing, running every debate turn against the Anthropic API burns real tokens quickly — a 20-turn debate with a judge call can cost $0.05–$0.20 per run. [Ollama](https://ollama.com) lets you run open-source models locally at zero cost.
 
 ### 1. Install Ollama
 
@@ -284,38 +312,12 @@ curl -fsSL https://ollama.com/install.sh | sh
 ```bash
 ollama pull qwen3:14b       # good balance of quality and speed on a modern GPU
 ollama pull llama3.2        # lighter option for slower machines
-ollama pull mistral         # alternative if you prefer Mistral
-```
-
-Check what you have installed:
-```bash
-ollama list
 ```
 
 ### 3. Run a debate with Ollama
 
-Use a JSON config file (recommended for multi-model setups):
-
-```json
-{
-  "topic": "Will AI automation destroy more jobs than it creates?",
-  "turns": 20,
-  "backend": "ollama-cli",
-  "debater_a": { "name": "Pessimist", "model": "qwen3:14b" },
-  "debater_b": { "name": "Optimist",  "model": "qwen3:14b" },
-  "judge":     { "model": "qwen3:14b", "factcheck": true },
-  "outdir": "outputs/ai-jobs"
-}
-```
-
 ```bash
-python main.py --config my-debate.json
-```
-
-Or inline via CLI flags:
-
-```bash
-python main.py \
+uv run python main.py \
   --topic "Will AI automation destroy more jobs than it creates?" \
   --backend ollama-cli \
   --model-a qwen3:14b --model-b qwen3:14b --model-judge qwen3:14b \
@@ -331,7 +333,7 @@ python main.py \
 | Ollama on a remote server | `ollama` (HTTP API) |
 | You have Claude Code + Pro subscription | `cli` |
 
-> **Note:** Ollama models follow instructions less reliably than Claude and may occasionally produce malformed JSON. The platform's retry logic handles this automatically — you may see more `WARNING` retry log lines than with the API backend.
+> **Note:** Ollama models follow instructions less reliably than Claude and may occasionally produce malformed JSON. The platform's retry logic handles this automatically.
 
 ### 5. Example debates run with Ollama
 
@@ -351,7 +353,7 @@ All config is externalised — no hard-coded values in source code.
 | `config/setup.json` | Application defaults (turns, timeouts, token limits) |
 | `config/rate_limits.json` | Per-backend rate limits and retry config |
 | `.env` | Secrets (API keys) — never committed |
-| `.env-example` | Template for `.env` |
+| `.env.example` | Template for `.env` |
 
 ---
 
@@ -366,6 +368,7 @@ outputs/20260101_120000/
   debate.log                     # full execution log
   result.json                    # latest judge verdict (convenience pointer)
   result_20260101_120500.json    # timestamped copy — never overwritten
+  run_info.json                  # backend, argv, run timestamp
 ```
 
 Running the judge multiple times on the same debate appends new `result_<timestamp>.json` files without overwriting previous verdicts.
@@ -375,17 +378,42 @@ Running the judge multiple times on the same debate appends new `result_<timesta
 ## Running Tests
 
 ```bash
-# Run all tests with coverage
-uv run pytest --cov=src --cov=orchestrator
+# Install dev dependencies
+uv sync --extra dev
 
-# Or with pip
-pytest tests/ --cov=src --cov=orchestrator
+# Run all tests (quick)
+uv run pytest -q
 
-# Lint check
-uv run ruff check .
+# Run with coverage report
+uv run pytest --cov=src --cov=orchestrator --cov-report=term-missing
+
+# Run a specific test file
+uv run pytest tests/unit/test_validator.py -v
 ```
 
-Coverage target: ≥ 85% (currently 100%).
+Coverage target: ≥ 85% (current: ~89%).
+
+---
+
+## Linting
+
+```bash
+uv run ruff check .        # check for violations
+uv run ruff check . --fix  # auto-fix fixable violations
+```
+
+Zero violations expected.
+
+---
+
+## Known Limitations
+
+- **`--backend cli`** requires Claude Code installed and a Pro subscription. It is not tested in CI.
+- **`--backend ollama` / `ollama-cli`** requires Ollama running locally. Install separately via [ollama.com](https://ollama.com).
+- **Web search** (`web_search` skill) is available to debater agents only when using the `cli` backend and only if the agent definition requests it. It is not available via the `api` backend.
+- **Token cost tracking** is only accurate for the `api` and `ollama` backends. CLI backends do not report token usage.
+- **Windows MAX_PATH**: if your working directory path exceeds ~200 characters (e.g. deeply nested Hebrew-character paths), the `api` backend uses lazy imports to work around Windows path-length limits.
+- **Judge timeout**: if the judge exhausts all retries, the debate state is preserved and can be resumed to re-run the judgment.
 
 ---
 
@@ -394,7 +422,7 @@ Coverage target: ≥ 85% (currently 100%).
 1. Fork the repository and create a feature branch: `git checkout -b feature/my-feature`
 2. Follow the code rules in `docs/rules.md` (150-line limit, ruff, docstrings)
 3. Write tests first (TDD) — coverage must stay ≥ 85%
-4. Run `ruff check .` and ensure zero violations before committing
+4. Run `uv run ruff check .` and ensure zero violations before committing
 5. Use semantic commit messages: `Feature:`, `BugFix:`, `Refactor:`, `Docs:`
 6. Update `docs/TODO.md` in the same commit as the work it describes
 7. Open a pull request with a clear description of the change
