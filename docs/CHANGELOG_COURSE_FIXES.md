@@ -132,3 +132,56 @@ All items below were identified in `docs/AUDIT.md`.
 
 **src/topic_validator.py**
 - Fallback Anthropic SDK path uses `from src.backends._api import _get_anthropic` (lazy import, Windows safe)
+
+---
+
+## Final Verification (2026-05-31)
+
+Additional commits on `fix/course-submission-compliance` after initial push:
+
+| Commit | Message |
+|--------|---------|
+| `703a966` | `docs: align README with uv-first course workflow` |
+
+### Commands run
+
+```
+uv sync --extra dev     → Resolved 32 packages, all OK
+uv lock                 → Resolved 32 packages, lock unchanged
+uv run pytest -q        → 190 passed in ~11s
+uv run pytest --cov=src --cov=orchestrator --cov-report=term-missing
+uv run ruff check .     → All checks passed
+uv run python -m compileall -q .  → No syntax errors
+```
+
+### Results
+
+| Check | Result |
+|-------|--------|
+| Tests | **190 passed, 0 failed** |
+| Coverage | **88.54%** (target ≥ 85%) |
+| Ruff | **0 violations** |
+| Syntax (compileall) | **Clean** |
+| uv.lock | **Up to date** |
+
+### Tasks completed in final pass
+
+- **Task 1** (pytest reliability): Already compliant — no pytest-html, no addopts. `uv run pytest -q` works after `uv sync --extra dev`.
+- **Task 2** (ruff full repo): Already compliant — `uv run ruff check .` passes with 0 violations.
+- **Task 3** (README uv-first): Updated — all `python main.py` → `uv run python main.py`, removed pip from main path, added Quick Start, Environment Variables, Known Limitations, Linting sections, fixed coverage claim (89% not 100%), fixed `.env-example` → `.env.example`.
+- **Task 4** (example result totals): Already compliant — all 6 example result files have correct totals.
+- **Task 5** (final verification): All checks pass.
+
+### Remaining limitations
+
+- `--backend cli` requires Claude Code + Pro subscription; not tested in CI
+- `--backend ollama` / `ollama-cli` requires Ollama installed separately
+- Web search only available via `cli` backend when the agent definition requests it
+- Token tracking only accurate for `api` and `ollama` backends
+- `_persistent_cli.py` and `_ollama_orchestrator.py` backends have lower coverage (~26–30%) because they require live external processes to test
+
+### Branch status
+
+Ready for PR review. Branch: `fix/course-submission-compliance` → `master`
+
+PR URL: https://github.com/AmitKuper/agent-orchestration-course-t2/pull/new/fix/course-submission-compliance
