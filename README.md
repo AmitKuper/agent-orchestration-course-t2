@@ -86,7 +86,7 @@ uv run python main.py --topic "AI will replace most jobs" --turns 4
 
 # Run with a free local model (no API key needed)
 uv run python main.py --topic "AI will replace most jobs" --turns 4 \
-  --backend ollama-cli --model-a llama3.2 --model-b llama3.2 --model-judge llama3.2
+  --backend ollama-cli-agents --model-a llama3.2 --model-b llama3.2 --model-judge llama3.2
 
 # Resume an interrupted debate
 uv run python main.py --resume --outdir outputs/my-run-folder
@@ -122,9 +122,10 @@ uv run python main.py --resume --outdir path/to/run/folder
 | `--max-retries` | 3 | Retries per invalid response |
 | `--outdir` | outputs/ | Base output directory |
 | `--factcheck` | off | Enable factual accuracy checks |
+| `--require-references` | off | Reject turns with empty references list |
 | `--log-level` | INFO | DEBUG / INFO / WARNING / ERROR |
-| `--config` | — | Path to YAML config file |
-| `--backend` | api | Invocation backend — see [Backends](#backends) |
+| `--config` | — | Path to YAML/JSON config file |
+| `--backend` | claude-api | Invocation backend — see [Backends](#backends) |
 
 ### YAML config file
 
@@ -199,7 +200,8 @@ outputs/ai-jobs/20260524_220438/
   config.json          ← resolved configuration used for this run
   conversation.jsonl   ← one JSON line per accepted turn with token usage
   debate.log           ← full execution log (INFO + WARNING + ERROR)
-  result.json          ← judge verdict, scores, explanation, factcheck flags
+  result.json          ← latest judge verdict (convenience pointer)
+  result_YYYYMMDD_HHMMSS.json  ← timestamped copy, never overwritten
   run_info.json        ← timestamp, backend, command used
 ```
 
@@ -278,14 +280,16 @@ Also updates `.claude/agents/*.md` model fields to match config.
 
 ```bash
 ollama pull llama3.2
-uv run python main.py --topic "..." --backend ollama-cli-agents --model-a llama3.2 --model-b llama3.2 --model-judge llama3.2
+uv run python main.py --topic "..." --backend ollama-cli-agents \
+  --model-a llama3.2 --model-b llama3.2 --model-judge llama3.2
 ```
 
 ### ollama-api — Ollama HTTP API
 
 ```bash
 uv sync --extra ollama    # installs requests package
-uv run python main.py --topic "..." --backend ollama-api --model-a llama3.2 --model-b llama3.2 --model-judge llama3.2
+uv run python main.py --topic "..." --backend ollama-api \
+  --model-a llama3.2 --model-b llama3.2 --model-judge llama3.2
 ```
 
 Override the Ollama server URL:
@@ -298,7 +302,7 @@ OLLAMA_BASE_URL=http://192.168.1.10:11434 uv run python main.py --topic "..." --
 
 ## Running with Ollama (free local backend)
 
-During development and testing, running every debate turn against the Anthropic API burns real tokens quickly — a 20-turn debate with a judge call can cost $0.05–$0.20 per run. [Ollama](https://ollama.com) lets you run open-source models locally at zero cost, making it practical to iterate freely without watching your API bill.
+During development and testing, running every debate turn against the Anthropic API burns real tokens quickly — a 20-turn debate with a judge call can cost $0.05–$0.20 per run. [Ollama](https://ollama.com) lets you run open-source models locally at zero cost.
 
 ### 1. Install Ollama
 
@@ -314,12 +318,6 @@ curl -fsSL https://ollama.com/install.sh | sh
 ```bash
 ollama pull qwen3:14b       # good balance of quality and speed on a modern GPU
 ollama pull llama3.2        # lighter option for slower machines
-ollama pull mistral         # alternative if you prefer Mistral
-```
-
-Check what you have installed:
-```bash
-ollama list
 ```
 
 ### 3. Run a debate with Ollama
@@ -361,7 +359,7 @@ uv run python main.py \
 | Ollama on a remote server | `ollama-api` (HTTP API) |
 | You have Claude Code + Pro subscription | `claude-cli-agents` |
 
-> **Note:** Ollama models follow instructions less reliably than Claude and may occasionally produce malformed JSON. The platform's retry logic handles this automatically — you may see more `WARNING` retry log lines than with the API backend.
+> **Note:** Ollama models follow instructions less reliably than Claude and may occasionally produce malformed JSON. The platform's retry logic handles this automatically.
 
 ### 5. Example debates run with Ollama
 
@@ -399,6 +397,7 @@ outputs/20260101_120000/
   debate.log                     # full execution log
   result.json                    # latest judge verdict (convenience pointer)
   result_20260101_120500.json    # timestamped copy — never overwritten
+  run_info.json                  # backend, argv, run timestamp
 ```
 
 Running the judge multiple times on the same debate appends new `result_<timestamp>.json` files without overwriting previous verdicts.
@@ -408,11 +407,17 @@ Running the judge multiple times on the same debate appends new `result_<timesta
 ## Running Tests
 
 ```bash
-# Run all tests
+# Install dev dependencies
+uv sync --extra dev
+
+# Run all tests (quick)
 uv run pytest -q
 
 # Run with coverage report
 uv run pytest --cov=src --cov=orchestrator --cov-report=term-missing
+
+# Run a specific test file
+uv run pytest tests/unit/test_validator.py -v
 ```
 
 Coverage target: ≥ 85% (currently ~89%).
@@ -432,11 +437,11 @@ Zero violations expected.
 
 ## Known Limitations
 
-- **`--backend cli`** requires Claude Code installed and a Pro subscription. It is not tested in CI.
-- **`--backend ollama` / `ollama-cli`** requires Ollama running locally. Install separately via [ollama.com](https://ollama.com).
-- **Web search** (`web_search` skill) is available to debater agents only when using the `cli` backend and only if the agent definition requests it. It is not available via the `api` backend.
-- **Token cost tracking** is only accurate for the `api` and `ollama` backends. CLI backends do not report token usage.
-- **Windows MAX_PATH**: if your working directory path exceeds ~200 characters (e.g. deeply nested Hebrew-character paths), the `api` backend uses lazy imports to work around Windows path-length limits.
+- **`--backend claude-cli-agents` / `claude-cli-session`** requires Claude Code installed and a Pro subscription. Not tested in CI.
+- **`--backend ollama-api` / `ollama-cli-agents`** requires Ollama running locally. Install separately via [ollama.com](https://ollama.com).
+- **Web search** (`web_search` skill) is available to debater agents only when using the `claude-cli-agents` backend and only if the agent definition requests it. It is not available via the `claude-api` backend.
+- **Token cost tracking** is only accurate for the `claude-api` and `ollama-api` backends. CLI backends do not report token usage.
+- **Windows MAX_PATH**: if your working directory path exceeds ~200 characters (e.g. deeply nested Hebrew-character paths), the `claude-api` backend uses lazy imports to work around Windows path-length limits.
 - **Judge timeout**: if the judge exhausts all retries, the debate state is preserved and can be resumed to re-run the judgment.
 
 ---
