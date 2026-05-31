@@ -1,43 +1,47 @@
-2026-05-24 23:51:58,389 [INFO] debate.orchestrator: Debate starting: Who is the greatest soccer player of all time — Lionel Messi or Cristiano Ronaldo?
-2026-05-24 23:52:16,782 [INFO] debate.orchestrator: Positions — A: Lionel Messi is the greatest soccer player of all time due to his technical skill, consistency, and pivotal role in team successes. | B: Cristiano Ronaldo is the greatest soccer player of all time because of his unmatched goal-scoring record, physicality, and achievements across multiple top leagues.
-2026-05-24 23:52:16,783 [INFO] debate.orchestrator: Turn 1/20 — TeamMessi
-2026-05-24 23:52:46,397 [INFO] debate.orchestrator: Turn 1/20 accepted from TeamMessi.
-2026-05-24 23:52:46,398 [INFO] debate.orchestrator: Turn 2/20 — TeamRonaldo
-2026-05-24 23:53:21,291 [INFO] debate.orchestrator: Turn 2/20 accepted from TeamRonaldo.
-2026-05-24 23:53:21,322 [INFO] debate.orchestrator: Turn 3/20 — TeamMessi
-2026-05-24 23:53:49,508 [INFO] debate.orchestrator: Turn 3/20 accepted from TeamMessi.
-2026-05-24 23:53:49,508 [INFO] debate.orchestrator: Turn 4/20 — TeamRonaldo
-2026-05-24 23:54:26,385 [INFO] debate.orchestrator: Turn 4/20 accepted from TeamRonaldo.
-2026-05-24 23:54:26,385 [INFO] debate.orchestrator: Turn 5/20 — TeamMessi
-2026-05-24 23:54:57,724 [INFO] debate.orchestrator: Turn 5/20 accepted from TeamMessi.
-2026-05-24 23:54:57,724 [INFO] debate.orchestrator: Turn 6/20 — TeamRonaldo
-2026-05-24 23:55:29,240 [INFO] debate.orchestrator: Turn 6/20 accepted from TeamRonaldo.
-2026-05-24 23:55:29,241 [INFO] debate.orchestrator: Turn 7/20 — TeamMessi
-2026-05-24 23:56:02,152 [INFO] debate.orchestrator: Turn 7/20 accepted from TeamMessi.
-2026-05-24 23:56:02,152 [INFO] debate.orchestrator: Turn 8/20 — TeamRonaldo
-2026-05-24 23:56:41,240 [INFO] debate.orchestrator: Turn 8/20 accepted from TeamRonaldo.
-2026-05-24 23:56:41,241 [INFO] debate.orchestrator: Turn 9/20 — TeamMessi
-2026-05-24 23:57:15,370 [INFO] debate.orchestrator: Turn 9/20 accepted from TeamMessi.
-2026-05-24 23:57:15,371 [INFO] debate.orchestrator: Turn 10/20 — TeamRonaldo
-2026-05-24 23:57:53,436 [INFO] debate.orchestrator: Turn 10/20 accepted from TeamRonaldo.
-2026-05-24 23:57:53,436 [INFO] debate.orchestrator: Turn 11/20 — TeamMessi
-2026-05-24 23:58:34,954 [INFO] debate.orchestrator: Turn 11/20 accepted from TeamMessi.
-2026-05-24 23:58:34,955 [INFO] debate.orchestrator: Turn 12/20 — TeamRonaldo
-2026-05-24 23:59:12,064 [INFO] debate.orchestrator: Turn 12/20 accepted from TeamRonaldo.
-2026-05-24 23:59:12,064 [INFO] debate.orchestrator: Turn 13/20 — TeamMessi
-2026-05-24 23:59:54,457 [INFO] debate.orchestrator: Turn 13/20 accepted from TeamMessi.
-2026-05-24 23:59:54,458 [INFO] debate.orchestrator: Turn 14/20 — TeamRonaldo
-2026-05-25 00:00:32,846 [INFO] debate.orchestrator: Turn 14/20 accepted from TeamRonaldo.
-2026-05-25 00:00:32,847 [INFO] debate.orchestrator: Turn 15/20 — TeamMessi
-2026-05-25 00:01:10,140 [INFO] debate.orchestrator: Turn 15/20 accepted from TeamMessi.
-2026-05-25 00:01:10,141 [INFO] debate.orchestrator: Turn 16/20 — TeamRonaldo
-2026-05-25 00:01:50,225 [INFO] debate.orchestrator: Turn 16/20 accepted from TeamRonaldo.
-2026-05-25 00:01:50,225 [INFO] debate.orchestrator: Turn 17/20 — TeamMessi
-2026-05-25 00:02:31,997 [INFO] debate.orchestrator: Turn 17/20 accepted from TeamMessi.
-2026-05-25 00:02:31,997 [INFO] debate.orchestrator: Turn 18/20 — TeamRonaldo
-2026-05-25 00:03:13,735 [INFO] debate.orchestrator: Turn 18/20 accepted from TeamRonaldo.
-2026-05-25 00:03:13,736 [INFO] debate.orchestrator: Turn 19/20 — TeamMessi
-2026-05-25 00:03:52,999 [INFO] debate.orchestrator: Turn 19/20 accepted from TeamMessi.
-2026-05-25 00:03:52,999 [INFO] debate.orchestrator: Turn 20/20 — TeamRonaldo
-2026-05-25 00:04:32,023 [INFO] debate.orchestrator: Turn 20/20 accepted from TeamRonaldo.
-2026-05-25 00:05:40,450 [INFO] debate.orchestrator: Verdict written to outputs\messi-ronaldo-api\20260524_235158\result.json.
+2026-05-26 09:13:07,860 [INFO] debate.orchestrator: Debate starting: Who is the greatest soccer player of all time â€” Lionel Messi or Cristiano Ronaldo?
+2026-05-26 09:13:15,487 [INFO] debate.orchestrator: Positions — A: Lionel Messi is the greatest soccer player of all time due to his consistent performance, technical skill, and numerous team and individual achievements. | B: Cristiano Ronaldo is the greatest soccer player of all time because of his physical prowess, longevity, and record-breaking career statistics across multiple leagues and clubs.
+2026-05-26 09:13:15,489 [INFO] debate.orchestrator: Turn 1/20 — TeamMessi
+2026-05-26 09:13:26,672 [INFO] debate.orchestrator: Turn 1/20 accepted from TeamMessi.
+2026-05-26 09:13:26,677 [INFO] debate.orchestrator: Turn 2/20 — TeamRonaldo
+2026-05-26 09:13:39,260 [INFO] debate.orchestrator: Turn 2/20 accepted from TeamRonaldo.
+2026-05-26 09:13:39,291 [INFO] debate.orchestrator: Turn 3/20 — TeamMessi
+2026-05-26 09:13:51,204 [INFO] debate.orchestrator: Turn 3/20 accepted from TeamMessi.
+2026-05-26 09:13:51,205 [INFO] debate.orchestrator: Turn 4/20 — TeamRonaldo
+2026-05-26 09:14:05,969 [INFO] debate.orchestrator: Turn 4/20 accepted from TeamRonaldo.
+2026-05-26 09:14:05,970 [INFO] debate.orchestrator: Turn 5/20 — TeamMessi
+2026-05-26 09:14:20,120 [INFO] debate.orchestrator: Turn 5/20 accepted from TeamMessi.
+2026-05-26 09:14:20,121 [INFO] debate.orchestrator: Turn 6/20 — TeamRonaldo
+2026-05-26 09:14:34,850 [INFO] debate.orchestrator: Turn 6/20 accepted from TeamRonaldo.
+2026-05-26 09:14:34,851 [INFO] debate.orchestrator: Turn 7/20 — TeamMessi
+2026-05-26 09:14:49,661 [INFO] debate.orchestrator: Turn 7/20 accepted from TeamMessi.
+2026-05-26 09:14:49,661 [INFO] debate.orchestrator: Turn 8/20 — TeamRonaldo
+2026-05-26 09:15:01,481 [WARNING] debate.agent.TeamRonaldo: Attempt 1/3 failed for TeamRonaldo: Your argument is too similar to a previous turn. You must introduce new points, angles, or evidence.
+2026-05-26 09:15:17,351 [INFO] debate.orchestrator: Turn 8/20 accepted from TeamRonaldo.
+2026-05-26 09:15:17,352 [INFO] debate.orchestrator: Turn 9/20 — TeamMessi
+2026-05-26 09:15:29,041 [INFO] debate.orchestrator: Turn 9/20 accepted from TeamMessi.
+2026-05-26 09:15:29,042 [INFO] debate.orchestrator: Turn 10/20 — TeamRonaldo
+2026-05-26 09:15:43,149 [INFO] debate.orchestrator: Turn 10/20 accepted from TeamRonaldo.
+2026-05-26 09:15:43,149 [INFO] debate.orchestrator: Turn 11/20 — TeamMessi
+2026-05-26 09:16:00,434 [INFO] debate.orchestrator: Turn 11/20 accepted from TeamMessi.
+2026-05-26 09:16:00,434 [INFO] debate.orchestrator: Turn 12/20 — TeamRonaldo
+2026-05-26 09:16:12,608 [INFO] debate.orchestrator: Turn 12/20 accepted from TeamRonaldo.
+2026-05-26 09:16:12,608 [INFO] debate.orchestrator: Turn 13/20 — TeamMessi
+2026-05-26 09:16:32,452 [INFO] debate.orchestrator: Turn 13/20 accepted from TeamMessi.
+2026-05-26 09:16:32,453 [INFO] debate.orchestrator: Turn 14/20 — TeamRonaldo
+2026-05-26 09:16:47,162 [INFO] debate.orchestrator: Turn 14/20 accepted from TeamRonaldo.
+2026-05-26 09:16:47,163 [INFO] debate.orchestrator: Turn 15/20 — TeamMessi
+2026-05-26 09:17:03,194 [INFO] debate.orchestrator: Turn 15/20 accepted from TeamMessi.
+2026-05-26 09:17:03,194 [INFO] debate.orchestrator: Turn 16/20 — TeamRonaldo
+2026-05-26 09:17:16,978 [INFO] debate.orchestrator: Turn 16/20 accepted from TeamRonaldo.
+2026-05-26 09:17:16,979 [INFO] debate.orchestrator: Turn 17/20 — TeamMessi
+2026-05-26 09:17:29,572 [INFO] debate.orchestrator: Turn 17/20 accepted from TeamMessi.
+2026-05-26 09:17:29,572 [INFO] debate.orchestrator: Turn 18/20 — TeamRonaldo
+2026-05-26 09:17:47,917 [WARNING] debate.agent.TeamRonaldo: Attempt 1/3 failed for TeamRonaldo: Your argument is too similar to a previous turn. You must introduce new points, angles, or evidence.
+2026-05-26 09:18:04,870 [INFO] debate.orchestrator: Turn 18/20 accepted from TeamRonaldo.
+2026-05-26 09:18:04,870 [INFO] debate.orchestrator: Turn 19/20 — TeamMessi
+2026-05-26 09:18:19,494 [WARNING] debate.agent.TeamMessi: Attempt 1/3 failed for TeamMessi: Your argument is too similar to a previous turn. You must introduce new points, angles, or evidence.
+2026-05-26 09:18:31,803 [INFO] debate.orchestrator: Turn 19/20 accepted from TeamMessi.
+2026-05-26 09:18:31,803 [INFO] debate.orchestrator: Turn 20/20 — TeamRonaldo
+2026-05-26 09:18:47,284 [WARNING] debate.agent.TeamRonaldo: Attempt 1/3 failed for TeamRonaldo: Your argument is too similar to a previous turn. You must introduce new points, angles, or evidence.
+2026-05-26 09:19:11,307 [INFO] debate.orchestrator: Turn 20/20 accepted from TeamRonaldo.
+2026-05-26 09:19:30,963 [INFO] debate.orchestrator: Verdict written to outputs\messi-ronaldo-api\20260526_091307\result.json.

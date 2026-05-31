@@ -421,10 +421,50 @@ judgment (skill)             ← also user-invocable directly via /judgment
 
 ### Add a new backend
 
-1. Create `src/backends/_mybackend.py` — subclass `Backend` from `_base.py` and implement `invoke(name, model, prompt, cost_tracker, max_tokens, system_prompt, agent_def) -> str`
-2. Register it in `src/backends/_factory.py` — add a new `elif backend_type == "my-backend":` branch in `make_backend()`
-3. Export it from `src/backends/__init__.py`
-4. Add tests in `tests/unit/test_mybackend.py`
+There are two backend contracts. Choose the right one before writing any code.
+
+#### Option A — Per-turn Backend (subclass `Backend`)
+
+Use this when the backend handles **one agent call at a time** — the orchestrator drives the turn loop and calls `invoke()` on every turn. This is the standard path for API backends, CLI wrappers, and HTTP transports.
+
+1. **Create `src/backends/_mybackend.py`** — subclass `Backend` from `_base.py` and implement:
+   ```python
+   def invoke(
+       self, name: str, model: str, prompt: str,
+       cost_tracker: CostTracker, max_tokens: int,
+       temperature: float | None = None, system: str | None = None,
+   ) -> str: ...
+   ```
+2. **Set `uses_memory`** — class attribute on your backend (`bool`, default `False`).
+   - `False` (recommended for all new backends): the orchestrator injects full conversation history into every prompt via `build_prompt()`.
+   - `True` only if your backend maintains its own persistent memory and agents must never receive history in their prompt (currently unused — the original CliBackend design intent that was never completed).
+3. **Register in `src/backends/_factory.py`**:
+   - Add your type string to the `_CHOICES` tuple.
+   - Add a branch in `make_backend()`: `if backend_type == "my-backend": return MyBackend(...)`.
+4. **Export from `src/backends/__init__.py`** — add to both the `import` block and `__all__`.
+5. **Add to `--backend` choices** in `build_cli_parser()` in `src/config.py`.
+6. **If CLI-based** (subprocess per agent turn): add your backend name to the `if c.backend in (...)` guard in `orchestrator.py` `initialize_agents()` so `.claude/agents/*.md` model fields are updated before agent construction.
+7. **Add tests** in `tests/unit/test_mybackend.py` — cover `invoke()`, token recording, error handling, and any constructor arguments.
+
+#### Option B — Orchestrator Backend (subclass `OrchestratorBackend`)
+
+Use this when the backend **generates the entire debate in a single call** — the model self-orchestrates all turns and the judge verdict internally. The Python orchestrator detects this via `isinstance` and delegates the full lifecycle to `run_debate()`.
+
+1. **Create `src/backends/_myorchestrator.py`** — subclass `OrchestratorBackend` from `_orchestrator_base.py` and implement:
+   ```python
+   def run_debate(
+       self, config: DebateConfig, position_a: str, position_b: str,
+   ) -> tuple[list[dict], dict | None]: ...
+   ```
+   Returns `(turns, verdict)` where `turns` is a list of accepted turn dicts (same schema as `conversation.jsonl`) and `verdict` is the judge result dict or `None`.
+2. **Set `fallback_backend_type: str`** — the per-turn backend to use for single calls that `OrchestratorBackend` cannot handle (e.g. topic validation). Must be from the same family as your backend so the environment requirements match:
+   - Claude orchestrator → `"claude-api"`
+   - Ollama orchestrator → `"ollama-cli-agents"`
+   - The base class default is `"claude-api"` — override it explicitly to avoid surprises.
+3. **Register in `src/backends/_factory.py`** — same as Option A steps 3–5.
+4. **Export from `src/backends/__init__.py`** — same as Option A step 4.
+5. **Add to `--backend` choices** in `build_cli_parser()` in `src/config.py`.
+6. **Add tests** in `tests/unit/test_myorchestrator.py` — cover `run_debate()` output parsing, `fallback_backend_type` value, and the prompt builder if present.
 
 ### Add a new agent type
 
@@ -448,6 +488,74 @@ judgment (skill)             ← also user-invocable directly via /judgment
 2. Run: `python main.py --config <your-config.json>`
 3. Copy the run output folder to `examples/<topic>/output-<backend>/`
 4. The config is already saved inside the output folder — no top-level config needed
+
+---
+
+## Future Development Options
+
+### New Backends
+
+**`ClaudeOrchestratorBackend`** (`src/backends/_claude_orchestrator.py`)
+Single-call Claude backend — sends one prompt asking Claude to generate the complete debate as JSONL, then parses the output. Mirrors `OllamaOrchestratorBackend` exactly. Set `fallback_backend_type = "claude-api"`. Useful for rapid prototyping and cost estimation without per-turn API overhead.
+
+**`OpenAIBackend`** (`src/backends/_openai.py`)
+Per-turn backend using the OpenAI API (GPT-4o, o1, etc.). Implement `invoke()` via the `openai` Python SDK. Add `OPENAI_API_KEY` to `.env.example`. Token tracking already works — `record_call()` accepts any integer counts.
+
+**`AsyncApiBackend`** (`src/backends/_async_api.py`)
+`asyncio`-based variant of `ApiBackend`. Enables both debate agents to generate their turns concurrently (Agent A and Agent B share no state between turns, so turns within a single round are independent). Requires an async orchestrator loop and `asyncio.gather()` for paired turns. Halves wall-clock time on API backends.
+
+**`GeminiBackend`** (`src/backends/_gemini.py`)
+Per-turn backend using the Google Gemini API via `google-generativeai`. Same structure as `ApiBackend` — lazy client init, gatekeeper wrapping, token count from response metadata.
+
+---
+
+### Debate Formats
+
+**Panel debate** — more than two agents arguing the same topic from different angles (e.g. economic, ethical, technical). Requires `DebateConfig` to support `n_agents` and a turn-order list. `_run_turns()` in `orchestrator.py` already uses a modulo pattern — extend to cycle through `n` agents.
+
+**Oxford format** — structured rounds: opening statements → rebuttals → audience questions → closing statements. Requires turn-type metadata in `ConversationState` and format-aware prompt injection in `build_prompt()`.
+
+**Human-in-the-loop** — one debater is a human typing at the terminal. Add a `HumanBackend` that reads from `stdin` instead of calling a model. No changes to `DebateAgent` or validation needed — the human's input goes through the same schema validation as model output.
+
+---
+
+### Judge Improvements
+
+**Multi-judge consensus** — invoke 2–3 judge agents with different models and average (or vote on) the scores. `execute_judge()` in `debate_helpers.py` already returns a verdict dict — run it N times and merge. Reduces single-model bias.
+
+**Real factcheck integration** — connect `factcheck_flags` to a web search call (the `web_search` skill already exists for Claude CLI agents). When `factcheck=true`, extract all `references` from the debate, verify each URL/claim, and populate `factcheck_flags` with failed checks.
+
+**Streaming judge output** — show scoring criteria as they are produced rather than waiting for the full verdict JSON. Requires streaming support in `ApiBackend` and a partial-JSON parser in `JudgeAgent`.
+
+---
+
+### Persistence & State
+
+**SQLite backend for `ConversationState`** — replace JSONL append with a SQLite table. Enables indexed queries (turns by agent, turns by score), multi-debate history, and leaderboards across runs without parsing files. The `ConversationState` interface (`append_turn`, `get_turns`, `load_from_file`) is already abstract enough to swap implementations.
+
+**S3 / remote output** — `OutputManager` writes all files locally. Add a `RemoteOutputManager` subclass that mirrors writes to an S3 bucket or GCS bucket. Useful for running debates on headless servers and collecting results centrally.
+
+**Debate replay** — given a `conversation.jsonl`, re-run validation on every turn and re-invoke the judge. Useful for re-scoring an existing debate with a different model or updated criteria without re-running all turns.
+
+---
+
+### Observability
+
+**Prometheus metrics** — export per-turn latency, retry counts, token usage, and validation failure rates as Prometheus counters/histograms. Add a `MetricsMiddleware` that wraps `APIGatekeeper.execute()`.
+
+**Live progress UI** — a `rich`-based terminal dashboard showing current turn, agent scores so far, retry count, and elapsed time. Replace the plain `logging` output in `_run_turns()` with a `rich.Live` context.
+
+**Cost alerts** — `CostTracker` already estimates USD cost per call. Add a configurable `max_cost_usd` field to `DebateConfig`; raise `CostLimitExceededError` (new exception in `exceptions.py`) before any call that would exceed the budget.
+
+---
+
+### API & Integration
+
+**REST API server** — wrap `DebateSDK` in a FastAPI app. Expose `POST /debates` (start), `GET /debates/{id}` (status/result), and `POST /debates/{id}/resume`. `ConversationState` and `OutputManager` already provide the persistence layer.
+
+**Tournament mode** — run N debates on the same topic with randomised position assignment, aggregate scores across runs, and report win rates per backend/model. Add a `Tournament` class that calls `DebateSDK.run()` in a loop and writes a summary CSV.
+
+**Webhook notifications** — call a configurable URL when a debate completes or fails. Add `webhook_url` to `DebateConfig` and a `notify()` call at the end of `DebateOrchestrator.run_debate()`.
 
 ---
 

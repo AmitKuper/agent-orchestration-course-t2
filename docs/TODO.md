@@ -83,3 +83,31 @@
 - [x] `tests/integration/test_debate_config_file.py`, `test_resume_complete.py`
 - [x] `examples/` restructured to topic-first layout (`examples/<topic>/output-<backend>/`)
 - [x] Example debates: `iran-nuclear`, `ai-jobs`, `messi-ronaldo` (all via ollama-cli / Qwen3:14b)
+
+## Phase 9 — Course Compliance Fixes ✅ Complete (759a380)
+- [x] Build system corrected (`setuptools.build_meta`, `uv.lock`)
+- [x] `main.py` delegates to `DebateSDK` — SDK layer as sole entry point
+- [x] `APIGatekeeper` wraps all external calls (Anthropic SDK, Ollama HTTP, subprocess)
+- [x] `StanceValidator` — 19 concession phrases, integrated into `BaseAgent` validation chain
+- [x] `validate_debate_turn()` and `validate_judge_verdict()` — strict JSON protocol validation
+- [x] `--require-references` flag; `require_references` field in `DebateConfig`
+- [x] `write_result()` — timestamped result files (`result_YYYYMMDD_HHMMSS.json` + `result.json` pointer)
+- [x] `JudgeAgent._validate_response()` override — uses `validate_judge_verdict()` schema
+- [x] `.env.example` consolidated; `.gitignore` updated; `docs/AUDIT.md` + `docs/CHANGELOG_COURSE_FIXES.md`
+- [x] 190 tests, 0 failures, ≥ 85% coverage
+
+## Phase 11 — Bug Fixes & Example Cleanup ✅ Complete
+- [x] `src/backends/_cli.py` — `CliBackend.uses_memory` changed `True` → `False`; history now injected via prompt (consistent with all other backends). Previously the agent received no history because prompt injection was suppressed but memory files were never written.
+- [x] `examples/*/config-claude-cli.json` — deleted from all 3 topic folders; no output exists for `claude-cli-agents` backend so config files were orphaned
+- [x] `CLAUDE.md` — State & History section updated to reflect prompt-injection mechanism
+
+## Phase 10 — Novelty Validation & Ollama Orchestrator ✅ Complete (ef35e99, 4f9ac4a)
+- [x] `OllamaOrchestratorBackend` — single-call backend; Qwen3 thinking-mode output parsed with brace-balanced scanner
+- [x] `validate_novelty()` in `ResponseValidator` — SequenceMatcher threshold 0.75
+- [x] `_extra_validate()` hook in `BaseAgent`; `DebateAgent` overrides to run novelty check
+- [x] `NOVELTY_THRESHOLD = 0.75` constant in `src/constants.py`
+- [x] "Never repeat arguments" rule added to `.claude/agents/debate-agent.md` skill definition
+- [x] `tests/integration/test_novelty_from_outputs.py` — parametrized tests against real debate outputs
+- [x] 9-run sweep (3 topics × 3 backends): all 20/20 turns, zero post-novelty repeats in 8/9 runs
+- [x] `examples/analysis.md` — cross-backend quality analysis; `analyze_results.py` helper
+- [x] 202 tests, 0 failures, 100% coverage

@@ -34,7 +34,7 @@ main.py
               └── JudgeAgent         # scores completed debate
 ```
 
-Every agent call passes through **APIGatekeeper** — a centralized router that enforces per-backend retry/backoff and logs every call. Backends are swappable (`api`, `cli`, `ollama-cli`, `ollama`); the rest of the system is backend-agnostic.
+Every agent call passes through **APIGatekeeper** — a centralized router that enforces per-backend retry/backoff and logs every call. Backends are swappable; the rest of the system is backend-agnostic.
 
 **Validation pipeline** (applied to every response before acceptance):
 
@@ -45,6 +45,7 @@ Every agent call passes through **APIGatekeeper** — a centralized router that 
 5. Unresolved placeholder rejection
 6. JSON schema check (debate turn or judge verdict, depending on agent type)
 7. **StanceValidator** — rejects concession phrases; agents may never agree with or yield to each other
+8. **Novelty check** — rejects arguments too similar (SequenceMatcher > 0.75) to any prior turn by the same agent
 
 ---
 
@@ -244,7 +245,7 @@ Use `--require-references` to reject any turn where `references` is an empty lis
 
 ## Backends
 
-Four backends are available via `--backend`:
+Seven backends are available via `--backend`:
 
 | Backend | Flag | Requires | Token tracking |
 |---------|------|----------|---------------|
@@ -253,7 +254,9 @@ Four backends are available via `--backend`:
 | Ollama CLI | `--backend ollama-cli` | Ollama installed with target model | No |
 | Ollama API | `--backend ollama` | Ollama running locally + requests package | Yes |
 
-### api — Anthropic SDK (default)
+Legacy aliases still accepted: `api` → `claude-api`, `cli` → `claude-cli-agents`, `ollama` → `ollama-api`.
+
+### claude-api — Anthropic SDK (default)
 
 ```bash
 uv run python main.py --topic "..." --backend api
@@ -261,7 +264,7 @@ uv run python main.py --topic "..." --backend api
 
 Requires `ANTHROPIC_API_KEY` in `.env`.
 
-### cli — Claude Code CLI
+### claude-cli-agents — Claude Code CLI
 
 ```bash
 uv run python main.py --topic "..." --backend cli --model-a claude-sonnet-4-6
@@ -270,7 +273,7 @@ uv run python main.py --topic "..." --backend cli --model-a claude-sonnet-4-6
 Uses `claude --model <model> --print`. Requires Claude Code and a Pro subscription.
 Also updates `.claude/agents/*.md` model fields to match config.
 
-### ollama-cli — Ollama CLI
+### ollama-cli-agents — Ollama CLI per-turn
 
 ```bash
 ollama pull llama3.2
@@ -278,7 +281,7 @@ uv run python main.py --topic "..." --backend ollama-cli \
   --model-a llama3.2 --model-b llama3.2 --model-judge llama3.2
 ```
 
-### ollama — Ollama HTTP API
+### ollama-api — Ollama HTTP API
 
 ```bash
 uv sync --extra ollama    # installs requests package
@@ -319,7 +322,7 @@ ollama pull llama3.2        # lighter option for slower machines
 ```bash
 uv run python main.py \
   --topic "Will AI automation destroy more jobs than it creates?" \
-  --backend ollama-cli \
+  --backend ollama-cli-agents \
   --model-a qwen3:14b --model-b qwen3:14b --model-judge qwen3:14b \
   --turns 20
 ```
@@ -328,19 +331,22 @@ uv run python main.py \
 
 | Situation | Recommended backend |
 |-----------|-------------------|
-| Production / best quality | `api` (Anthropic Claude) |
-| Development, cost-free iteration | `ollama-cli` |
-| Ollama on a remote server | `ollama` (HTTP API) |
-| You have Claude Code + Pro subscription | `cli` |
+| Production / best quality | `claude-api` (Anthropic Claude) |
+| Development, cost-free, per-turn | `ollama-cli-agents` |
+| Ollama on a remote server | `ollama-api` (HTTP API) |
+| You have Claude Code + Pro subscription | `claude-cli-agents` |
 
 > **Note:** Ollama models follow instructions less reliably than Claude and may occasionally produce malformed JSON. The platform's retry logic handles this automatically.
 
 ### 5. Example debates run with Ollama
 
-See [`examples/`](examples/) for complete run outputs using `qwen3:14b` via `ollama-cli`:
-- `examples/iran-nuclear/output-ollama/` — diplomatic vs military approach
-- `examples/ai-jobs/output-ollama/` — AI job displacement debate
-- `examples/messi-ronaldo/output-ollama/` — GOAT debate
+See [`examples/`](examples/) for complete run outputs using `qwen3:14b` via Ollama. Each topic has outputs for three backends:
+- `examples/ai-jobs/output-ollama-api/` — AI job displacement, per-turn API backend
+- `examples/ai-jobs/output-ollama-cli-agents/` — same topic, per-turn CLI backend
+- `examples/ai-jobs/output-ollama-cli/` — same topic, single-shot orchestrator
+- `examples/iran-nuclear/` and `examples/messi-ronaldo/` — same three backends each
+
+See [`examples/analysis.md`](examples/analysis.md) for a cross-backend quality comparison.
 
 ---
 

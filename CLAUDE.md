@@ -28,9 +28,9 @@ Agents communicate strictly through the orchestrator — debaters never call eac
 
 ## State & History
 
-Agent memory files are the **live history mechanism** — each debater agent has a memory file (`.claude/agent-memory/debate-agent/<name>.md`) that accumulates the full conversation. The orchestrator clears these at the start of every new debate and writes each accepted turn to the opponent's memory file after validation. The agent itself writes its own turns to its own memory.
+History is passed via **prompt injection** — on every turn, the orchestrator assembles the full conversation history from `ConversationState` and includes it in the prompt sent to the agent (`build_prompt()` in `src/agents/debate.py`). This applies to all backends uniformly.
 
-The JSONL conversation file is used for **reporting only** (judge input, cost tracking, output). It is not the source of history for the agents during a debate.
+The JSONL conversation file (`conversation.jsonl`) is the persistent source of truth: `ConversationState` reads from it to support resume. It is also used for judge input, cost tracking, and output reporting.
 
 ## Validation & Retry
 

@@ -3,26 +3,26 @@
   "scores": {
     "TeamMessi": {
       "logic": 9,
-      "evidence": 8,
+      "evidence": 9,
       "clarity": 8,
       "persuasiveness": 9,
-      "total": 34
+      "total": 35
     },
     "TeamRonaldo": {
-      "logic": 9,
-      "evidence": 7,
+      "logic": 8,
+      "evidence": 9,
       "clarity": 8,
-      "persuasiveness": 9,
+      "persuasiveness": 8,
       "total": 33
     }
   },
-  "tiebreaker": "evidence",
-  "explanation": "TeamMessi presented stronger arguments in evidence due to consistent data citing (FIFA, UEFA, Sports Science Journal) and clear focus on sustained excellence and team impact. TeamRonaldo's claims about Ronaldo's 2023 Serie A title with Juventus were flagged as unverifiable, slightly lowering their evidence score. Both teams demonstrated similar logic and persuasiveness, but TeamMessi's more accurate evidence secured their win.",
+  "tiebreaker": null,
+  "explanation": "TeamMessi excelled in persuasiveness through emotionally resonant arguments (e.g., 2022 World Cup legacy) and consistent citation of tournament-specific stats. Both debaters used credible sources, but TeamMessi's focus on Messi's unique combination of individual honors (8 Ballon d'Ors) and team success (World Cup) created stronger rhetorical force. TeamRonaldo's statistical emphasis and longevity arguments were robust but less impactful than Messi's narrative of global legacy.",
   "factcheck_flags": [
     {
       "agent": "TeamRonaldo",
-      "claim": "Ronaldo's 2023 Serie A title (Juventus)",
-      "issue": "Unverifiable: Ronaldo moved to Al Nassr in 2023; Juventus did not win Serie A in 2023."
+      "claim": "Ronaldo\u2019s 3-hour daily training regimen (Sports Illustrated, 2022)",
+      "issue": "Unverified claim; no specific 3-hour regimen cited in Sports Illustrated archives"
     }
   ]
 }

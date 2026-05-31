@@ -39,17 +39,7 @@ class BaseAgent:
         backend: Backend | None = None,
         system_prompt: str | None = None,
     ) -> None:
-        """Initialise with shared infrastructure references.
-
-        Args:
-            name: Display name for this agent instance (e.g. "Agent A").
-            model: Claude model ID to use for API calls.
-            config: Fully resolved debate configuration.
-            state: Shared conversation state for history access.
-            cost_tracker: Token usage recorder for cost accounting.
-            backend: Invocation backend. Required unless subclass overrides _invoke().
-            system_prompt: Optional system prompt injected on every call.
-        """
+        """Initialise agent with shared infrastructure references."""
         self.name = name
         self.model = model
         self.config = config
@@ -63,20 +53,25 @@ class BaseAgent:
         self._assigned_position: str | None = None
         self._logger = logging.getLogger(f"debate.agent.{name}")
 
+    @staticmethod
+    def _strip_fences(text: str) -> str:
+        """Strip markdown code fences from a response if present."""
+        stripped = text.strip()
+        if stripped.startswith("```"):
+            lines = stripped.splitlines()
+            if len(lines) >= 2 and lines[-1].strip() == "```":
+                return "\n".join(lines[1:-1]).strip()
+        return stripped
+
     def invoke_with_retry(self, prompt: str, context: str = "") -> str:
-        """Invoke the agent and retry on validation failure.
+        """Invoke the agent, validate, and retry up to max_retries on failure.
 
-        Args:
-            prompt: The main prompt to send.
-            context: Optional context prepended to the prompt on first attempt.
-
-        Returns:
-            Accepted response string, or empty string after max retries.
+        Returns accepted response string, or empty string after all retries.
         """
         full_prompt = f"{context}\n\n{prompt}".strip() if context else prompt
         current_prompt = full_prompt
         for attempt in range(self.config.max_retries + 1):
-            response = self._invoke(current_prompt)
+            response = self._strip_fences(self._invoke(current_prompt))
             result = self._validate_response(response)
             if result.valid and self._assigned_position is not None:
                 stance = self._stance_validator.validate(
@@ -84,6 +79,8 @@ class BaseAgent:
                 )
                 if not stance.valid:
                     result = type(result)(False, stance.reason, "content")
+            if result.valid:
+                result = self._extra_validate(response)
             if result.valid:
                 return response
             self._logger.warning(
@@ -99,31 +96,21 @@ class BaseAgent:
         return ""
 
     def _validate_response(self, response: str) -> ValidationResult:
-        """Validate a raw agent response. Subclasses may override for different schemas.
-
-        Args:
-            response: Raw string returned by the agent backend.
-
-        Returns:
-            ValidationResult from the appropriate validator method.
-        """
+        """Run base format/length/content checks. Override in subclasses for different schemas."""
         return self._validator.validate(
             response,
             self.config.min_response_len,
             require_references=getattr(self.config, "require_references", False),
         )
 
+    def _extra_validate(self, response: str) -> ValidationResult:
+        """Hook for subclass-specific validation. Returns valid by default."""
+        return ValidationResult(True)
+
     def _invoke(self, prompt: str) -> str:
-        """Send prompt to the configured backend and return the raw response.
+        """Send prompt to the backend and return the raw response.
 
-        Args:
-            prompt: Full prompt to send.
-
-        Returns:
-            Raw string response from the backend.
-
-        Raises:
-            NotImplementedError: If no backend was provided at construction.
+        Raises NotImplementedError if no backend was provided.
         """
         if self._backend is None:
             raise NotImplementedError(
@@ -135,19 +122,7 @@ class BaseAgent:
         )
 
     def _build_format_retry_prompt(self, prompt: str, reason: str) -> str:
-        """Retry prompt for format/JSON errors — no history re-attached.
-
-        The agent produced the right content but the wrong structure. Re-sending
-        history would add noise; just explain the structural error and repeat the
-        bare task so the agent can focus on fixing the format.
-
-        Args:
-            prompt: The original task prompt (without history context).
-            reason: JSONDecodeError or other structural failure description.
-
-        Returns:
-            Compact prompt focused on format correction.
-        """
+        """Build retry prompt for format/JSON errors (no history re-attached)."""
         return (
             f"Your previous response was rejected: {reason}\n"
             f"Output ONLY the raw JSON line — no markdown, no explanation, no code fences.\n\n"
@@ -155,18 +130,7 @@ class BaseAgent:
         )
 
     def _build_content_retry_prompt(self, prompt_with_context: str, reason: str) -> str:
-        """Retry prompt for content errors — full history context re-attached.
-
-        Re-attaches history so the agent can produce a substantive response
-        grounded in the debate so far (too short, empty, disrespectful, etc.).
-
-        Args:
-            prompt_with_context: The full prompt including history context.
-            reason: Human-readable description of the content violation.
-
-        Returns:
-            Prompt with history context and a clear correction instruction.
-        """
+        """Build retry prompt for content errors (full history context re-attached)."""
         return (
             f"Your previous response was rejected: {reason}\n"
             f"Please provide a substantive response that meets the requirements.\n\n"

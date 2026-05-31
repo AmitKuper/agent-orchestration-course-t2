@@ -4,13 +4,14 @@
 The backend layer decouples agent invocation from the transport mechanism, allowing the platform to run agents via the Anthropic SDK, Claude Code CLI, or Ollama without changing any agent or orchestration logic.
 
 ## Goals
-- Support 4 distinct invocation backends selectable at runtime
+- Support 7 invocation backends selectable at runtime
 - Zero code changes required when switching backends
 - Consistent error handling and token usage recording across all backends
 - Clean ANSI/VT100 output from CLI-based backends (e.g. Qwen3 thinking mode)
+- All external calls routed through `APIGatekeeper` for rate-limiting and logging
 
 ## Acceptance Criteria
-- [x] `make_backend(type)` returns a correctly typed instance for all 4 backend types
+- [x] `make_backend(type)` returns a correctly typed instance for all backend types
 - [x] All backends implement the `Backend.invoke()` interface
 - [x] `ApiBackend` records actual input/output token counts
 - [x] `CliBackend` passes `--model <model>` to the `claude` CLI
@@ -24,16 +25,34 @@ The backend layer decouples agent invocation from the transport mechanism, allow
 | Component | File | Responsibility |
 |-----------|------|---------------|
 | `Backend` | `src/backends/_base.py` | Abstract interface |
-| `ApiBackend` | `src/backends/_api.py` | Anthropic SDK calls |
-| `CliBackend` | `src/backends/_cli.py` | `claude --model … --print` subprocess |
-| `OllamaCliBackend` | `src/backends/_cli.py` | `ollama run <model>` subprocess |
-| `OllamaBackend` | `src/backends/_ollama.py` | Ollama HTTP API (OpenAI-compatible) |
+| `OrchestratorBackend` | `src/backends/_orchestrator_base.py` | Base for single-call orchestrating backends |
+| `ApiBackend` | `src/backends/_api.py` | Anthropic SDK calls via `APIGatekeeper` |
+| `CliBackend` | `src/backends/_cli.py` | `claude --model … --print` subprocess per turn |
+| `OllamaCliBackend` | `src/backends/_cli.py` | `ollama run <model>` subprocess per turn |
+| `OllamaBackend` | `src/backends/_ollama.py` | Ollama HTTP API (OpenAI-compatible) via `APIGatekeeper` |
+| `OllamaOrchestratorBackend` | `src/backends/_ollama_orchestrator.py` | Single Ollama call; self-orchestrates full debate |
+| `PersistentCliBackend` | `src/backends/_persistent_cli.py` | Keeps `claude` subprocess alive per agent session |
+| `APIGatekeeper` | `src/shared/gatekeeper.py` | Rate-limit / concurrency guard wrapping all external calls |
 | `make_backend` | `src/backends/_factory.py` | Factory: type string → backend instance |
-| `extract_response` | `src/backends/_ansi.py` | VT100 terminal emulator; strips ANSI codes and thinking preambles |
+| `extract_response` / `render_ansi` | `src/backends/_ansi.py` | VT100 terminal emulator; strips ANSI codes and thinking preambles |
+
+## Backend Identifiers
+| Identifier | Backend class | Description |
+|-----------|--------------|-------------|
+| `claude-api` | `ApiBackend` | Anthropic SDK (default) |
+| `claude-cli-agents` | `CliBackend` | `claude --print` per turn |
+| `claude-cli-session` | `PersistentCliBackend` | Persistent `claude` subprocess per agent |
+| `ollama-api` | `OllamaBackend` | Ollama HTTP API |
+| `ollama-cli-agents` | `OllamaCliBackend` | `ollama run` per turn |
+| `ollama-cli` | `OllamaOrchestratorBackend` | Single-shot Ollama orchestrator |
+| `ollama-orchestrator` | `OllamaOrchestratorBackend` | Alias for `ollama-cli` |
+
+Legacy aliases: `api`, `cli`, `cli-session`, `ollama`.
 
 ## Configuration
-- Backend selected via `--backend {api,cli,ollama-cli,ollama}`
+- Backend selected via `--backend <identifier>`
 - Ollama base URL from `OLLAMA_BASE_URL` env var
+- `CLAUDE_SKIP_PERMISSIONS=true` (default) passes `--dangerously-skip-permissions` to CLI backends
 
 ---
 

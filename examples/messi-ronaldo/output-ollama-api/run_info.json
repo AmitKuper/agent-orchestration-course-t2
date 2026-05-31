@@ -1,6 +1,6 @@
 {
-  "timestamp": "2026-05-24 23:51:58",
-  "backend": "ollama",
+  "timestamp": "2026-05-26 09:13:07",
+  "backend": "ollama-api",
   "command": "main.py --config examples/messi-ronaldo/config-ollama-api.json",
   "argv": [
     "main.py",

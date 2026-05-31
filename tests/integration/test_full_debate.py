@@ -30,7 +30,8 @@ _VERDICT = json.dumps(
 
 def _debate_response(agent_name: str, turn: int) -> MagicMock:
     """Build a mock API response returning a valid JSONL debate turn."""
-    text = json.dumps({"agent": agent_name, "turn": turn, "argument": "A" * 50, "references": []})
+    body = chr(ord("A") + turn - 1) * 50
+    text = json.dumps({"agent": agent_name, "turn": turn, "argument": f"Turn {turn} unique argument: {body}", "references": []})
     m = MagicMock()
     m.content[0].text = text
     m.usage.input_tokens = 100

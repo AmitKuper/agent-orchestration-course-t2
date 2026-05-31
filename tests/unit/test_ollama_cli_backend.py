@@ -7,6 +7,7 @@ from unittest.mock import MagicMock, patch
 import pytest
 
 from src.backends import OllamaCliBackend
+from src.backends._ollama_orchestrator import OllamaOrchestratorBackend
 from src.cost import CostTracker
 
 
@@ -53,6 +54,11 @@ def test_ollama_cli_backend_records_zero_tokens(cost: CostTracker):
     summary = cost.get_run_summary()
     assert summary["total_input_tokens"] == 0
     assert summary["total_output_tokens"] == 0
+
+
+def test_ollama_orchestrator_fallback_backend_type():
+    """OllamaOrchestratorBackend falls back to ollama-cli-agents for per-turn calls."""
+    assert OllamaOrchestratorBackend.fallback_backend_type == "ollama-cli-agents"
 
 
 def test_ollama_cli_backend_raises_on_nonzero_exit(cost: CostTracker):

@@ -1,0 +1,4 @@
+2026-05-26 09:39:58,471 [INFO] debate.orchestrator: Debate starting: Will AI automation destroy more jobs than it creates, causing long-term unemployment, or will it generate new industries and opportunities that outweigh the losses?
+2026-05-26 09:40:05,193 [INFO] debate.orchestrator: Positions — A: Will AI automation destroy more jobs than it creates, causing long-term unemployment? | B: Will it generate new industries and opportunities that outweigh the losses?
+2026-05-26 09:41:13,393 [INFO] debate.orchestrator: Orchestrator produced 20 turns.
+2026-05-26 09:41:13,394 [INFO] debate.orchestrator: Verdict written to outputs\ai-jobs-ollama-cli\20260526_093958\result.json.

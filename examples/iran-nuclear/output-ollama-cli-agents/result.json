@@ -1,0 +1,38 @@
+{
+  "winner": "Dove",
+  "scores": {
+    "Hawk": {
+      "logic": 7,
+      "evidence": 6,
+      "clarity": 8,
+      "persuasiveness": 7,
+      "total": 28
+    },
+    "Dove": {
+      "logic": 8,
+      "evidence": 9,
+      "clarity": 9,
+      "persuasiveness": 8,
+      "total": 34
+    }
+  },
+  "tiebreaker": null,
+  "explanation": "Dove demonstrated stronger logic by systematically dismantling Hawk's binary framework and highlighting nuanced considerations like regional stability and the risks of military escalation. Their evidence was more balanced, citing multiple reputable sources (IAEA, SIPRI, RAND) with precision. Dove's clarity was exceptional, organizing complex arguments coherently, while Hawk's persuasive force relied on hyperbolic rhetoric that risked alienating audiences. Though Hawk presented compelling urgency, Dove's comprehensive, evidence-backed case for diplomacy emerged as more sustainable.",
+  "factcheck_flags": [
+    {
+      "agent": "Hawk",
+      "claim": "IAEA\u2019s confidential reports detail Iran\u2019s obstruction of safeguards implementation",
+      "issue": "Public IAEA reports do not explicitly confirm 'confidential reports' directly linking Iran\u2019s actions to weapons programs; the IAEA\u2019s official stance remains cautiously worded."
+    },
+    {
+      "agent": "Hawk",
+      "claim": "Sanctions have 'utterly failed' to curtail Iran\u2019s nuclear ambitions",
+      "issue": "Economic analyses (e.g., CFR, PIIE) show sanctions have had measurable economic impact on Iran, though their effectiveness in curbing nuclear progress is debated."
+    },
+    {
+      "agent": "Dove",
+      "claim": "IAEA has not issued judgments confirming Iran is actively pursuing nuclear weapons",
+      "issue": "This is accurate based on public IAEA statements, which emphasize ongoing investigations rather than definitive conclusions."
+    }
+  ]
+}

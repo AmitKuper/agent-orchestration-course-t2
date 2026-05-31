@@ -1,0 +1,22 @@
+{
+  "winner": "Optimist",
+  "scores": {
+    "Pessimist": {
+      "logic": 8,
+      "evidence": 7,
+      "clarity": 7,
+      "persuasiveness": 6,
+      "total": 35
+    },
+    "Optimist": {
+      "logic": 9,
+      "evidence": 9,
+      "clarity": 9,
+      "persuasiveness": 9,
+      "total": 46
+    }
+  },
+  "tiebreaker": null,
+  "explanation": "The Optimist presented stronger, more evidence-based arguments supported by diverse global examples and policy proposals. While the Pessimist raised valid concerns about inequality and displacement, the Optimist effectively rebutted these with historical precedents and scalable solutions. The Optimist\u2019s arguments were more logically cohesive and persuasive in addressing both challenges and opportunities.",
+  "factcheck_flags": []
+}

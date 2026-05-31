@@ -86,6 +86,8 @@ Every agent response must be validated by the orchestrator before being accepted
 - Contains an API error or exception
 - Is empty or too short
 - Is clearly off-topic
+- Contains concession phrases (e.g. "I agree with you", "you are right", "I concede")
+- Is too similar to a previous argument by the same agent (SequenceMatcher ratio > 0.75)
 
 **Retry behavior**:
 - On invalid response: orchestrator explains the violation and requests a retry

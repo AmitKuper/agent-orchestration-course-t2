@@ -1,0 +1,10 @@
+{
+  "timestamp": "2026-05-26 09:39:58",
+  "backend": "ollama-cli",
+  "command": "main.py --config examples/ai-jobs/config-ollama-cli.json",
+  "argv": [
+    "main.py",
+    "--config",
+    "examples/ai-jobs/config-ollama-cli.json"
+  ]
+}

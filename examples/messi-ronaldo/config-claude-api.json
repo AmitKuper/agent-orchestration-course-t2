@@ -1,0 +1,20 @@
+{
+  "topic": "Who is the greatest soccer player of all time — Lionel Messi or Cristiano Ronaldo?",
+  "turns": 20,
+  "backend": "claude-api",
+  "debater_a": {
+    "name": "TeamMessi",
+    "model": "claude-haiku-4-5-20251001"
+  },
+  "debater_b": {
+    "name": "TeamRonaldo",
+    "model": "claude-haiku-4-5-20251001"
+  },
+  "judge": {
+    "model": "claude-haiku-4-5-20251001",
+    "factcheck": true
+  },
+  "max_retries": 2,
+  "min_response_len": 200,
+  "outdir": "outputs/messi-ronaldo-claude-api"
+}

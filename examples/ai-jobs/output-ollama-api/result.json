@@ -3,8 +3,8 @@
   "scores": {
     "Pessimist": {
       "logic": 8,
-      "evidence": 9,
-      "clarity": 7,
+      "evidence": 7,
+      "clarity": 9,
       "persuasiveness": 8,
       "total": 32
     },
@@ -17,22 +17,22 @@
     }
   },
   "tiebreaker": null,
-  "explanation": "Optimist outperformed Pessimist in clarity (more structured arguments) and persuasiveness (effective use of futuristic job creation narratives). Both used strong evidence, but Optimist's data (e.g., WEF projections) was more dynamic, while Pessimist relied heavily on OECD/ILO figures. Pessimist's repetition of core arguments slightly reduced clarity. Optimist's rebuttals directly addressed Pessimist's skills gap claims with micro-credential examples.",
+  "explanation": "The Optimist presented more varied and dynamically evolving arguments, emphasizing new sectors and global reskilling successes. Their evidence (e.g., AI ethics roles, India\u2019s AI logistics) showcased adaptability. The Pessimist\u2019s logic was strong but overrelied on static displacement models. Both had high clarity, but the Optimist\u2019s persuasive trajectory (from \u2018myth\u2019 to \u2018ecosystems\u2019) was more compelling.",
   "factcheck_flags": [
     {
+      "agent": "Pessimist",
+      "claim": "ILO\u2019s 2025 report confirms a net loss of 10M positions",
+      "issue": "Unverifiable future projection"
+    },
+    {
       "agent": "Optimist",
-      "claim": "WEF 2025 projects 250 million new roles by 2030",
-      "issue": "The World Economic Forum's most recent public projections (as of 2023) do not include a 2025 report with this specific figure"
+      "claim": "WEF 2025 projection: 150M AI roles",
+      "issue": "Unverifiable future projection"
     },
     {
       "agent": "Pessimist",
-      "claim": "OECD 2025 report confirms 18% job displacement by 2030",
-      "issue": "The OECD has no publicly released 2025 report as of 2023"
-    },
-    {
-      "agent": "Optimist",
-      "claim": "MIT Sloan 2025 study reveals 75% access to AI training",
-      "issue": "MIT Sloan has not published any 2025 studies on AI training access as of 2023"
+      "claim": "70% of displaced workers lack retraining access",
+      "issue": "Attributed to World Bank 2024 without citation"
     }
   ]
 }

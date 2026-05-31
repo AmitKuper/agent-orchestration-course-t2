@@ -1,0 +1,10 @@
+{
+  "timestamp": "2026-05-26 16:43:26",
+  "backend": "ollama-cli-agents",
+  "command": "main.py --config examples/messi-ronaldo/config-ollama-cli-agents.json",
+  "argv": [
+    "main.py",
+    "--config",
+    "examples/messi-ronaldo/config-ollama-cli-agents.json"
+  ]
+}

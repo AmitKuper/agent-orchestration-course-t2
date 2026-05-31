@@ -32,13 +32,19 @@ class CliBackend(Backend):
     Token counts are unavailable; records zeros to the cost tracker.
     Strips CLAUDE*/ANTHROPIC* env vars to prevent recursive invocation.
     Routes each subprocess call through APIGatekeeper for retry logic.
+    History is injected into the prompt by the orchestrator (uses_memory=False).
     """
 
-    uses_memory: bool = True
+    uses_memory: bool = False
 
-    def __init__(self) -> None:
-        """Initialise gatekeeper for CLI backend."""
+    def __init__(self, workdir: str | None = None) -> None:
+        """Initialise gatekeeper for CLI backend.
+
+        Args:
+            workdir: Working directory for subprocess. Defaults to cwd.
+        """
         self._gatekeeper = APIGatekeeper("cli")
+        self._workdir = workdir or None
 
     def invoke(
         self,
@@ -83,6 +89,7 @@ class CliBackend(Backend):
                 text=True,
                 encoding="utf-8",
                 env=env,
+                cwd=self._workdir,
                 timeout=DEBATER_TIMEOUT,
             )
             if result.returncode != 0:

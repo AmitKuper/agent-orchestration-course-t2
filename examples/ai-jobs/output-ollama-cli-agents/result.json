@@ -1,0 +1,32 @@
+{
+  "winner": "Optimist",
+  "scores": {
+    "Pessimist": {
+      "logic": 9,
+      "evidence": 8,
+      "clarity": 9,
+      "persuasiveness": 7,
+      "total": 33
+    },
+    "Optimist": {
+      "logic": 9,
+      "evidence": 9,
+      "clarity": 9,
+      "persuasiveness": 9,
+      "total": 36
+    }
+  },
+  "tiebreaker": "Optimist",
+  "explanation": "Both sides presented strong arguments with robust evidence from credible sources (ILO, OECD, World Economic Forum, etc.). The Optimist's edge came from: (1) more consistent use of verifiable current programs (e.g., IBM\u2019s retraining, U.S. CHIPS Act) and global initiatives (EU Digital Skills Coalition), (2) addressing systemic solutions (gig economy, hybrid roles) that align with modern labor trends, and (3) more persuasive framing of long-term opportunities despite displacement. The Pessimist\u2019s claims about future reports (e.g., ILO 2029, OECD 2028) were flagged as unverifiable, while the Optimist\u2019s references to existing programs (e.g., IBM 2028, EU 2028) were plausible even if speculative.",
+  "factcheck_flags": {
+    "Pessimist": [
+      "ILO 2029 report (unverifiable future projection)",
+      "OECD 2028 data (unverifiable future projection)",
+      "Brookings 2028 analysis (unverifiable future projection)"
+    ],
+    "Optimist": [
+      "EU 2028 Digital Skills and Jobs Coalition (unverifiable future initiative)",
+      "World Bank 2028 \u2018Digital Dividends\u2019 initiative (unverifiable future program)"
+    ]
+  }
+}

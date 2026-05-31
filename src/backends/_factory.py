@@ -54,17 +54,16 @@ def make_backend(
     if backend_type == "claude-api":
         return ApiBackend()
     if backend_type == "claude-cli-agents":
-        return CliBackend()
+        return CliBackend(workdir=str(output_path) if output_path else None)
     if backend_type == "claude-cli-session":
         if output_path is None:
             raise ValueError("claude-cli-session backend requires output_path")
         return PersistentCliBackend(output_path)
     if backend_type == "ollama-api":
         return OllamaBackend()
-    if backend_type in ("ollama-cli-agents", "ollama-cli"):
-        # Both names mean per-agent CLI invocation (ollama run per turn)
+    if backend_type == "ollama-cli-agents":
         return OllamaCliBackend()
-    if backend_type == "ollama-orchestrator":
+    if backend_type in ("ollama-cli", "ollama-orchestrator"):
         # Single model call that self-orchestrates the entire debate
         return OllamaOrchestratorBackend()
 
@@ -72,7 +71,7 @@ def make_backend(
     if backend_type == "api":
         return ApiBackend()
     if backend_type == "cli":
-        return CliBackend()
+        return CliBackend(workdir=str(output_path) if output_path else None)
     if backend_type == "cli-session":
         if output_path is None:
             raise ValueError("cli-session backend requires output_path")

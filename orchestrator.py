@@ -55,12 +55,16 @@ class DebateOrchestrator:
     def validate_topic(self, topic: str) -> tuple[str, str]:
         """Check if topic is debatable; return (position_a, position_b).
 
+        OrchestratorBackend (single-shot mode) cannot handle per-turn calls, so
+        topic validation falls back to ``ollama-cli-agents`` — subprocess-based,
+        requires no HTTP server, uses the same local Ollama installation.
+
         Raises:
             InvalidTopicError: If the topic cannot be split into two clear sides.
         """
         backend = self._backend or make_backend(self.config.backend, output_path=self.output.folder)
         if isinstance(backend, OrchestratorBackend):
-            backend = make_backend("ollama-api")
+            backend = make_backend(backend.fallback_backend_type)
         return validate_topic(topic, self.config.model_judge, backend)
 
     def initialize_agents(self, position_a: str, position_b: str) -> None:

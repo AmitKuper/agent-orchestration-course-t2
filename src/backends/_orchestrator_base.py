@@ -19,7 +19,15 @@ class OrchestratorBackend(ABC):
     The Python ``DebateOrchestrator`` detects this type via ``isinstance``
     and delegates the full debate to ``run_debate()`` instead of running
     its own turn loop.
+
+    Subclasses must set ``fallback_backend_type`` to the backend that should
+    be used for single per-turn calls (e.g. topic validation) that this
+    backend cannot handle. The default is ``"claude-api"`` — the most
+    universally available backend — so environments without Ollama can always
+    fall back to Claude.
     """
+
+    fallback_backend_type: str = "claude-api"
 
     @abstractmethod
     def run_debate(
@@ -40,3 +48,6 @@ class OrchestratorBackend(ABC):
             (same schema as conversation.jsonl entries) and verdict is the
             judge result dict or None if judgment failed.
         """
+
+    def close(self) -> None:  # noqa: B027
+        """Release any resources. No-op by default."""

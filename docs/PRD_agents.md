@@ -14,19 +14,25 @@ Three specialized agent roles implement the debate: two opposing debaters and a 
 - [x] `JudgeAgent` scores Logic, Evidence, Clarity, Persuasiveness (0–10 each)
 - [x] `BaseAgent.invoke_with_retry` retries up to `max_retries` times
 - [x] Format failures (bad JSON) receive a focused fix-the-format retry prompt without history
-- [x] Content failures (too short, empty) receive a retry prompt that re-attaches full history context
+- [x] Content failures (too short, empty, stance violation, novelty repeat) receive a retry prompt that re-attaches full history context
 - [x] Each retry includes the specific violation reason in the prompt
 - [x] Agent definition files loaded from `.claude/agents/*.md` at startup
 - [x] Variable substitution (`$AGENT_NAME`, `$POSITION`, etc.) applied correctly
 - [x] Empty/too-short/disrespectful responses rejected by validator
 - [x] `parse_verdict` enforces full per-category score schema; recomputes totals; normalises key case
+- [x] `StanceValidator` rejects concession phrases before acceptance
+- [x] Novelty check rejects arguments too similar (SequenceMatcher > 0.75) to any prior same-agent turn
+
+## Validation Chain (per response)
+`_validate_response()` → `StanceValidator` (if position set) → `_extra_validate()` (novelty check in `DebateAgent`)
 
 ## Components
 | Component | File | Responsibility |
 |-----------|------|---------------|
-| `BaseAgent` | `src/agents/base.py` | Retry loop, validation, backend invocation |
-| `DebateAgent` | `src/agents/debate.py` | Debate turn prompt construction |
+| `BaseAgent` | `src/agents/base.py` | Retry loop, validation chain, backend invocation |
+| `DebateAgent` | `src/agents/debate.py` | Debate turn prompt construction; novelty check via `_extra_validate` |
 | `JudgeAgent` | `src/agents/judge.py` | Scoring prompt, verdict parsing and schema enforcement |
+| `StanceValidator` | `src/stance_validator.py` | Rule-based concession phrase detector (19+ phrases) |
 | `load_agent_def` | `src/agents/loader.py` | Loads `.claude/agents/*.md` as system prompts |
 
 ## Scoring Rubric (Judge)
