@@ -95,7 +95,7 @@ def test_run_turn_returns_response(orch):
     with patch("orchestrator.make_backend", return_value=mock_backend):
         orch.initialize_agents("FOR", "AGAINST")
 
-    response = _fake_turn("AgentA", 1)
+    response = _fake_turn(orch._agent_a.name, 1)
     mock_backend.invoke.return_value = response
     result = orch.run_turn(orch._agent_a, 1)
     assert result == response

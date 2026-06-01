@@ -55,6 +55,7 @@ class DebateAgent(BaseAgent):
         self.position = position
         self.opponent_name = opponent_name
         self._assigned_position = position
+        self._current_turn: int | None = None
 
     def build_prompt(
         self, history: list[dict], turn_number: int, turns_remaining: int
@@ -69,6 +70,7 @@ class DebateAgent(BaseAgent):
         Returns:
             Formatted prompt string ready to send to the backend.
         """
+        self._current_turn = turn_number
         history_section = (
             "" if self._backend.uses_memory
             else f"Debate so far:\n{self._format_history(history)}\n\n"
@@ -83,6 +85,16 @@ class DebateAgent(BaseAgent):
             f"Respond with exactly one JSONL line:\n"
             f'{{"agent": "{self.name}", "turn": {turn_number}, '
             f'"argument": "...", "references": ["..."]}}'
+        )
+
+    def _validate_response(self, response: str) -> ValidationResult:
+        """Validate debate-turn JSON, enforcing expected agent name and turn number."""
+        return self._validator.validate(
+            response,
+            self.config.min_response_len,
+            expected_agent=self.name,
+            expected_turn=self._current_turn,
+            require_references=getattr(self.config, "require_references", False),
         )
 
     def _extra_validate(self, response: str) -> ValidationResult:
