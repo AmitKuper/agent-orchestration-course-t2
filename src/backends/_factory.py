@@ -29,7 +29,7 @@ def make_backend(
         claude-cli-session     Persistent claude subprocess per agent
         ollama-api             Ollama HTTP API
         ollama-cli-agents      ollama run subprocess per agent turn
-        ollama-cli             ollama run subprocess per agent turn (alias)
+        ollama-cli             Single-shot Ollama self-orchestrating backend (alias for ollama-orchestrator)
         ollama-orchestrator    Single-shot Ollama self-orchestrating backend
 
     Legacy aliases:
@@ -64,7 +64,8 @@ def make_backend(
     if backend_type == "ollama-cli-agents":
         return OllamaCliBackend()
     if backend_type in ("ollama-cli", "ollama-orchestrator"):
-        # Single model call that self-orchestrates the entire debate
+        # Both names map to the single-shot self-orchestrating backend.
+        # Use "ollama-cli-agents" for per-agent subprocess mode.
         return OllamaOrchestratorBackend()
 
     # Legacy aliases
