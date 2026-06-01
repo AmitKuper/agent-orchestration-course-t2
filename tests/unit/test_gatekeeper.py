@@ -71,3 +71,92 @@ def test_gatekeeper_defaults_when_no_config():
     assert gk._retry_delay == 5
     assert gk._max_retries == 3
     assert gk._backoff == 2.0
+
+
+# ── RPM enforcement ────────────────────────────────────────────────────────
+
+
+def _make_clock(start: float = 0.0):
+    """Return a mutable fake monotonic clock."""
+    state = [start]
+
+    def clock():
+        return state[0]
+
+    clock.advance = lambda secs: state.__setitem__(0, state[0] + secs)  # type: ignore[attr-defined]
+    return clock
+
+
+def test_rpm_allows_calls_under_limit():
+    """Calls within the RPM window proceed without sleeping."""
+    clock = _make_clock()
+    gk = APIGatekeeper.__new__(APIGatekeeper)
+    from collections import deque
+    gk._rpm = 3
+    gk._retry_delay = 0
+    gk._max_retries = 0
+    gk._backoff = 1.0
+    gk._backend_type = "test"
+    gk._window = deque()
+    gk._clock = clock
+    results = []
+    for _ in range(3):
+        results.append(gk.execute(lambda: "ok"))
+    assert results == ["ok", "ok", "ok"]
+    assert len(gk._window) == 3
+
+
+def test_rpm_blocks_at_limit():
+    """When window is full, gatekeeper sleeps before allowing the next call."""
+    clock = _make_clock(start=0.0)
+    from collections import deque
+    gk = APIGatekeeper.__new__(APIGatekeeper)
+    gk._rpm = 2
+    gk._retry_delay = 0
+    gk._max_retries = 0
+    gk._backoff = 1.0
+    gk._backend_type = "test"
+    gk._window = deque()
+    gk._clock = clock
+    # Fill the window
+    gk._window.append(0.0)
+    gk._window.append(0.5)
+    # Advance clock to t=10 — old timestamps are still within 60 s
+    clock.advance(10.0)
+    slept = []
+    with patch("src.shared.gatekeeper.time.sleep", side_effect=lambda s: (slept.append(s), clock.advance(s))):
+        gk.execute(lambda: "ok")
+    assert slept, "Expected gatekeeper to sleep when RPM window is full"
+
+
+def test_rpm_evicts_old_timestamps():
+    """Timestamps older than 60 s are evicted before checking the limit."""
+    clock = _make_clock(start=0.0)
+    from collections import deque
+    gk = APIGatekeeper.__new__(APIGatekeeper)
+    gk._rpm = 1
+    gk._retry_delay = 0
+    gk._max_retries = 0
+    gk._backoff = 1.0
+    gk._backend_type = "test"
+    gk._window = deque([0.0])  # one old timestamp
+    gk._clock = clock
+    clock.advance(61.0)  # now that timestamp is stale
+    with patch("src.shared.gatekeeper.time.sleep") as mock_sleep:
+        gk.execute(lambda: "ok")
+    mock_sleep.assert_not_called()  # old timestamp evicted, no sleep needed
+
+
+def test_recent_request_count():
+    """recent_request_count reflects only timestamps within the 60-second window."""
+    clock = _make_clock(start=100.0)
+    from collections import deque
+    gk = APIGatekeeper.__new__(APIGatekeeper)
+    gk._rpm = 10
+    gk._retry_delay = 0
+    gk._max_retries = 0
+    gk._backoff = 1.0
+    gk._backend_type = "test"
+    gk._window = deque([30.0, 50.0, 90.0])  # 30 is exactly 70s ago (outside); 50 and 90 within
+    gk._clock = clock
+    assert gk.recent_request_count == 2
