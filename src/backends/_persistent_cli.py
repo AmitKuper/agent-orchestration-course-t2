@@ -1,7 +1,16 @@
 """Persistent CLI backend — keeps a claude subprocess alive per agent.
 
-``--dangerously-skip-permissions`` is conditional on the
-``CLAUDE_SKIP_PERMISSIONS`` environment variable (defaults to ``true``).
+EXPERIMENTAL: this backend is not part of the default recommended workflow
+and is not exercised in CI against a real Claude CLI process. Use
+``claude-cli-agents`` (per-turn subprocess) for the recommended CLI path.
+
+Limitations:
+- Does not route calls through APIGatekeeper (subprocess stdin/stdout pattern
+  does not map cleanly to the gatekeeper callable model).
+- Timeout is enforced at the Watchdog level (debate_helpers.py), not inside
+  the backend itself.
+- Requires Claude Code CLI installed and a Pro subscription.
+- Set ``CLAUDE_SKIP_PERMISSIONS=false`` to disable --dangerously-skip-permissions.
 """
 
 from __future__ import annotations
