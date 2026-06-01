@@ -103,7 +103,7 @@ def test_run_turn_timeout_callback_is_called(orch):
         orch.initialize_agents("FOR", "AGAINST")
 
     response = json.dumps(
-        {"agent": "AgentA", "turn": 1, "argument": "x" * 20, "references": []}
+        {"agent": orch._agent_a.name, "turn": 1, "argument": "x" * 20, "references": []}
     )
     orch._agent_a._backend.invoke.return_value = response
 
