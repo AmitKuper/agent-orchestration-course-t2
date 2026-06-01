@@ -1,64 +1,47 @@
-2026-05-26 17:18:55,098 [INFO] debate.orchestrator: Debate starting: Will attacking Iran prevent them from achieving a nuclear weapon, or is diplomacy the way to go?
-2026-05-26 17:19:06,237 [INFO] debate.orchestrator: Positions — A: Military action against Iran, while carrying significant risks, offers the most realistic prospect of preventing Iran from acquiring nuclear weapons. Diplomacy has repeatedly failed to yield verifiable restrictions on their nuclear program and Iran's continued pursuit, combined with its destabilizing regional actions, suggests it cannot be trusted to negotiate in good faith. A preemptive strike targeting Iran's nuclear facilities, while likely to provoke retaliation, could significantly delay or permanently disrupt their program, buying time for a more comprehensive regional strategy. | B: Diplomacy, supported by robust multilateral sanctions and incentives, remains the most viable and sustainable path to preventing Iran from developing nuclear weapons. Military action would be disastrous, triggering a wider regional conflict with potentially catastrophic consequences, destabilizing the Middle East, and likely accelerating Iran's nuclear ambitions through a 'rally-around-the-flag' effect. Continued engagement, coupled with verifiable inspections and a willingness to address Iran's legitimate security concerns, offers a far safer and more effective approach than resorting to military force.
-2026-05-26 17:19:06,243 [INFO] debate.orchestrator: Turn 1/20 — Hawk
-2026-05-26 17:19:12,090 [INFO] debate.orchestrator: Turn 1/20 accepted from Hawk.
-2026-05-26 17:19:12,091 [INFO] debate.orchestrator: Turn 2/20 — Dove
-2026-05-26 17:19:19,155 [WARNING] debate.agent.Dove: Attempt 1/3 failed for Dove: Invalid JSON: Expecting value: line 1 column 1 (char 0)
-2026-05-26 17:19:27,552 [INFO] debate.orchestrator: Turn 2/20 accepted from Dove.
-2026-05-26 17:19:27,552 [INFO] debate.orchestrator: Turn 3/20 — Hawk
-2026-05-26 17:19:34,552 [WARNING] debate.agent.Hawk: Attempt 1/3 failed for Hawk: Invalid JSON: Expecting value: line 1 column 1 (char 0)
-2026-05-26 17:19:41,779 [INFO] debate.orchestrator: Turn 3/20 accepted from Hawk.
-2026-05-26 17:19:41,780 [INFO] debate.orchestrator: Turn 4/20 — Dove
-2026-05-26 17:19:51,968 [WARNING] debate.agent.Dove: Attempt 1/3 failed for Dove: Invalid JSON: Expecting value: line 1 column 1 (char 0)
-2026-05-26 17:19:59,575 [INFO] debate.orchestrator: Turn 4/20 accepted from Dove.
-2026-05-26 17:19:59,575 [INFO] debate.orchestrator: Turn 5/20 — Hawk
-2026-05-26 17:20:06,934 [WARNING] debate.agent.Hawk: Attempt 1/3 failed for Hawk: Invalid JSON: Expecting value: line 1 column 1 (char 0)
-2026-05-26 17:20:13,313 [INFO] debate.orchestrator: Turn 5/20 accepted from Hawk.
-2026-05-26 17:20:13,314 [INFO] debate.orchestrator: Turn 6/20 — Dove
-2026-05-26 17:20:21,385 [WARNING] debate.agent.Dove: Attempt 1/3 failed for Dove: Invalid JSON: Expecting value: line 1 column 1 (char 0)
-2026-05-26 17:20:29,226 [INFO] debate.orchestrator: Turn 6/20 accepted from Dove.
-2026-05-26 17:20:29,226 [INFO] debate.orchestrator: Turn 7/20 — Hawk
-2026-05-26 17:20:36,205 [INFO] debate.orchestrator: Turn 7/20 accepted from Hawk.
-2026-05-26 17:20:36,205 [INFO] debate.orchestrator: Turn 8/20 — Dove
-2026-05-26 17:20:44,347 [WARNING] debate.agent.Dove: Attempt 1/3 failed for Dove: Invalid JSON: Expecting value: line 1 column 1 (char 0)
-2026-05-26 17:20:52,779 [INFO] debate.orchestrator: Turn 8/20 accepted from Dove.
-2026-05-26 17:20:52,780 [INFO] debate.orchestrator: Turn 9/20 — Hawk
-2026-05-26 17:20:58,403 [INFO] debate.orchestrator: Turn 9/20 accepted from Hawk.
-2026-05-26 17:20:58,404 [INFO] debate.orchestrator: Turn 10/20 — Dove
-2026-05-26 17:21:06,627 [WARNING] debate.agent.Dove: Attempt 1/3 failed for Dove: Invalid JSON: Expecting value: line 1 column 1 (char 0)
-2026-05-26 17:21:14,842 [WARNING] debate.agent.Dove: Attempt 2/3 failed for Dove: Invalid JSON: Expecting ',' delimiter: line 1 column 2158 (char 2157)
-2026-05-26 17:21:22,209 [INFO] debate.orchestrator: Turn 10/20 accepted from Dove.
-2026-05-26 17:21:22,210 [INFO] debate.orchestrator: Turn 11/20 — Hawk
-2026-05-26 17:21:29,133 [WARNING] debate.agent.Hawk: Attempt 1/3 failed for Hawk: Invalid JSON: Expecting value: line 1 column 1 (char 0)
-2026-05-26 17:21:36,051 [INFO] debate.orchestrator: Turn 11/20 accepted from Hawk.
-2026-05-26 17:21:36,052 [INFO] debate.orchestrator: Turn 12/20 — Dove
-2026-05-26 17:21:44,856 [WARNING] debate.agent.Dove: Attempt 1/3 failed for Dove: Invalid JSON: Expecting value: line 1 column 1 (char 0)
-2026-05-26 17:21:54,204 [WARNING] debate.agent.Dove: Attempt 2/3 failed for Dove: Invalid JSON: Expecting ',' delimiter: line 1 column 2374 (char 2373)
-2026-05-26 17:22:03,214 [INFO] debate.orchestrator: Turn 12/20 accepted from Dove.
-2026-05-26 17:22:03,214 [INFO] debate.orchestrator: Turn 13/20 — Hawk
-2026-05-26 17:22:11,628 [WARNING] debate.agent.Hawk: Attempt 1/3 failed for Hawk: Invalid JSON: Expecting ',' delimiter: line 1 column 1887 (char 1886)
-2026-05-26 17:22:19,419 [INFO] debate.orchestrator: Turn 13/20 accepted from Hawk.
-2026-05-26 17:22:19,420 [INFO] debate.orchestrator: Turn 14/20 — Dove
-2026-05-26 17:22:27,354 [INFO] debate.orchestrator: Turn 14/20 accepted from Dove.
-2026-05-26 17:22:27,355 [INFO] debate.orchestrator: Turn 15/20 — Hawk
-2026-05-26 17:22:33,870 [INFO] debate.orchestrator: Turn 15/20 accepted from Hawk.
-2026-05-26 17:22:33,870 [INFO] debate.orchestrator: Turn 16/20 — Dove
-2026-05-26 17:22:43,042 [WARNING] debate.agent.Dove: Attempt 1/3 failed for Dove: Invalid JSON: Expecting value: line 1 column 1 (char 0)
-2026-05-26 17:22:50,778 [INFO] debate.orchestrator: Turn 16/20 accepted from Dove.
-2026-05-26 17:22:50,779 [INFO] debate.orchestrator: Turn 17/20 — Hawk
-2026-05-26 17:22:58,192 [WARNING] debate.agent.Hawk: Attempt 1/3 failed for Hawk: Invalid JSON: Expecting value: line 1 column 1 (char 0)
-2026-05-26 17:23:05,126 [WARNING] debate.agent.Hawk: Attempt 2/3 failed for Hawk: Invalid JSON: Expecting ',' delimiter: line 1 column 1442 (char 1441)
-2026-05-26 17:23:12,112 [INFO] debate.orchestrator: Turn 17/20 accepted from Hawk.
-2026-05-26 17:23:12,112 [INFO] debate.orchestrator: Turn 18/20 — Dove
-2026-05-26 17:23:21,308 [WARNING] debate.agent.Dove: Attempt 1/3 failed for Dove: Invalid JSON: Expecting value: line 1 column 1 (char 0)
-2026-05-26 17:23:29,298 [INFO] debate.orchestrator: Turn 18/20 accepted from Dove.
-2026-05-26 17:23:29,299 [INFO] debate.orchestrator: Turn 19/20 — Hawk
-2026-05-26 17:23:35,588 [INFO] debate.orchestrator: Turn 19/20 accepted from Hawk.
-2026-05-26 17:23:35,588 [INFO] debate.orchestrator: Turn 20/20 — Dove
-2026-05-26 17:23:44,062 [WARNING] debate.agent.Dove: Attempt 1/3 failed for Dove: Invalid JSON: Expecting ',' delimiter: line 1 column 1956 (char 1955)
-2026-05-26 17:23:53,099 [INFO] debate.orchestrator: Turn 20/20 accepted from Dove.
-2026-05-26 17:24:05,645 [WARNING] debate.agent.Judge: Attempt 1/3 failed for Judge: Invalid JSON: Expecting value: line 1 column 1 (char 0)
-2026-05-26 17:24:17,966 [WARNING] debate.agent.Judge: Attempt 2/3 failed for Judge: Invalid JSON: Expecting value: line 1 column 1 (char 0)
-2026-05-26 17:24:32,147 [WARNING] debate.agent.Judge: Attempt 3/3 failed for Judge: Invalid JSON: Expecting value: line 1 column 1 (char 0)
-2026-05-26 17:24:32,147 [ERROR] debate.agent.Judge: All retries exhausted for Judge — skipping turn.
-2026-05-26 17:24:32,147 [ERROR] debate.orchestrator: Judge failed — state preserved for resume.
+2026-06-01 01:27:11,502 [INFO] debate.orchestrator: Debate starting: Will attacking Iran prevent them from achieving a nuclear weapon, or is diplomacy the way to go?
+2026-06-01 01:27:16,888 [INFO] debate.orchestrator: Positions — A: Attacking Iran would prevent them from achieving a nuclear weapon by disrupting their programs and demonstrating deterrence. | B: Diplomacy is the way to go, as it fosters cooperation, reduces escalation risks, and allows for negotiated solutions to address concerns about Iran's nuclear ambitions.
+2026-06-01 01:27:16,890 [INFO] debate.orchestrator: Turn 1/20 — Hawk
+2026-06-01 01:27:26,468 [WARNING] debate.agent.Hawk: Attempt 1/3 failed for Hawk: Invalid JSON: Expecting ',' delimiter: line 1 column 955 (char 954)
+2026-06-01 01:27:35,898 [WARNING] debate.agent.Hawk: Attempt 2/3 failed for Hawk: Invalid JSON: Expecting ',' delimiter: line 1 column 978 (char 977)
+2026-06-01 01:27:49,381 [INFO] debate.orchestrator: Turn 1/20 accepted from Hawk.
+2026-06-01 01:27:49,382 [INFO] debate.orchestrator: Turn 2/20 — Dove
+2026-06-01 01:27:57,463 [WARNING] debate.agent.Dove: Attempt 1/3 failed for Dove: Invalid JSON: Expecting ',' delimiter: line 1 column 925 (char 924)
+2026-06-01 01:28:04,720 [INFO] debate.orchestrator: Turn 2/20 accepted from Dove.
+2026-06-01 01:28:04,720 [INFO] debate.orchestrator: Turn 3/20 — Hawk
+2026-06-01 01:28:13,581 [INFO] debate.orchestrator: Turn 3/20 accepted from Hawk.
+2026-06-01 01:28:13,581 [INFO] debate.orchestrator: Turn 4/20 — Dove
+2026-06-01 01:28:22,858 [INFO] debate.orchestrator: Turn 4/20 accepted from Dove.
+2026-06-01 01:28:22,858 [INFO] debate.orchestrator: Turn 5/20 — Hawk
+2026-06-01 01:28:38,425 [INFO] debate.orchestrator: Turn 5/20 accepted from Hawk.
+2026-06-01 01:28:38,425 [INFO] debate.orchestrator: Turn 6/20 — Dove
+2026-06-01 01:28:56,401 [INFO] debate.orchestrator: Turn 6/20 accepted from Dove.
+2026-06-01 01:28:56,401 [INFO] debate.orchestrator: Turn 7/20 — Hawk
+2026-06-01 01:29:07,576 [INFO] debate.orchestrator: Turn 7/20 accepted from Hawk.
+2026-06-01 01:29:07,577 [INFO] debate.orchestrator: Turn 8/20 — Dove
+2026-06-01 01:29:18,446 [INFO] debate.orchestrator: Turn 8/20 accepted from Dove.
+2026-06-01 01:29:18,447 [INFO] debate.orchestrator: Turn 9/20 — Hawk
+2026-06-01 01:29:30,395 [INFO] debate.orchestrator: Turn 9/20 accepted from Hawk.
+2026-06-01 01:29:30,396 [INFO] debate.orchestrator: Turn 10/20 — Dove
+2026-06-01 01:29:43,641 [INFO] debate.orchestrator: Turn 10/20 accepted from Dove.
+2026-06-01 01:29:43,642 [INFO] debate.orchestrator: Turn 11/20 — Hawk
+2026-06-01 01:29:54,550 [INFO] debate.orchestrator: Turn 11/20 accepted from Hawk.
+2026-06-01 01:29:54,550 [INFO] debate.orchestrator: Turn 12/20 — Dove
+2026-06-01 01:30:09,703 [INFO] debate.orchestrator: Turn 12/20 accepted from Dove.
+2026-06-01 01:30:09,704 [INFO] debate.orchestrator: Turn 13/20 — Hawk
+2026-06-01 01:30:23,901 [INFO] debate.orchestrator: Turn 13/20 accepted from Hawk.
+2026-06-01 01:30:23,902 [INFO] debate.orchestrator: Turn 14/20 — Dove
+2026-06-01 01:30:37,041 [INFO] debate.orchestrator: Turn 14/20 accepted from Dove.
+2026-06-01 01:30:37,041 [INFO] debate.orchestrator: Turn 15/20 — Hawk
+2026-06-01 01:30:49,534 [INFO] debate.orchestrator: Turn 15/20 accepted from Hawk.
+2026-06-01 01:30:49,534 [INFO] debate.orchestrator: Turn 16/20 — Dove
+2026-06-01 01:31:03,817 [INFO] debate.orchestrator: Turn 16/20 accepted from Dove.
+2026-06-01 01:31:03,818 [INFO] debate.orchestrator: Turn 17/20 — Hawk
+2026-06-01 01:31:15,940 [INFO] debate.orchestrator: Turn 17/20 accepted from Hawk.
+2026-06-01 01:31:15,941 [INFO] debate.orchestrator: Turn 18/20 — Dove
+2026-06-01 01:31:29,296 [INFO] debate.orchestrator: Turn 18/20 accepted from Dove.
+2026-06-01 01:31:29,296 [INFO] debate.orchestrator: Turn 19/20 — Hawk
+2026-06-01 01:31:42,640 [INFO] debate.orchestrator: Turn 19/20 accepted from Hawk.
+2026-06-01 01:31:42,640 [INFO] debate.orchestrator: Turn 20/20 — Dove
+2026-06-01 01:31:57,311 [WARNING] debate.agent.Dove: Attempt 1/3 failed for Dove: Your argument is too similar to a previous turn. You must introduce new points, angles, or evidence.
+2026-06-01 01:32:10,598 [INFO] debate.orchestrator: Turn 20/20 accepted from Dove.
+2026-06-01 01:32:40,577 [INFO] debate.orchestrator: Verdict written to outputs\iran-nuclear-ollama-cli-agents\20260601_012711\result_20260601_013240.json.

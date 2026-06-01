@@ -3,14 +3,14 @@
   "turns": 20,
   "debater_a": {
     "name": "TeamMessi",
-    "model": "claude-haiku-4-5-20251001"
+    "model": "claude-sonnet-4-6"
   },
   "debater_b": {
     "name": "TeamRonaldo",
-    "model": "claude-haiku-4-5-20251001"
+    "model": "claude-sonnet-4-6"
   },
   "judge": {
-    "model": "claude-haiku-4-5-20251001",
+    "model": "claude-sonnet-4-6",
     "factcheck": true
   },
   "max_retries": 2,
