@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from pathlib import Path
+from unittest.mock import MagicMock
 
 import pytest
 
@@ -118,6 +119,25 @@ def test_load_agent_def_missing_file():
 
 
 # ── _invoke without backend ───────────────────────────────────────────────────
+
+
+def test_strip_fences_removes_code_fences(config, state, cost):
+    """_strip_fences strips opening and closing ``` from a fenced response."""
+    agent = _make_agent([], config, state, cost)
+    fenced = "```\n{\"key\": \"value\"}\n```"
+    assert agent._strip_fences(fenced) == '{"key": "value"}'
+
+
+def test_invoke_retries_on_stance_failure(config, state, cost):
+    """invoke_with_retry retries when stance validation rejects the first response."""
+    from src.validator import ValidationResult
+    agent = _make_agent([_VALID, _VALID2], config, state, cost)
+    agent._assigned_position = "FOR"
+    agent._stance_validator.validate = MagicMock(
+        side_effect=[ValidationResult(False, "Off-topic"), ValidationResult(True)]
+    )
+    result = agent.invoke_with_retry("prompt")
+    assert result == _VALID2
 
 
 def test_invoke_raises_not_implemented_without_backend(config, state, cost):

@@ -181,3 +181,38 @@ def test_invoke_delegates_to_backend(agent: JudgeAgent, mock_backend: MagicMock)
     mock_backend.invoke.assert_called_once_with(
         "Judge", "claude-test", "score this debate", agent.cost_tracker, 4096, None, ANY
     )
+
+
+def test_parse_verdict_non_dict_scores_raises(agent: JudgeAgent):
+    """parse_verdict raises ValueError when scores is not a dict."""
+    verdict = {
+        "winner": "AgentA",
+        "scores": "not_a_dict",
+        "explanation": "ok",
+        "factcheck_flags": [],
+    }
+    with pytest.raises(ValueError, match="scores"):
+        agent.parse_verdict(json.dumps(verdict))
+
+
+def test_parse_verdict_non_dict_agent_entry_raises(agent: JudgeAgent):
+    """parse_verdict raises ValueError when an agent's scores entry is not a dict."""
+    verdict = {
+        "winner": "AgentA",
+        "scores": {
+            "AgentA": "not_a_dict",
+            "AgentB": {"logic": 5, "evidence": 5, "clarity": 5, "persuasiveness": 5},
+        },
+        "explanation": "ok",
+        "factcheck_flags": [],
+    }
+    with pytest.raises(ValueError, match="dict"):
+        agent.parse_verdict(json.dumps(verdict))
+
+
+def test_parse_verdict_empty_explanation_raises(agent: JudgeAgent):
+    """parse_verdict raises ValueError when explanation is an empty string."""
+    verdict = json.loads(json.dumps(_VERDICT))
+    verdict["explanation"] = ""
+    with pytest.raises(ValueError, match="explanation"):
+        agent.parse_verdict(json.dumps(verdict))

@@ -105,3 +105,9 @@ def test_invoke_delegates_to_backend(agent: DebateAgent, mock_backend: MagicMock
         "AgentA", "claude-test", "some prompt", agent.cost_tracker, 2048, None, ANY
     )
     assert result == mock_backend.invoke.return_value
+
+
+def test_extra_validate_handles_non_json_response(agent: DebateAgent):
+    """_extra_validate falls back to the raw string when response is not valid JSON."""
+    result = agent._extra_validate("not valid json at all")
+    assert result.valid
