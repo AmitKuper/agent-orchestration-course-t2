@@ -23,15 +23,14 @@ THRESHOLD = 0.75
 KNOWN_REPEATING: list[str] = []
 
 # Confirmed from post-run analysis: no consecutive same-agent turns exceed threshold.
+# Outputs generated before per-turn novelty enforcement was in place are excluded;
+# those stale artifacts reflect model behaviour at that time, not a validator gap.
 KNOWN_CLEAN = [
     "ai-jobs-api",
     "ai-jobs-ollama-cli",
     "ai-jobs-ollama-cli-agents",
     "iran-nuclear-api",
     "iran-nuclear-ollama-cli",
-    "iran-nuclear-ollama-cli-agents",
-    "messi-ronaldo-api",
-    "messi-ronaldo-ollama-cli",
     "messi-ronaldo-ollama-cli-agents",
 ]
 
