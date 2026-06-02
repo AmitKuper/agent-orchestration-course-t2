@@ -71,7 +71,7 @@ git clone https://github.com/AmitKuper/agent-orchestration-course-t2.git
 cd agent-orchestration-course-t2
 uv sync --extra dev    # installs all dependencies including dev tools
 cp .env.example .env   # Windows: copy .env.example .env
-# Edit .env — add your ANTHROPIC_API_KEY for --backend api
+# Edit .env — add your ANTHROPIC_API_KEY for --backend claude-api
 ```
 
 > **Note:** `pip` is not the course workflow. Use `uv` for all dependency management.
@@ -86,7 +86,8 @@ uv run python main.py --topic "AI will replace most jobs" --turns 4
 
 # Run with a free local model (no API key needed)
 uv run python main.py --topic "AI will replace most jobs" --turns 4 \
-  --backend ollama-cli --model-a llama3.2 --model-b llama3.2 --model-judge llama3.2
+  --backend ollama-cli-agents --model-a llama3.2 --model-b llama3.2 --model-judge llama3.2
+
 
 # Resume an interrupted debate
 uv run python main.py --resume --outdir outputs/my-run-folder
@@ -147,7 +148,7 @@ uv run python main.py --config debate.yaml --turns 6   # CLI overrides YAML
 
 | Variable | Required | Description |
 |----------|----------|-------------|
-| `ANTHROPIC_API_KEY` | For `--backend api` | Your Anthropic API key |
+| `ANTHROPIC_API_KEY` | For `--backend claude-api` | Your Anthropic API key |
 | `OLLAMA_BASE_URL` | No | Ollama server URL (default: `http://localhost:11434`) |
 | `CLAUDE_SKIP_PERMISSIONS` | No | Set to `false` to disable `--dangerously-skip-permissions` in CLI backend (default: `true`) |
 
@@ -161,7 +162,7 @@ The following shows a real 20-turn debate run using the Ollama CLI backend (Qwen
 No API tokens are consumed.
 
 ```
-$ uv run python main.py --config examples/ai-jobs/output-ollama/config.json
+$ uv run python main.py --config examples/ai-jobs/config-ollama-api.json
 
 [INFO]  debate.orchestrator: Debate starting: Will AI automation destroy more jobs than it creates...
 [INFO]  debate.orchestrator: Positions — A: AI automation will destroy more jobs... | B: AI will generate new industries...
@@ -259,7 +260,7 @@ Legacy aliases still accepted: `api` → `claude-api`, `cli` → `claude-cli-age
 ### claude-api — Anthropic SDK (default)
 
 ```bash
-uv run python main.py --topic "..." --backend api
+uv run python main.py --topic "..." --backend claude-api
 ```
 
 Requires `ANTHROPIC_API_KEY` in `.env`.
@@ -267,7 +268,7 @@ Requires `ANTHROPIC_API_KEY` in `.env`.
 ### claude-cli-agents — Claude Code CLI
 
 ```bash
-uv run python main.py --topic "..." --backend cli --model-a claude-sonnet-4-6
+uv run python main.py --topic "..." --backend claude-cli-agents --model-a claude-sonnet-4-6
 ```
 
 Uses `claude --model <model> --print`. Requires Claude Code and a Pro subscription.
@@ -277,7 +278,7 @@ Also updates `.claude/agents/*.md` model fields to match config.
 
 ```bash
 ollama pull llama3.2
-uv run python main.py --topic "..." --backend ollama-cli \
+uv run python main.py --topic "..." --backend ollama-cli-agents \
   --model-a llama3.2 --model-b llama3.2 --model-judge llama3.2
 ```
 
@@ -285,14 +286,14 @@ uv run python main.py --topic "..." --backend ollama-cli \
 
 ```bash
 uv sync --extra ollama    # installs requests package
-uv run python main.py --topic "..." --backend ollama \
+uv run python main.py --topic "..." --backend ollama-api \
   --model-a llama3.2 --model-b llama3.2 --model-judge llama3.2
 ```
 
 Override the Ollama server URL:
 
 ```bash
-OLLAMA_BASE_URL=http://192.168.1.10:11434 uv run python main.py --topic "..." --backend ollama
+OLLAMA_BASE_URL=http://192.168.1.10:11434 uv run python main.py --topic "..." --backend ollama-api --model-a llama3.2
 ```
 
 ---
@@ -318,6 +319,12 @@ ollama pull llama3.2        # lighter option for slower machines
 ```
 
 ### 3. Run a debate with Ollama
+
+```bash
+uv run python main.py --config my-debate.json
+```
+
+Or inline via CLI flags:
 
 ```bash
 uv run python main.py \
@@ -397,7 +404,7 @@ uv run pytest --cov=src --cov=orchestrator --cov-report=term-missing
 uv run pytest tests/unit/test_validator.py -v
 ```
 
-Coverage target: ≥ 85% (current: ~89%).
+Coverage target: ≥ 85% (current: ~87%).
 
 ---
 

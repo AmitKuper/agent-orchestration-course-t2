@@ -1,43 +1,44 @@
-2026-05-26 09:00:48,922 [INFO] debate.orchestrator: Debate starting: Will AI automation destroy more jobs than it creates, causing long-term unemployment, or will it generate new industries and opportunities that outweigh the losses?
-2026-05-26 09:00:59,668 [INFO] debate.orchestrator: Positions — A: AI automation will destroy more jobs than it creates, leading to long-term unemployment. | B: AI automation will generate new industries and opportunities that outweigh the losses from job displacement.
-2026-05-26 09:00:59,670 [INFO] debate.orchestrator: Turn 1/20 — Pessimist
-2026-05-26 09:01:10,923 [INFO] debate.orchestrator: Turn 1/20 accepted from Pessimist.
-2026-05-26 09:01:10,923 [INFO] debate.orchestrator: Turn 2/20 — Optimist
-2026-05-26 09:01:22,772 [INFO] debate.orchestrator: Turn 2/20 accepted from Optimist.
-2026-05-26 09:01:22,772 [INFO] debate.orchestrator: Turn 3/20 — Pessimist
-2026-05-26 09:01:33,826 [INFO] debate.orchestrator: Turn 3/20 accepted from Pessimist.
-2026-05-26 09:01:33,826 [INFO] debate.orchestrator: Turn 4/20 — Optimist
-2026-05-26 09:01:48,070 [INFO] debate.orchestrator: Turn 4/20 accepted from Optimist.
-2026-05-26 09:01:48,071 [INFO] debate.orchestrator: Turn 5/20 — Pessimist
-2026-05-26 09:02:04,682 [INFO] debate.orchestrator: Turn 5/20 accepted from Pessimist.
-2026-05-26 09:02:04,682 [INFO] debate.orchestrator: Turn 6/20 — Optimist
-2026-05-26 09:02:18,809 [INFO] debate.orchestrator: Turn 6/20 accepted from Optimist.
-2026-05-26 09:02:18,810 [INFO] debate.orchestrator: Turn 7/20 — Pessimist
-2026-05-26 09:02:33,614 [INFO] debate.orchestrator: Turn 7/20 accepted from Pessimist.
-2026-05-26 09:02:33,614 [INFO] debate.orchestrator: Turn 8/20 — Optimist
-2026-05-26 09:02:47,412 [INFO] debate.orchestrator: Turn 8/20 accepted from Optimist.
-2026-05-26 09:02:47,413 [INFO] debate.orchestrator: Turn 9/20 — Pessimist
-2026-05-26 09:03:04,370 [INFO] debate.orchestrator: Turn 9/20 accepted from Pessimist.
-2026-05-26 09:03:04,370 [INFO] debate.orchestrator: Turn 10/20 — Optimist
-2026-05-26 09:03:21,698 [INFO] debate.orchestrator: Turn 10/20 accepted from Optimist.
-2026-05-26 09:03:21,698 [INFO] debate.orchestrator: Turn 11/20 — Pessimist
-2026-05-26 09:03:39,728 [INFO] debate.orchestrator: Turn 11/20 accepted from Pessimist.
-2026-05-26 09:03:39,728 [INFO] debate.orchestrator: Turn 12/20 — Optimist
-2026-05-26 09:03:55,093 [INFO] debate.orchestrator: Turn 12/20 accepted from Optimist.
-2026-05-26 09:03:55,094 [INFO] debate.orchestrator: Turn 13/20 — Pessimist
-2026-05-26 09:04:17,668 [INFO] debate.orchestrator: Turn 13/20 accepted from Pessimist.
-2026-05-26 09:04:17,669 [INFO] debate.orchestrator: Turn 14/20 — Optimist
-2026-05-26 09:04:34,522 [INFO] debate.orchestrator: Turn 14/20 accepted from Optimist.
-2026-05-26 09:04:34,522 [INFO] debate.orchestrator: Turn 15/20 — Pessimist
-2026-05-26 09:04:52,146 [INFO] debate.orchestrator: Turn 15/20 accepted from Pessimist.
-2026-05-26 09:04:52,147 [INFO] debate.orchestrator: Turn 16/20 — Optimist
-2026-05-26 09:05:09,163 [INFO] debate.orchestrator: Turn 16/20 accepted from Optimist.
-2026-05-26 09:05:09,163 [INFO] debate.orchestrator: Turn 17/20 — Pessimist
-2026-05-26 09:05:23,599 [INFO] debate.orchestrator: Turn 17/20 accepted from Pessimist.
-2026-05-26 09:05:23,600 [INFO] debate.orchestrator: Turn 18/20 — Optimist
-2026-05-26 09:05:41,205 [INFO] debate.orchestrator: Turn 18/20 accepted from Optimist.
-2026-05-26 09:05:41,205 [INFO] debate.orchestrator: Turn 19/20 — Pessimist
-2026-05-26 09:05:55,493 [INFO] debate.orchestrator: Turn 19/20 accepted from Pessimist.
-2026-05-26 09:05:55,493 [INFO] debate.orchestrator: Turn 20/20 — Optimist
-2026-05-26 09:06:15,576 [INFO] debate.orchestrator: Turn 20/20 accepted from Optimist.
-2026-05-26 09:06:36,625 [INFO] debate.orchestrator: Verdict written to outputs\ai-jobs-api\20260526_090048\result.json.
+2026-06-01 00:35:19,424 [INFO] debate.orchestrator: Debate starting: Will AI automation destroy more jobs than it creates, causing long-term unemployment, or will it generate new industries and opportunities that outweigh the losses?
+2026-06-01 00:35:30,719 [INFO] debate.orchestrator: Positions — A: Will AI automation destroy more jobs than it creates, causing long-term unemployment? | B: Will it generate new industries and opportunities that outweigh the losses?
+2026-06-01 00:35:30,722 [INFO] debate.orchestrator: Turn 1/20 — Pessimist
+2026-06-01 00:35:41,362 [INFO] debate.orchestrator: Turn 1/20 accepted from Pessimist.
+2026-06-01 00:35:41,363 [INFO] debate.orchestrator: Turn 2/20 — Optimist
+2026-06-01 00:35:54,641 [INFO] debate.orchestrator: Turn 2/20 accepted from Optimist.
+2026-06-01 00:35:54,642 [INFO] debate.orchestrator: Turn 3/20 — Pessimist
+2026-06-01 00:36:06,555 [INFO] debate.orchestrator: Turn 3/20 accepted from Pessimist.
+2026-06-01 00:36:06,555 [INFO] debate.orchestrator: Turn 4/20 — Optimist
+2026-06-01 00:36:27,287 [INFO] debate.orchestrator: Turn 4/20 accepted from Optimist.
+2026-06-01 00:36:27,288 [INFO] debate.orchestrator: Turn 5/20 — Pessimist
+2026-06-01 00:36:46,489 [INFO] debate.orchestrator: Turn 5/20 accepted from Pessimist.
+2026-06-01 00:36:46,490 [INFO] debate.orchestrator: Turn 6/20 — Optimist
+2026-06-01 00:36:58,295 [INFO] debate.orchestrator: Turn 6/20 accepted from Optimist.
+2026-06-01 00:36:58,296 [INFO] debate.orchestrator: Turn 7/20 — Pessimist
+2026-06-01 00:37:14,812 [INFO] debate.orchestrator: Turn 7/20 accepted from Pessimist.
+2026-06-01 00:37:14,813 [INFO] debate.orchestrator: Turn 8/20 — Optimist
+2026-06-01 00:37:34,034 [INFO] debate.orchestrator: Turn 8/20 accepted from Optimist.
+2026-06-01 00:37:34,034 [INFO] debate.orchestrator: Turn 9/20 — Pessimist
+2026-06-01 00:37:49,813 [INFO] debate.orchestrator: Turn 9/20 accepted from Pessimist.
+2026-06-01 00:37:49,813 [INFO] debate.orchestrator: Turn 10/20 — Optimist
+2026-06-01 00:38:07,009 [INFO] debate.orchestrator: Turn 10/20 accepted from Optimist.
+2026-06-01 00:38:07,009 [INFO] debate.orchestrator: Turn 11/20 — Pessimist
+2026-06-01 00:38:24,382 [INFO] debate.orchestrator: Turn 11/20 accepted from Pessimist.
+2026-06-01 00:38:24,383 [INFO] debate.orchestrator: Turn 12/20 — Optimist
+2026-06-01 00:38:37,231 [INFO] debate.orchestrator: Turn 12/20 accepted from Optimist.
+2026-06-01 00:38:37,231 [INFO] debate.orchestrator: Turn 13/20 — Pessimist
+2026-06-01 00:38:52,045 [INFO] debate.orchestrator: Turn 13/20 accepted from Pessimist.
+2026-06-01 00:38:52,046 [INFO] debate.orchestrator: Turn 14/20 — Optimist
+2026-06-01 00:39:07,950 [INFO] debate.orchestrator: Turn 14/20 accepted from Optimist.
+2026-06-01 00:39:07,951 [INFO] debate.orchestrator: Turn 15/20 — Pessimist
+2026-06-01 00:39:20,460 [WARNING] debate.agent.Pessimist: Attempt 1/3 failed for Pessimist: Invalid JSON: Expecting ',' delimiter: line 1 column 778 (char 777)
+2026-06-01 00:39:35,400 [INFO] debate.orchestrator: Turn 15/20 accepted from Pessimist.
+2026-06-01 00:39:35,400 [INFO] debate.orchestrator: Turn 16/20 — Optimist
+2026-06-01 00:39:53,836 [INFO] debate.orchestrator: Turn 16/20 accepted from Optimist.
+2026-06-01 00:39:53,836 [INFO] debate.orchestrator: Turn 17/20 — Pessimist
+2026-06-01 00:40:07,163 [INFO] debate.orchestrator: Turn 17/20 accepted from Pessimist.
+2026-06-01 00:40:07,163 [INFO] debate.orchestrator: Turn 18/20 — Optimist
+2026-06-01 00:40:21,754 [INFO] debate.orchestrator: Turn 18/20 accepted from Optimist.
+2026-06-01 00:40:21,755 [INFO] debate.orchestrator: Turn 19/20 — Pessimist
+2026-06-01 00:40:36,451 [INFO] debate.orchestrator: Turn 19/20 accepted from Pessimist.
+2026-06-01 00:40:36,451 [INFO] debate.orchestrator: Turn 20/20 — Optimist
+2026-06-01 00:40:56,380 [INFO] debate.orchestrator: Turn 20/20 accepted from Optimist.
+2026-06-01 00:41:18,357 [INFO] debate.orchestrator: Verdict written to outputs\ai-jobs-api\20260601_003519\result_20260601_004118.json.

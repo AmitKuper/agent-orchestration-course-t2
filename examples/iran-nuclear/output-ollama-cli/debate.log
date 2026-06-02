@@ -1,4 +1,4 @@
-2026-05-26 09:41:20,142 [INFO] debate.orchestrator: Debate starting: Will attacking Iran prevent them from achieving a nuclear weapon, or is diplomacy the way to go?
-2026-05-26 09:41:27,283 [INFO] debate.orchestrator: Positions — A: Attacking Iran will prevent them from achieving a nuclear weapon | B: Diplomacy is the way to go
-2026-05-26 09:42:09,668 [INFO] debate.orchestrator: Orchestrator produced 20 turns.
-2026-05-26 09:42:09,669 [INFO] debate.orchestrator: Verdict written to outputs\iran-nuclear-ollama-cli\20260526_094120\result.json.
+2026-06-01 00:54:13,790 [INFO] debate.orchestrator: Debate starting: Will attacking Iran prevent them from achieving a nuclear weapon, or is diplomacy the way to go?
+2026-06-01 00:54:18,465 [INFO] debate.orchestrator: Positions — A: Attacking Iran will prevent them from achieving a nuclear weapon | B: Diplomacy is the way to go to prevent Iran from achieving a nuclear weapon
+2026-06-01 00:54:55,712 [INFO] debate.orchestrator: Orchestrator produced 20 turns.
+2026-06-01 00:54:55,713 [INFO] debate.orchestrator: Verdict written to outputs\iran-nuclear-ollama-cli\20260601_005413\result_20260601_005455.json.

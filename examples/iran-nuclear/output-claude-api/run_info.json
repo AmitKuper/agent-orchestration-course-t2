@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-05-26 22:19:31",
+  "timestamp": "2026-06-01 02:02:59",
   "backend": "claude-api",
   "command": "main.py --config examples/iran-nuclear/config-claude-api.json",
   "argv": [

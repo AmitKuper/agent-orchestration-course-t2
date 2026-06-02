@@ -15,6 +15,7 @@
   },
   "max_retries": 2,
   "min_response_len": 200,
+  "require_references": false,
   "outdir": "outputs/ai-jobs-ollama-cli",
   "backend": "ollama-cli",
   "temperature": null,
