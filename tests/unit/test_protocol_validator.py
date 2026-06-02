@@ -148,3 +148,101 @@ def test_verdict_with_markdown_fence_fails():
     result = validate_judge_verdict(payload, "Agent A", "Agent B")
     assert not result.valid
     assert result.category == "format"
+
+
+# ── validate_debate_turn() — type checks ─────────────────────────────────────
+
+
+def test_empty_agent_string_fails():
+    """agent field that is an empty string is rejected."""
+    data = {"agent": "", "turn": 1, "argument": "x" * 80, "references": []}
+    result = validate_debate_turn(json.dumps(data))
+    assert not result.valid
+    assert "agent" in result.reason.lower()
+
+
+def test_non_int_turn_fails():
+    """turn field that is a string is rejected."""
+    data = {"agent": "A", "turn": "1", "argument": "x" * 80, "references": []}
+    result = validate_debate_turn(json.dumps(data))
+    assert not result.valid
+    assert "turn" in result.reason.lower()
+
+
+def test_empty_argument_string_fails():
+    """argument field that is an empty string is rejected."""
+    data = {"agent": "A", "turn": 1, "argument": "", "references": []}
+    result = validate_debate_turn(json.dumps(data))
+    assert not result.valid
+    assert "argument" in result.reason.lower()
+
+
+def test_non_list_references_fails():
+    """references field that is not a list is rejected."""
+    data = {"agent": "A", "turn": 1, "argument": "x" * 80, "references": "bad"}
+    result = validate_debate_turn(json.dumps(data))
+    assert not result.valid
+    assert "list" in result.reason.lower()
+
+
+def test_non_string_in_references_fails():
+    """references list containing non-strings is rejected."""
+    data = {"agent": "A", "turn": 1, "argument": "x" * 80, "references": [1, 2]}
+    result = validate_debate_turn(json.dumps(data))
+    assert not result.valid
+    assert "string" in result.reason.lower()
+
+
+# ── validate_judge_verdict() — type checks ───────────────────────────────────
+
+
+def test_verdict_invalid_json_fails():
+    """validate_judge_verdict rejects invalid JSON."""
+    result = validate_judge_verdict("{bad json}", "Agent A", "Agent B")
+    assert not result.valid
+    assert result.category == "format"
+
+
+def test_verdict_array_json_fails():
+    """validate_judge_verdict rejects a JSON array instead of an object."""
+    result = validate_judge_verdict("[1, 2, 3]", "Agent A", "Agent B")
+    assert not result.valid
+    assert "object" in result.reason.lower()
+
+
+def test_verdict_agent_missing_from_scores_fails():
+    """validate_judge_verdict rejects scores dict that omits one agent."""
+    verdict = _valid_verdict()
+    verdict["scores"] = {
+        "Agent A": {"logic": 8, "evidence": 9, "clarity": 7, "persuasiveness": 8},
+    }
+    result = validate_judge_verdict(json.dumps(verdict), "Agent A", "Agent B")
+    assert not result.valid
+    assert "Agent B" in result.reason
+
+
+def test_verdict_agent_scores_not_dict_fails():
+    """validate_judge_verdict rejects an agent scores entry that is not a dict."""
+    verdict = _valid_verdict()
+    verdict["scores"]["Agent A"] = "not_a_dict"
+    result = validate_judge_verdict(json.dumps(verdict), "Agent A", "Agent B")
+    assert not result.valid
+    assert "dict" in result.reason.lower()
+
+
+def test_verdict_missing_criterion_fails():
+    """validate_judge_verdict rejects scores missing a required criterion."""
+    verdict = _valid_verdict()
+    del verdict["scores"]["Agent A"]["logic"]
+    result = validate_judge_verdict(json.dumps(verdict), "Agent A", "Agent B")
+    assert not result.valid
+    assert "logic" in result.reason
+
+
+def test_verdict_factcheck_flags_not_list_fails():
+    """validate_judge_verdict rejects factcheck_flags that is not a list."""
+    verdict = _valid_verdict()
+    verdict["factcheck_flags"] = "not_a_list"
+    result = validate_judge_verdict(json.dumps(verdict), "Agent A", "Agent B")
+    assert not result.valid
+    assert "list" in result.reason.lower()

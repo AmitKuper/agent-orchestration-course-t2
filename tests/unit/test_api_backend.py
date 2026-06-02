@@ -72,6 +72,19 @@ def test_api_backend_passes_temperature(cost: CostTracker):
     assert call_kwargs.get("temperature") == 0.7
 
 
+def test_api_backend_creates_client_lazily():
+    """ApiBackend._ensure_client creates the Anthropic client on first call."""
+    from unittest.mock import patch
+    from src.backends._api import ApiBackend
+    backend = ApiBackend()
+    mock_ant = MagicMock()
+    mock_ant.Anthropic.return_value = MagicMock()
+    with patch("src.backends._api._get_anthropic", return_value=mock_ant):
+        backend._ensure_client()
+    assert backend._client is not None
+    mock_ant.Anthropic.assert_called_once()
+
+
 def test_api_backend_passes_system(cost: CostTracker):
     """ApiBackend.invoke includes system prompt in the API call when provided."""
     backend, client = _make_backend_with_mock_client()

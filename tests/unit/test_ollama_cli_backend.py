@@ -72,3 +72,108 @@ def test_ollama_cli_backend_raises_on_nonzero_exit(cost: CostTracker):
         pytest.raises(RuntimeError, match="ollama CLI failed"),
     ):
         OllamaCliBackend().invoke("Agent", "nomodel", "prompt", cost, 2048)
+
+
+# ── OllamaOrchestratorBackend ─────────────────────────────────────────────────
+
+
+def test_ollama_orchestrator_parse_jsonl_turns():
+    """_parse extracts turns and verdict from one-JSON-per-line output."""
+    backend = OllamaOrchestratorBackend()
+    raw = (
+        '{"agent":"A","turn":1,"argument":"hello","references":[]}\n'
+        '{"agent":"B","turn":2,"argument":"world","references":[]}\n'
+        '{"winner":"A","scores":{"A":{"logic":8},"B":{"logic":7}},'
+        '"explanation":"A wins","factcheck_flags":[]}'
+    )
+    turns, verdict = backend._parse(raw)
+    assert len(turns) == 2
+    assert turns[0]["agent"] == "A"
+    assert verdict is not None
+    assert verdict["winner"] == "A"
+
+
+def test_ollama_orchestrator_parse_no_verdict():
+    """_parse returns (turns, None) when no verdict object is present."""
+    backend = OllamaOrchestratorBackend()
+    raw = '{"agent":"A","turn":1,"argument":"hello","references":[]}'
+    turns, verdict = backend._parse(raw)
+    assert len(turns) == 1
+    assert verdict is None
+
+
+def test_ollama_orchestrator_parse_word_wrapped():
+    """_parse handles JSON objects word-wrapped across terminal lines."""
+    backend = OllamaOrchestratorBackend()
+    raw = '{"agent":"A","turn":1,\n"argument":"hello","references":[]}'
+    turns, verdict = backend._parse(raw)
+    assert len(turns) == 1
+    assert turns[0]["turn"] == 1
+
+
+def test_ollama_orchestrator_parse_nested_braces():
+    """_parse depth-tracks nested braces when reassembling word-wrapped objects."""
+    backend = OllamaOrchestratorBackend()
+    raw = '{"agent":"A","data":\n{"nested":true},"turn":1,"argument":"test","references":[]}'
+    turns, verdict = backend._parse(raw)
+    assert len(turns) == 1
+
+
+def test_ollama_orchestrator_build_prompt_contains_topic():
+    """_build_prompt includes the debate topic and agent names."""
+    backend = OllamaOrchestratorBackend()
+    config = MagicMock()
+    config.turns = 4
+    config.name_a = "AgentA"
+    config.name_b = "AgentB"
+    config.topic = "Is AI beneficial?"
+    config.min_response_len = 100
+    prompt = backend._build_prompt(config, "FOR", "AGAINST")
+    assert "Is AI beneficial?" in prompt
+    assert "AgentA" in prompt
+    assert "AgentB" in prompt
+    assert "FOR" in prompt
+
+
+def test_ollama_orchestrator_run_debate_returns_parsed_output():
+    """run_debate calls subprocess and returns parsed turns and verdict."""
+    backend = OllamaOrchestratorBackend()
+    config = MagicMock()
+    config.turns = 2
+    config.model_a = "Qwen3:14b"
+    config.name_a = "A"
+    config.name_b = "B"
+    config.topic = "test"
+    config.min_response_len = 50
+    raw_output = (
+        '{"agent":"A","turn":1,"argument":"arg1","references":[]}\n'
+        '{"agent":"B","turn":2,"argument":"arg2","references":[]}\n'
+        '{"winner":"A","scores":{},"explanation":"A wins","factcheck_flags":[]}'
+    )
+    mock_result = MagicMock()
+    mock_result.stdout = raw_output
+    with patch("src.backends._ollama_orchestrator.subprocess.run", return_value=mock_result):
+        turns, verdict = backend.run_debate(config, "FOR", "AGAINST")
+    assert len(turns) == 2
+    assert verdict["winner"] == "A"
+
+
+def test_ollama_orchestrator_run_debate_strips_thinking_preamble():
+    """run_debate discards text before '...done thinking.' in model output."""
+    backend = OllamaOrchestratorBackend()
+    config = MagicMock()
+    config.turns = 1
+    config.model_a = "Qwen3:14b"
+    config.name_a = "A"
+    config.name_b = "B"
+    config.topic = "test"
+    config.min_response_len = 50
+    raw_output = (
+        "Thinking deeply...\n...done thinking.\n"
+        '{"agent":"A","turn":1,"argument":"arg","references":[]}'
+    )
+    mock_result = MagicMock()
+    mock_result.stdout = raw_output
+    with patch("src.backends._ollama_orchestrator.subprocess.run", return_value=mock_result):
+        turns, verdict = backend.run_debate(config, "FOR", "AGAINST")
+    assert len(turns) == 1

@@ -147,6 +147,36 @@ def test_rpm_evicts_old_timestamps():
     mock_sleep.assert_not_called()  # old timestamp evicted, no sleep needed
 
 
+def test_configured_rpm_property():
+    """configured_rpm returns the RPM limit set on the gatekeeper."""
+    from collections import deque
+    gk = APIGatekeeper.__new__(APIGatekeeper)
+    gk._rpm = 5
+    gk._retry_delay = 0
+    gk._max_retries = 0
+    gk._backoff = 1.0
+    gk._backend_type = "test"
+    gk._window = deque()
+    gk._clock = lambda: 0.0
+    assert gk.configured_rpm == 5
+
+
+def test_enforce_rpm_returns_immediately_when_unlimited():
+    """_enforce_rpm is a no-op when rpm is 0 (unlimited)."""
+    from collections import deque
+    gk = APIGatekeeper.__new__(APIGatekeeper)
+    gk._rpm = 0
+    gk._retry_delay = 0
+    gk._max_retries = 0
+    gk._backoff = 1.0
+    gk._backend_type = "test"
+    gk._window = deque()
+    gk._clock = lambda: 0.0
+    with patch("src.shared.gatekeeper.time.sleep") as mock_sleep:
+        gk._enforce_rpm()
+    mock_sleep.assert_not_called()
+
+
 def test_recent_request_count():
     """recent_request_count reflects only timestamps within the 60-second window."""
     clock = _make_clock(start=100.0)

@@ -9,6 +9,7 @@ from unittest.mock import MagicMock, patch
 import pytest
 
 from orchestrator import DebateOrchestrator, InvalidTopicError
+from src.backends import OrchestratorBackend
 from src.backends._ollama_orchestrator import OllamaOrchestratorBackend
 from src.config import DebateConfig
 from src.cost import CostTracker
@@ -140,6 +141,46 @@ def test_validate_topic_fallback_for_orchestrator_backend(orch):
     ):
         orch.validate_topic("test topic")
     mk.assert_called_once_with(OllamaOrchestratorBackend.fallback_backend_type)
+
+
+def test_initialize_agents_updates_agent_files_for_cli_backend(orch, config):
+    """initialize_agents calls update_agent_file_model for CLI-based backends."""
+    config.backend = "ollama-cli-agents"
+    with (
+        patch("orchestrator.make_backend"),
+        patch("orchestrator.update_agent_file_model") as mock_update,
+    ):
+        orch.initialize_agents("FOR", "AGAINST")
+    assert mock_update.call_count == 2
+
+
+def test_run_debate_delegates_to_orchestrated_backend(orch):
+    """run_debate calls _run_orchestrated when the backend is an OrchestratorBackend."""
+    mock_backend = MagicMock(spec=OrchestratorBackend)
+    mock_backend.run_debate.return_value = (
+        [{"agent": "A", "turn": 1, "argument": "arg", "references": []}],
+        {"winner": "A", "scores": {}, "explanation": "ok", "factcheck_flags": []},
+    )
+    with (
+        patch("orchestrator.make_backend", return_value=mock_backend),
+        patch("orchestrator.validate_topic", return_value=("FOR", "AGAINST")),
+    ):
+        orch.run_debate()
+    mock_backend.run_debate.assert_called_once()
+
+
+def test_run_orchestrated_handles_missing_verdict(orch):
+    """_run_orchestrated logs an error and does not crash when verdict is None."""
+    orch._backend = MagicMock(spec=OrchestratorBackend)
+    orch._backend.run_debate.return_value = ([], None)
+    orch._run_orchestrated("FOR", "AGAINST")
+
+
+def test_close_backend_calls_close(orch):
+    """_close_backend calls close() on the backend when it is set."""
+    orch._backend = MagicMock()
+    orch._close_backend()
+    orch._backend.close.assert_called_once()
 
 
 def test_resume_raises_if_complete(orch, state):
